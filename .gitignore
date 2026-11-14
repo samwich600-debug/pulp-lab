@@ -1,0 +1,9 @@
+# working copies (originals and background-removal drafts), not used by the site
+img/raw/
+img/cut/
+.DS_Store
+# separate project (Design Justice e-reader)
+design-justice-reader.html
+# old JPG versions replaced by background-free PNGs
+img/p-*.jpg
+img/e-*.jpg

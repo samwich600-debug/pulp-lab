@@ -1,0 +1,1167 @@
+<title>Pulp Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Doto:wght@800;900&display=swap">
+<style>
+/* Layout: a quiet gallery. Near-empty pages, a grid of line drawings; everything else lives in a side drawer. */
+:root{
+  --paper:#EFF0E6; --sheet:#F7F8F1; --ink:#1C3415; --muted:#5E6B57; --line:#DADDCB;
+  --moss:#1F3B16; --moss-soft:#E1F0C4; --kraft:#8A6A2E; --kraft-soft:#EFE7D2;
+  --plastic:#E5EAEE; --plastic-ink:#41566A; --warn:#86561A; --good:#2E5F23;
+  --shadow:drop-shadow(0 22px 18px rgba(31,59,22,.10)) drop-shadow(0 4px 4px rgba(31,59,22,.06));
+  color-scheme:light;
+  --display:"Geist","Suisse Int'l","Helvetica Neue",system-ui,sans-serif;
+  --body:"Geist","Suisse Int'l","Helvetica Neue",system-ui,sans-serif;
+  --mono:"Geist","Suisse Int'l","Helvetica Neue",system-ui,sans-serif;
+}
+/* Single sage-cream look in every theme, by design (Seed-inspired). */
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:18px}
+.brand{font-family:"Doto","Courier New",monospace;font-weight:900;font-size:26px;letter-spacing:.02em;text-transform:uppercase;line-height:1;color:var(--ink);text-decoration:none;display:flex;gap:8px;align-items:center}
+.brand i{width:14px;height:14px;border-radius:50% 50% 50% 3px;background:var(--moss);display:inline-block}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav a{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:999px}
+nav a:hover{color:var(--ink)}
+nav a[aria-current="page"]{color:var(--ink);background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line)}
+:focus-visible{outline:2px solid var(--kraft);outline-offset:2px}
+main{padding-block:40px 80px}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.vh{display:grid;gap:6px;margin-bottom:44px;max-width:560px}
+.vh h1{font-size:clamp(28px,4.4vw,42px);font-weight:700;line-height:1.05}
+.vh p{margin:0;color:var(--muted)}
+.label{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:clamp(12px,2.4vw,28px)}
+.tile{all:unset;cursor:pointer;display:grid;gap:10px;justify-items:center;text-align:center}
+.tile .art{width:100%;aspect-ratio:1;max-width:100%;display:grid;place-items:center;border-radius:14px;transition:background .2s, transform .2s}
+.tile:hover .art,.tile:focus-visible .art{background:var(--sheet);transform:translateY(-3px)}
+.tile:focus-visible{outline:none}.tile:focus-visible .art{box-shadow:0 0 0 2px var(--kraft)}
+.tile svg{width:64%;height:64%;overflow:visible}
+.tile .nm{font-size:12.5px;color:var(--muted)}
+.tile .stat{font-family:var(--mono);font-size:11px;color:var(--plastic-ink)}
+.tile.swap .stat{color:var(--moss)}
+.ink{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pl{fill:var(--plastic)} .kr{fill:var(--kraft-soft)} .ms{fill:var(--moss-soft)}
+.bgf{fill:var(--paper)}
+.foot{margin-top:56px;font-size:12px;color:var(--muted);max-width:70ch}
+.foot a{color:var(--muted)}
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,15,12,.28);z-index:20}
+aside.drawer{position:fixed;z-index:21;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--sheet);border-left:1px solid var(--line);overflow-y:auto;padding:calc(20px + env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) calc(32px + env(safe-area-inset-bottom,0px)) 24px;display:grid;gap:22px;align-content:start}
+@media (prefers-reduced-motion:no-preference){aside.drawer{animation:slide .22s ease}}
+@keyframes slide{from{transform:translateX(24px)}to{transform:none}}
+aside.drawer.modal{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:min(940px,calc(100% - 32px));max-height:calc(100% - 48px);border:1px solid var(--line);border-radius:20px;padding:24px max(24px,2.4vw) 32px;box-shadow:0 30px 80px rgba(0,0,0,.18)}
+@media (prefers-reduced-motion:no-preference){aside.drawer.modal{animation:pop .22s ease}}
+@keyframes pop{from{transform:translate(-50%,-48%) scale(.98)}to{transform:translate(-50%,-50%)}}
+.modal .dclose{position:sticky;top:0;z-index:2;background:var(--sheet)}
+.mtop{display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);gap:28px;align-items:start}
+.mtop .dphoto{max-height:300px;filter:var(--shadow)}
+.mstats{display:grid;gap:18px;min-width:0}
+@media (max-width:640px){.mtop{grid-template-columns:minmax(0,1fr)}.mtop .dphoto{max-height:200px}}
+.alts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.alt{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:10px;align-content:start;min-width:0}
+.alt .dphoto{max-height:180px;filter:var(--shadow)}
+.alt h3{font-size:18px}
+.anums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.anums div{display:grid;gap:1px;min-width:0}
+.anums b{font-family:var(--mono);font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.cofmt{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:10px}
+.cofmt figure{margin:0;display:grid;gap:8px;justify-items:center;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 10px}
+.cofmt img{width:100%;max-width:180px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)}
+.cofmt figcaption{font-size:13px;font-weight:600}
+.co2col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:28px;align-items:start}
+@media (max-width:640px){.co2col{grid-template-columns:minmax(0,1fr)}}
+.buy{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
+.buy a{display:flex;justify-content:space-between;gap:10px;align-items:baseline;text-decoration:none;color:var(--ink);background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13.5px;font-weight:600}
+.buy a:hover{border-color:var(--moss)}
+.buy a span{font-weight:400;font-size:12px;color:var(--muted);text-align:right}
+.buy a::after{content:"↗";color:var(--moss);margin-left:4px}
+.dclose{all:unset;cursor:pointer;justify-self:end;font-size:13px;color:var(--muted);padding:4px 8px;border-radius:6px}
+.dclose:hover{color:var(--ink)}
+.dhead{display:grid;grid-template-columns:72px minmax(0,1fr);gap:16px;align-items:center}
+.dhead svg{width:72px;height:72px;overflow:visible}
+.dhead h2{font-size:26px;line-height:1.1}
+.big{display:grid;gap:2px}
+.big b{font-family:var(--display);font-size:46px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.big span{color:var(--muted);font-size:13px}
+.dots{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.dots i{width:16px;height:16px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--plastic-ink)}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px}
+.kv div{display:grid;gap:2px;min-width:0}
+.kv b{font-family:var(--mono);font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.kv .wide{grid-column:1/-1}
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--plastic);color:var(--plastic-ink);justify-self:start}
+.pill.g{background:var(--moss-soft);color:var(--moss)}
+.swapbox{background:var(--moss-soft);border-radius:12px;padding:14px 16px;display:grid;gap:4px}
+.btn{font:inherit;font-weight:600;border:0;border-radius:999px;padding:11px 20px;background:var(--ink);color:var(--paper);cursor:pointer;justify-self:start}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.src{font-size:12px;color:var(--muted)} .src a{color:var(--muted)}
+/* ideate */
+.composer{max-width:720px;display:grid;gap:12px}
+.box{background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:6px;display:grid}
+.box textarea{font:inherit;font-size:17px;border:0;background:transparent;color:var(--ink);padding:14px 14px 6px;min-height:92px;resize:vertical;outline:none}
+.box .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 8px}
+.box .bar .sp{flex:1}
+.attach{all:unset;cursor:pointer;font-size:13px;color:var(--muted);padding:6px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);display:flex;gap:8px;align-items:center}
+.attach img{width:28px;height:28px;object-fit:cover;border-radius:6px}
+.box.over{border-color:var(--moss);background:var(--moss-soft)}
+select,input[type=number]{font:inherit;font-size:13px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:6px 10px}
+input[type=number]{width:96px}
+.status{font-family:var(--mono);font-size:12px;color:var(--muted);min-height:1.3em}
+.ideas{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:36px}
+.idea{all:unset;cursor:pointer;background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;align-content:start}
+.idea:hover{border-color:var(--muted)}
+.idea:focus-visible{outline:2px solid var(--kraft)}
+.idea h3{font-size:19px}
+.idea .nums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.idea .nums div{display:grid}
+.idea .nums b{font-family:var(--mono);font-weight:500;font-size:16px;font-variant-numeric:tabular-nums}
+.up{color:var(--warn)} .down{color:var(--good)}
+.more{font-size:12.5px;color:var(--muted)}
+.read{max-width:720px;margin-top:20px;font-size:14px;color:var(--muted)}
+/* studio */
+.studio{width:min(1400px,calc(100vw - 32px));margin-left:50%;transform:translateX(-50%)}
+.board{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:0;border-radius:24px;background-color:var(--sheet);background-image:radial-gradient(var(--line) 1.2px,transparent 1.3px);background-size:22px 22px;border:1px solid var(--line);min-height:min(78vh,760px);overflow:hidden;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 20px 60px rgba(0,0,0,.06)}
+.surface{position:relative;min-width:0}
+#pad{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.board.over{outline:3px dashed var(--moss);outline-offset:-10px}
+.hint{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);text-align:center;display:grid;gap:6px;pointer-events:none;color:var(--muted);transition:opacity .25s}
+.hint b{font-family:var(--display);font-size:clamp(22px,3vw,34px);letter-spacing:-.02em;color:var(--ink);font-weight:700}
+.hint.gone{opacity:0}
+.tools{position:absolute;left:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;padding:8px;border-radius:16px;background:var(--sheet);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.tool{all:unset;cursor:pointer;width:36px;height:36px;display:grid;place-items:center;border-radius:10px;color:var(--ink)}
+.tool svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tool:hover{background:var(--paper)}
+.tool[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.tool:focus-visible,.swatch:focus-visible{outline:2px solid var(--kraft)}
+.swatch{all:unset;cursor:pointer;width:22px;height:22px;margin:3px 7px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--sheet),0 0 0 3px transparent}
+.swatch[aria-pressed="true"]{box-shadow:0 0 0 2px var(--sheet),0 0 0 4px var(--ink)}
+.tsep{height:1px;background:var(--line);margin:4px 6px}
+.rail{border-left:1px solid var(--line);background:color-mix(in srgb,var(--sheet) 82%,transparent);backdrop-filter:blur(6px);padding:18px 16px 96px;display:flex;flex-direction:column;gap:12px;min-width:0;overflow-y:auto;max-height:min(78vh,760px)}
+.rail-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rail .status{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+.read{margin:0;font-size:13px;color:var(--muted);background:var(--paper);border-radius:12px;padding:10px 12px}
+.stack{display:grid;gap:12px}
+.mcard{all:unset;cursor:pointer;display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:start;background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.mcard:hover{border-color:var(--muted)}
+.mcard:focus-visible{outline:2px solid var(--kraft)}
+.mcard img{width:76px;height:76px;border-radius:12px;object-fit:cover}
+.mcard h4{margin:2px 0 4px;font-family:var(--display);font-size:16px;letter-spacing:-.01em}
+.mcard .row{display:flex;flex-wrap:wrap;gap:4px 10px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.mcard .row b{color:var(--ink);font-weight:500}
+@media (prefers-reduced-motion:no-preference){.mcard{animation:drop .45s cubic-bezier(.2,.8,.2,1) both}}
+@keyframes drop{from{transform:translateY(-10px) scale(.97)}to{transform:none}}
+.ghost{height:96px;border-radius:16px;background:linear-gradient(90deg,var(--paper),var(--sheet),var(--paper));background-size:200% 100%;border:1px dashed var(--line)}
+@media (prefers-reduced-motion:no-preference){.ghost{animation:shimmer 1.2s linear infinite}}
+@keyframes shimmer{to{background-position:-200% 0}}
+.promptbar{position:absolute;left:calc((100% - 360px) / 2);bottom:20px;transform:translateX(-50%);width:min(760px,calc(100% - 400px));display:flex;gap:8px;align-items:center;padding:8px;border-radius:999px;background:var(--sheet);border:1px solid var(--line);box-shadow:0 16px 40px rgba(0,0,0,.12);z-index:3}
+.promptbar input[type=text]{flex:1;min-width:0;font:inherit;font-size:15px;border:0;background:transparent;color:var(--ink);padding:8px 12px;outline:none}
+.promptbar .qty{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+.promptbar input[type=number]{width:78px}
+.promptbar select{max-width:140px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:860px){
+  .board{grid-template-columns:minmax(0,1fr);min-height:0}
+  .surface{aspect-ratio:4/5}
+  .rail{border-left:0;border-top:1px solid var(--line);max-height:none;padding-bottom:18px}
+  .tools{left:10px;top:10px;transform:none;flex-direction:row;flex-wrap:wrap;max-width:calc(100% - 20px)}
+  .tsep{width:1px;height:auto;margin:6px 4px}
+  .promptbar{position:static;transform:none;width:auto;margin:12px;border-radius:18px;flex-wrap:wrap;grid-column:1}
+  .promptbar input[type=text]{flex-basis:100%}
+}
+.gallery.four{grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(16px,3vw,40px) clamp(12px,2.4vw,28px)}
+@media (max-width:700px){.gallery.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile .cnum{font-family:var(--display);font-size:clamp(20px,2.2vw,26px);font-weight:700;letter-spacing:-.01em;font-variant-numeric:normal;line-height:1.1;margin-top:2px}
+.tile.case{gap:4px}
+.tile .art.mat{overflow:hidden;border-radius:18px}
+.tile .art.mat img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.tile:hover .art.mat img{transform:scale(1.05)}
+.art.flip{position:relative}
+.art.flip img{position:absolute;inset:0;transition:opacity .4s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.art.flip .brand{opacity:0;transform:scale(.92) translateY(6px)}
+.tile:hover .art.flip .now,.tile:focus-visible .art.flip .now{opacity:0;transform:scale(1.04)}
+.tile:hover .art.flip .brand,.tile:focus-visible .art.flip .brand{opacity:1;transform:scale(1.03) translateY(-4px)}
+@media (prefers-reduced-motion:reduce){.art.flip img{transition:opacity .2s}}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) 72px minmax(0,1fr);align-items:center;gap:8px}
+.pair figure{margin:0;display:grid;gap:10px;justify-items:center;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px 12px}
+.pair figure.now{background:var(--moss-soft);border-color:color-mix(in srgb,var(--moss) 35%,var(--line))}
+.pair img{width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)}
+.pair figcaption{display:grid;gap:6px;justify-items:center;font-size:13.5px;font-weight:600}
+.pair .arrow{width:64px;height:24px;fill:none;stroke:var(--moss);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;justify-self:center}
+@media (max-width:560px){.pair{grid-template-columns:minmax(0,1fr)}.pair .arrow{transform:rotate(90deg);margin:4px 0}}
+.art.flip .multi.brand{position:absolute;top:0;bottom:0;left:-22%;width:144%;height:100%;gap:0;z-index:2;pointer-events:none}
+.hoverswap:hover,.hoverswap:focus-visible{position:relative;z-index:3}
+.art.flip .multi.brand img{position:static;opacity:1;transform:none;width:100%;height:100%;object-fit:contain}
+.hoverswap .nm .ec{display:none;color:var(--moss);font-weight:600}
+.hoverswap:hover .nm .pl,.hoverswap:focus-visible .nm .pl{display:none}
+.hoverswap:hover .nm .ec,.hoverswap:focus-visible .nm .ec{display:inline}
+.art.flip .multi.brand img.orig{opacity:.55;filter:grayscale(.6);transform:scale(.82)}
+.hoverswap .nm .ec .was{color:var(--muted);font-weight:500}
+/* material swatches */
+.seg{display:inline-flex;gap:2px;margin-bottom:32px;background:var(--sheet);border-radius:999px;padding:3px;box-shadow:inset 0 0 0 1px var(--line)}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--muted);padding:6px 14px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.sw{width:78%;aspect-ratio:1;border-radius:50%;max-width:100%}
+/* photos + eco toggle */
+.tile .art.ph{background:transparent;overflow:visible;position:relative}
+.tile:hover .art.ph,.tile:focus-visible .art.ph{background:transparent}
+.tile .art.ph img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .35s, transform .35s;filter:var(--shadow)}
+.tile:hover .art.ph img{transform:scale(1.06)}
+.art.ph .multi{display:grid;grid-template-columns:repeat(var(--n,1),minmax(0,1fr));gap:2px;width:100%;height:100%}
+.art.ph .multi img{height:100%}
+.eco-badge{position:absolute;left:8px;bottom:8px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--moss-soft);color:var(--moss);padding:3px 7px;border-radius:999px}
+.vhrow{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:44px}
+.vhrow .vh{margin-bottom:0}
+.switch{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:500;padding:6px 6px 6px 14px;border-radius:999px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line)}
+.switch .knob{width:42px;height:24px;border-radius:999px;background:var(--line);position:relative;transition:background .2s}
+.switch .knob::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--sheet);box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .2s}
+.switch[aria-checked="true"] .knob{background:var(--moss)}
+.switch[aria-checked="true"] .knob::after{transform:translateX(18px)}
+.switch:focus-visible{outline:2px solid var(--kraft)}
+.dphoto{width:100%;display:block;aspect-ratio:1;object-fit:contain;max-height:320px}
+.altgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.altgrid figure{margin:0;display:grid;gap:6px}
+.altgrid figcaption{font-size:13px;font-weight:600}
+/* companies */
+.corows{display:grid;gap:4px;max-width:880px}
+.corow{all:unset;cursor:pointer;display:grid;grid-template-columns:minmax(110px,180px) minmax(0,1fr) auto;gap:14px;align-items:center;padding:8px 10px;border-radius:10px}
+.corow:hover,.corow:focus-visible{background:var(--sheet)}
+.corow:focus-visible{box-shadow:0 0 0 2px var(--kraft)}
+.corow .nm{font-weight:600;font-size:14px}
+.corow .bar{height:14px;border-radius:3px;background:var(--plastic-ink);min-width:2px}
+.corow .bar.v{background:linear-gradient(90deg,var(--plastic-ink) var(--v),var(--plastic) var(--v))}
+.corow .val{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.cohead{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:14px;align-items:center}
+.cohead i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:6px}
+.nd{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.nd button{all:unset;cursor:pointer;font-size:13px;padding:6px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);background:var(--sheet)}
+.nd button:hover{box-shadow:inset 0 0 0 1px var(--muted)}
+.stat3{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:24px;margin-bottom:40px;max-width:880px}
+.stat3 b{display:block;font-family:var(--display);font-size:34px;font-weight:800;letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+.stat3 span{font-size:13px;color:var(--muted)}
+.pill.r{background:var(--kraft-soft);color:var(--warn)}
+.case-n{font-family:var(--display);font-weight:800;font-size:clamp(30px,4vw,42px);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+
+/* ---- Seed / Cosmos refinement layer ---- */
+h1,h2,h3,h4{font-weight:500;color:var(--ink)}
+.vh{margin:0 auto 64px;text-align:center;justify-items:center;max-width:720px}
+.vh h1{font-size:clamp(34px,5vw,58px);font-weight:500;letter-spacing:-.03em;line-height:1.02}
+.vh p{font-size:16px;color:var(--ink);opacity:.8}
+.vhrow{flex-direction:column;align-items:center;gap:22px;margin-bottom:64px}
+.vhrow .vh{margin-bottom:0}
+main{padding-block:56px 120px}
+header.top .wrap{padding-block:22px}
+.brand{color:var(--moss)}
+.brand i{background:var(--moss)}
+nav a{color:var(--ink);opacity:.7;font-weight:500}
+nav a:hover{opacity:1;color:var(--ink)}
+nav a[aria-current="page"]{opacity:1;background:transparent;box-shadow:inset 0 0 0 1px var(--ink)}
+.btn{background:var(--moss);color:#F7F8F1;font-weight:500;padding:13px 26px}
+.btn:hover{background:#2A4D1F}
+.btn.ghost{color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:transparent}
+.pill{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);text-transform:none;letter-spacing:0;font-size:12px;font-weight:500;padding:3px 10px}
+.pill.g{background:var(--moss-soft);color:var(--moss);box-shadow:none}
+.pill.r{background:var(--kraft-soft);color:var(--warn);box-shadow:none}
+.label{letter-spacing:.06em;font-weight:500;color:var(--muted)}
+.gallery{gap:clamp(20px,3.4vw,48px) clamp(14px,2.6vw,32px)}
+.tile .art,.tile:hover .art,.tile:focus-visible .art{background:transparent}
+.tile .art.ph img,.art.flip img{filter:var(--shadow)}
+.tile .nm{font-size:15px;color:var(--ink);font-weight:500}
+.tile .cnum{font-weight:500;font-size:clamp(22px,2.4vw,30px);letter-spacing:-.02em;color:var(--ink)}
+.tile .art.mat{border-radius:22px}
+.seg{background:transparent;box-shadow:none;gap:6px}
+.seg button{box-shadow:inset 0 0 0 1px var(--line);color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--moss);color:#F7F8F1;box-shadow:none}
+.switch{background:transparent;box-shadow:inset 0 0 0 1px var(--ink);color:var(--ink)}
+.switch[aria-checked="true"] .knob{background:var(--moss)}
+.scrim{background:rgba(28,52,21,.18);backdrop-filter:blur(3px)}
+aside.drawer.modal{background:var(--paper);border:0;box-shadow:0 40px 100px rgba(31,59,22,.18);border-radius:28px}
+.cofmt figure,.pair figure,.alt{background:var(--sheet);border:0;border-radius:22px}
+.pair figure.now{background:var(--moss-soft)}
+.pair .arrow{stroke:var(--moss)}
+.big b{font-weight:500}
+.dots i.on{background:var(--moss)}
+.corow .bar{background:var(--moss)}
+.corow .bar.v{background:linear-gradient(90deg,var(--moss) var(--v),var(--moss-soft) var(--v))}
+.cohead i[style*="plastic-ink"]{background:var(--moss)!important}.cohead i[style*="--plastic)"]{background:var(--moss-soft)!important}
+.board{background-color:var(--sheet);border:0;box-shadow:0 30px 80px rgba(31,59,22,.08)}
+.mcard{border:0;background:var(--paper);box-shadow:none}
+.foot{text-align:center;margin-left:auto;margin-right:auto}
+
+/* Seed-style type treatment */
+body{font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;color:var(--ink)}
+h1,h2,h3,h4{font-weight:400;letter-spacing:-.025em}
+.vh h1{font-weight:400;font-size:clamp(38px,5.6vw,64px);letter-spacing:-.035em;line-height:1.02}
+.vh p{font-weight:500;font-size:17px;opacity:1;letter-spacing:-.005em}
+.drawer h2,#dTitle{font-weight:400;letter-spacing:-.03em}
+.tile .nm{font-size:17px;font-weight:400;letter-spacing:-.015em}
+.tile.case .nm:first-of-type{font-size:20px!important;font-weight:400!important}
+.tile .cnum{font-weight:400;font-size:clamp(24px,2.6vw,32px);letter-spacing:-.03em}
+.big b{font-weight:400;letter-spacing:-.035em}
+.label{font-size:11px;font-weight:500;letter-spacing:.07em}
+.btn{font-size:16px;font-weight:400;padding:14px 30px}
+nav a{font-size:12px;font-weight:500;letter-spacing:.06em}
+.kv b,.anums b,.mcard .row b{font-weight:500}
+.hint b{font-weight:400;letter-spacing:-.03em}
+[hidden]{display:none!important}
+.seg{display:flex;flex-wrap:wrap;justify-content:center;width:fit-content;max-width:100%;margin:0 auto 48px}
+.stat3{margin-left:auto;margin-right:auto;text-align:center}
+.cohead{justify-content:center}
+.corows{margin:0 auto}
+main{overflow-x:clip}
+
+/* Plastic hover = the "peek" from the 002 portfolio (NPR): swaps tucked behind the item fan out, staggered; the rest dims */
+:root{--ease:cubic-bezier(.22,1,.36,1)}
+.art.fan{position:relative;overflow:visible}
+.art.fan .orig{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;transition:transform .9s var(--ease)}
+.art.fan .peek{position:absolute;inset:0;z-index:1;pointer-events:none}
+.art.fan .pk{position:absolute;left:50%;top:50%;width:64%;translate:-50% -50%;opacity:0;transform:scale(.86);transition:transform .9s var(--ease),opacity .5s var(--ease);transition-delay:0s}
+.art.fan .pk img{width:100%;aspect-ratio:1;object-fit:contain;display:block;filter:var(--shadow)}
+.art.fan .pk i{position:absolute;left:50%;bottom:calc(100% - 4px);translate:-50% 0;font-style:normal;font-size:11px;letter-spacing:.02em;color:var(--muted);white-space:nowrap}
+.hoverswap:hover .art.fan .pk,.hoverswap:focus-visible .art.fan .pk{opacity:1;transition-delay:calc(var(--k) * 70ms);transform:translate(var(--px),var(--py)) rotate(var(--pr)) scale(1)}
+.hoverswap:hover .art.fan .orig,.hoverswap:focus-visible .art.fan .orig{transform:translateY(10px) scale(1.04)}
+.tile.hoverswap{transition:opacity .45s var(--ease)}
+.hoverswap:hover{z-index:3}
+@media (prefers-reduced-motion:reduce){.art.fan .pk,.art.fan .orig,.tile.hoverswap{transition:none}}
+
+/* Frosted-glass popups (Seed reference): heavy blur behind, translucent sage panel, white type */
+.scrim{background:rgba(70,92,60,.22);backdrop-filter:blur(28px) saturate(1.25);-webkit-backdrop-filter:blur(28px) saturate(1.25)}
+aside.drawer.modal{
+  --ink:#FFFFFF; --muted:rgba(255,255,255,.74); --line:rgba(255,255,255,.26);
+  --paper:rgba(255,255,255,.07); --sheet:rgba(255,255,255,.10); --moss-soft:rgba(255,255,255,.16);
+  --kraft-soft:rgba(255,236,200,.18); --plastic:rgba(255,255,255,.14); --plastic-ink:#FFFFFF;
+  color:#fff;background:rgba(98,118,88,.58);backdrop-filter:blur(44px) saturate(1.35);-webkit-backdrop-filter:blur(44px) saturate(1.35);
+  border:1px solid rgba(255,255,255,.22);border-radius:32px;box-shadow:0 30px 90px rgba(31,59,22,.22);padding:34px max(32px,3vw) 40px}
+aside.drawer.modal h2,aside.drawer.modal h3,aside.drawer.modal b{color:#fff}
+aside.drawer.modal .label{color:rgba(255,255,255,.82);letter-spacing:.08em}
+aside.drawer.modal .label::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:8px;vertical-align:1px}
+aside.drawer.modal .src,aside.drawer.modal .src a,aside.drawer.modal a{color:rgba(255,255,255,.78)}
+aside.drawer.modal .dclose{background:transparent;color:#fff;opacity:.85}
+aside.drawer.modal .cofmt figure,aside.drawer.modal .pair figure,aside.drawer.modal .alt,aside.drawer.modal .swapbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.3);border-radius:22px}
+aside.drawer.modal .pair figure.now{background:rgba(255,255,255,.16)}
+aside.drawer.modal .pair .arrow{stroke:#fff}
+aside.drawer.modal .pill{color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.85);background:transparent}
+aside.drawer.modal .pill.g{background:#fff;color:#1F3B16;box-shadow:none}
+aside.drawer.modal .pill.r{background:rgba(255,226,180,.9);color:#5A3A0E;box-shadow:none}
+aside.drawer.modal .btn{background:#F7F8F1;color:#1F3B16}
+aside.drawer.modal .btn:hover{background:#fff}
+aside.drawer.modal .up{color:#FFE2AE} aside.drawer.modal .down{color:#DDF7BE}
+aside.drawer.modal .dots i{background:rgba(255,255,255,.25)} aside.drawer.modal .dots i.on{background:#fff}
+aside.drawer.modal .buy a{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3);color:#fff}
+aside.drawer.modal .buy a span{color:rgba(255,255,255,.75)} aside.drawer.modal .buy a::after{color:#fff}
+aside.drawer.modal img{filter:drop-shadow(0 20px 22px rgba(20,40,15,.22))}
+aside.drawer.modal #dTitle{font-size:clamp(30px,3.6vw,46px)!important;line-height:1.05;letter-spacing:-.035em}
+
+/* temporary logo switcher + dot logo */
+.brand svg .on{fill:var(--moss)} .brand svg .off{fill:color-mix(in srgb,var(--moss) 14%,transparent)}
+.brand{gap:0}
+.logo-switch{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;font:inherit;font-size:13px;color:#F7F8F1;background:var(--moss);border:0;border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 10px 30px rgba(31,59,22,.25)}
+.logo-switch b{font-weight:500}
+.logo-switch:focus-visible{outline:2px solid var(--kraft);outline-offset:2px}
+
+/* ---- home: full-screen reel ---- */
+.home{position:relative;width:100vw;margin-left:calc(50% - 50vw);height:100vh;height:100dvh;background:#0E1A0B;color:#fff;overflow:hidden}
+.reel,.reel-shade{position:absolute;inset:0}
+.reel video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s var(--ease,ease)}
+.reel video.on{opacity:1}
+.reel-shade{background:radial-gradient(120% 90% at 0% 100%,rgba(10,20,8,.72) 0%,rgba(10,20,8,.35) 45%,rgba(10,20,8,0) 75%),linear-gradient(180deg,rgba(10,20,8,.55) 0%,rgba(10,20,8,.12) 30%,rgba(10,20,8,.2) 60%,rgba(10,20,8,.7) 100%)}
+.home-copy{position:absolute;left:max(24px,env(safe-area-inset-left,0px),4vw);bottom:calc(9vh + env(safe-area-inset-bottom,0px));max-width:min(760px,88vw);display:grid;gap:16px;justify-items:start}
+.home-copy .label{color:rgba(255,255,255,.85)}
+.home-copy .label::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:8px;vertical-align:1px}
+.home-copy h1{margin:0;color:#fff;font-weight:400;font-size:clamp(40px,6.4vw,92px);line-height:.98;letter-spacing:-.04em;text-wrap:balance}
+.home-copy p{margin:0;font-size:clamp(16px,1.4vw,20px);color:rgba(255,255,255,.88)}
+.home-copy .btn{background:#F7F8F1;color:#1F3B16;margin-top:8px}
+.reel-cap{position:absolute;right:max(24px,env(safe-area-inset-right,0px),4vw);bottom:calc(9vh + env(safe-area-inset-bottom,0px));font-size:12px;color:rgba(255,255,255,.75);text-align:right;max-width:260px}
+.reel-pause{position:absolute;right:max(24px,env(safe-area-inset-right,0px),4vw);bottom:calc(9vh - 44px + env(safe-area-inset-bottom,0px));font:inherit;font-size:12px;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 14px;cursor:pointer;backdrop-filter:blur(8px)}
+body.is-home header.top{position:fixed;left:0;right:0;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(10px);transition:background .35s}
+body.is-home.over-hero header.top{background:transparent;backdrop-filter:none}
+body.is-home.over-hero::before{background:transparent}
+body.is-home.over-hero .brand svg .on{fill:#fff} body.is-home.over-hero .brand svg .off{fill:rgba(255,255,255,.18)}
+body.is-home.over-hero nav a{color:#fff;opacity:.85}
+body.is-home.over-hero nav a[aria-current="page"]{box-shadow:inset 0 0 0 1px #fff}
+body.is-home main{padding-top:0}
+body.is-home #v-still-plastic{padding-top:96px}
+.scroll-cue{position:absolute;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));translate:-50% 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.8);display:grid;justify-items:center;gap:6px;pointer-events:none}
+.scroll-cue i{width:1px;height:28px;background:rgba(255,255,255,.7);display:block}
+@media (prefers-reduced-motion:no-preference){.scroll-cue i{animation:cue 1.8s var(--ease) infinite}}
+@keyframes cue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+body.is-home header.top{z-index:5}
+@media (max-width:640px){.reel-cap{display:none}}
+
+/* audit fixes: specs, flags, calculator, brief tools */
+.spec{display:grid;gap:8px;margin-top:10px}
+.spec>div{display:grid;grid-template-columns:140px minmax(0,1fr) 64px;gap:12px;align-items:center;font-size:14px}
+.sbar{display:block;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.sbar i{display:block;height:100%;background:currentColor;border-radius:99px}
+.spec b{font-weight:500;font-size:13px}
+.flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.calc{margin-top:96px}
+.calc-grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:32px;align-items:start;max-width:980px;margin:0 auto}
+@media (max-width:760px){.calc-grid{grid-template-columns:minmax(0,1fr)}}
+.calc-in{display:grid;gap:14px}
+.calc-in label{display:grid;gap:6px;font-size:13px;font-weight:500;color:var(--muted)}
+.calc-in label.chk{display:flex;gap:8px;align-items:center;color:var(--ink)}
+.calc-in input[type=number],.calc-in select{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.calc-out{display:grid;gap:14px}
+.ctab{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.ctab>div{background:var(--sheet);border-radius:18px;padding:18px;display:grid;gap:4px}
+.ctab b{font-size:clamp(24px,2.6vw,32px);font-weight:400;letter-spacing:-.03em}
+#cSrc{max-width:980px;margin:18px auto 0}
+.railtools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chipbtn{font:inherit;font-size:12px;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer}
+.chipbtn:hover{border-color:var(--ink)}
+.railtools select{font:inherit;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:5px 8px;background:transparent;color:var(--ink);max-width:150px}
+
+.buy a{align-items:center}
+.buy .bn,.buy .bp{display:grid;gap:1px;font-weight:600}
+.buy .bp{text-align:right;font-variant-numeric:tabular-nums}
+.buy em{font-style:normal;font-weight:400;font-size:11.5px;color:var(--muted)}
+aside.drawer.modal .buy em{color:rgba(255,255,255,.72)}
+.buy a span{color:inherit}
+
+</style>
+
+<header class="top"><div class="wrap">
+  <a class="brand" href="#still-plastic" aria-label="Pulp Lab home">PULP LAB</a>
+  <nav aria-label="Pages">
+    <a href="#still-plastic" data-v="still-plastic">Plastic</a>
+    <a href="#already-swapped" data-v="already-swapped">Swaps</a>
+    <a href="#ideate" data-v="ideate">Ideate</a>
+    <a href="#materials" data-v="materials">Material Lab</a>
+    <a href="#case-studies" data-v="case-studies">Real World</a>
+    <a href="#companies" data-v="companies">Rankings</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <section id="v-home" data-view hidden class="home" aria-label="Pulp Lab">
+    <div class="reel" id="reel" aria-hidden="true"></div>
+    <div class="reel-shade" aria-hidden="true"></div>
+    <div class="home-copy">
+      <span class="label">About 11 tonnes of plastic waste every second</span>
+      <h1>Made, poured and thrown away. Every second.</h1>
+      <p>Most packaging is still plastic. It doesn't have to be.</p>
+      <a class="btn" href="#still-plastic" id="heroGo">See what's still plastic</a>
+    </div>
+    <div class="reel-cap" id="reelCap"></div>
+    <button type="button" class="reel-pause" id="reelPause" aria-label="Pause video">Pause</button>
+    <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
+  </section>
+  <section id="v-still-plastic" data-view>
+    <div class="vhrow">
+      <div class="vh"><h1 id="stillTitle">Easy to make plastic-free. Still plastic.</h1><p id="stillSub">Tap an item to see what it leaves behind.</p></div>
+      <button type="button" class="switch" id="ecoSwitch" role="switch" aria-checked="false">Show eco versions <span class="knob" aria-hidden="true"></span></button>
+    </div>
+    <div class="gallery four" id="g-still"></div>
+    <p class="foot">Worldwide, only 9% of plastic waste is recycled and 22% is mismanaged: dumped, burned in the open or leaked into nature. About 1.7 million tonnes reached the ocean in 2019 (<a href="https://www.oecd.org/en/publications/global-plastics-outlook_de747aef-en.html" target="_blank" rel="noopener">OECD Global Plastics Outlook</a>). Item recycling rates are US figures from the <a href="https://www.epa.gov/facts-and-figures-about-materials-waste-and-recycling/plastics-material-specific-data" target="_blank" rel="noopener">EPA</a> and <a href="https://www.greenpeace.org/usa/reports/circular-claims-fall-flat-again/" target="_blank" rel="noopener">Greenpeace USA (2022)</a>.</p>
+  </section>
+
+  <section id="v-already-swapped" data-view hidden>
+    <div class="vh"><h1>Already on shelves, plastic-free.</h1><p>Everyday products that made the switch. Tap one to see how.</p></div>
+    <div class="gallery" id="g-swap"></div>
+  </section>
+
+  <section id="v-ideate" data-view hidden>
+    <div class="studio">
+      <div class="board" id="board">
+        <div class="surface" id="surface">
+          <canvas id="pad" width="1200" height="900" aria-label="Drawing board. Draw your idea or drop an image."></canvas>
+          <div class="hint" id="boardHint"><b>Draw what you want to make.</b><span>Or drop a sketch or photo anywhere on the board.</span></div>
+          <div class="tools" role="toolbar" aria-label="Drawing tools">
+            <button type="button" class="tool" data-tool="pen" aria-pressed="true" title="Pen"><svg viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg></button>
+            <button type="button" class="tool" data-tool="erase" aria-pressed="false" title="Eraser"><svg viewBox="0 0 24 24"><path d="M8 20h12M5 15l8-8 6 6-6 6H9z"/></svg></button>
+            <span class="tsep"></span>
+            <button type="button" class="swatch" data-color="#1C1F1D" aria-pressed="true" title="Ink" style="--c:#1C1F1D"></button>
+            <button type="button" class="swatch" data-color="#2F6B3A" aria-pressed="false" title="Moss" style="--c:#2F6B3A"></button>
+            <button type="button" class="swatch" data-color="#B8772E" aria-pressed="false" title="Kraft" style="--c:#B8772E"></button>
+            <button type="button" class="swatch" data-color="#24607F" aria-pressed="false" title="Blue" style="--c:#24607F"></button>
+            <span class="tsep"></span>
+            <button type="button" class="tool" id="upBtn" title="Add an image"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg></button>
+            <button type="button" class="tool" id="undoBtn" title="Undo"><svg viewBox="0 0 24 24"><path d="M9 7L4 12l5 5M4 12h11a5 5 0 010 10h-3"/></svg></button>
+            <button type="button" class="tool" id="clearBtn" title="Clear board"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg></button>
+            <input type="file" id="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+          </div>
+        </div>
+        <aside class="rail" id="rail" aria-live="polite">
+          <div class="rail-head"><span class="label">Materials</span><span class="status" id="ideaStatus" role="status"></span></div>
+          <div class="railtools"><button type="button" class="chipbtn" id="copyBrief">Copy brief</button><button type="button" class="chipbtn" id="dlBrief" hidden>Download</button><button type="button" class="chipbtn" id="saveBrief">Save</button><select id="savedBriefs" aria-label="Saved briefs"><option value="">Saved briefs</option></select></div>
+          <p class="read" id="sketchRead" hidden></p>
+          <div class="stack" id="ideas"></div>
+        </aside>
+        <form class="promptbar" id="ideaForm">
+          <label for="brief" class="sr">What are you making?</label>
+          <input id="brief" type="text" placeholder="What are you making? e.g. a soy candle in a jar, shipped online" autocomplete="off">
+          <label class="qty"><input type="number" id="qty" min="1" value="5000" aria-label="Units per year"><span>/yr</span></label>
+          <select id="region" aria-label="Where you're based"><option>United States</option><option>Canada</option><option>United Kingdom</option><option>European Union</option><option>Australia</option><option>Asia</option><option>Latin America</option></select>
+          <button class="btn ghost" type="button" id="ideaStop" hidden>Stop</button>
+          <button class="btn" type="submit" id="ideaBtn">Generate materials</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-materials" data-view hidden>
+    <div class="vh"><h1>Materials</h1><p>Tap a swatch for cost, source and lead time.</p></div>
+    <div class="seg" role="group" aria-label="Material status">
+      <button type="button" aria-pressed="true" data-kind="common">Available now</button>
+      <button type="button" aria-pressed="false" data-kind="dev">In development</button>
+    </div>
+    <div class="gallery" id="g-mats"></div>
+    <section class="calc" aria-labelledby="calcT">
+      <div class="vh" style="margin-bottom:28px"><span class="label">Tax and fee check</span><h2 id="calcT" style="font-size:clamp(28px,3.4vw,42px)">What plastic packaging costs in fees</h2><p>Plastic tax and packaging fees (EPR) for your pack, compared with a swap.</p></div>
+      <div class="calc-grid">
+        <div class="calc-in">
+          <label for="cRegion">Where you sell<select id="cRegion"><option value="UK">United Kingdom</option><option value="OR">Oregon (US)</option><option value="US">Other US states</option><option value="EU">European Union</option></select></label>
+          <label for="cUnits">Units a year<input type="number" id="cUnits" min="0" value="100000"></label>
+          <label for="cPg">Plastic pack weight (g)<input type="number" id="cPg" min="0" value="30"></label>
+          <label class="chk" for="cRec"><input type="checkbox" id="cRec"> Plastic has 30%+ recycled content</label>
+          <label for="cMat">Switch to<select id="cMat"></select></label>
+          <label for="cNg">New pack weight (g)<input type="number" id="cNg" min="0" value="40"></label>
+        </div>
+        <div class="calc-out" id="cOut" aria-live="polite"></div>
+      </div>
+      <p class="src" id="cSrc"></p>
+    </section>
+    <p class="foot">Costs are indicative 2025–26 ranges at 1,000–50,000 units, before freight. Get supplier quotes before committing.</p>
+  </section>
+
+  <section id="v-case-studies" data-view hidden>
+    <div class="vh"><h1>50 brands that cut plastic</h1><p>Plastic saved, as each company reported it. Tap one for the story.</p></div>
+    <div class="stat3" id="caseStats" hidden></div>
+    <div class="seg" role="group" aria-label="Category" id="caseSeg"></div>
+    <div class="gallery four" id="g-cases"></div>
+    <p class="foot">Company-reported estimates, not independent audits. Most brands don't publish what a switch cost them.</p>
+  </section>
+
+  <section id="v-companies" data-view hidden>
+    <div class="vh"><h1>Who puts the most plastic out there</h1><p>Plastic packaging each company sells into the world in a year. Tap one for details.</p></div>
+    <div class="stat3" id="coStats"></div>
+    <div class="cohead"><span><i style="background:var(--plastic-ink)"></i>Virgin plastic</span><span><i style="background:var(--plastic)"></i>Recycled content</span><span>Tonnes a year, latest reported</span></div>
+    <div class="corows" id="coRows"></div>
+    <div style="margin-top:36px"><span class="label">No total published</span><div class="nd" id="coND"></div></div>
+    <p class="foot">Company figures as disclosed to the <a href="https://content.ellenmacarthurfoundation.org/m/21c4a4ffd7e2e9b4/original/Global-Commitment-2025-Report-M-10-25.pdf" target="_blank" rel="noopener">Ellen MacArthur Foundation (2025 report, 2024 data)</a> or in company reports. Brand audit ranks from <a href="https://www.breakfreefromplastic.org/2024/02/07/bffp-movement-unveils-2023-global-brand-audit-results/" target="_blank" rel="noopener">Break Free From Plastic</a>, counting branded litter collected by volunteers. Plastic packaging waste worldwide was about 142 million tonnes in 2019, roughly 40% of all plastic waste (<a href="https://ourworldindata.org/data-insights/packaging-is-the-source-of-40-of-the-planets-plastic-waste" target="_blank" rel="noopener">OECD via Our World in Data</a>).</p>
+  </section>
+</main>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden role="dialog" aria-modal="true" aria-labelledby="dTitle"></aside>
+
+<script src="data-cases.js" charset="utf-8"></script>
+<script src="data-companies.js" charset="utf-8"></script>
+<script src="data-buy.js" charset="utf-8"></script>
+<script src="data-specs.js" charset="utf-8"></script>
+<script src="data-prices.js" charset="utf-8"></script>
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=(n,d=0)=>Number(n).toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});
+const money=n=>"$"+(Math.abs(n)<100?Number(n).toFixed(2):fmt(n));
+
+/* ---------- drawings (viewBox 0 0 120 120) ---------- */
+const P={
+ bottle:`<rect class="pl ink" x="50" y="10" width="20" height="8" rx="2"/><path class="pl ink" d="M52 18h16v10l7 9v65a6 6 0 0 1-6 6H51a6 6 0 0 1-6-6V37l7-9z"/><path class="ink" d="M45 56h30M45 78h30"/>`,
+ shampoo:`<rect class="pl ink" x="48" y="14" width="24" height="12" rx="4"/><rect class="pl ink" x="54" y="26" width="12" height="10"/><rect class="pl ink" x="38" y="36" width="44" height="72" rx="12"/><path class="ink" d="M50 62h20M50 70h14"/>`,
+ toothbrush:`<rect class="pl ink" x="55" y="44" width="10" height="64" rx="5"/><rect class="pl ink" x="54" y="12" width="12" height="34" rx="5"/><path class="ink" d="M66 16h8M66 22h8M66 28h8M66 34h8M66 40h8"/>`,
+ film:`<path class="pl ink" d="M28 74l4 30h56l4-30"/><rect class="pl ink" x="20" y="44" width="80" height="30" rx="15"/><ellipse class="bgf ink" cx="35" cy="59" rx="6" ry="9"/><path class="ink" d="M44 86h32"/>`,
+ pod:`<rect class="pl ink" x="32" y="36" width="56" height="8" rx="2"/><path class="pl ink" d="M38 44h44l-7 46H45z"/><path class="ink" d="M48 60h24"/>`,
+ cutlery:`<ellipse class="pl ink" cx="44" cy="32" rx="10" ry="15"/><path class="ink" d="M44 47v59"/><path class="pl ink" d="M66 16v22q8 10 16 0V16"/><path class="ink" d="M74 16v22M74 44v62"/>`,
+ chips:`<path class="pl ink" d="M30 22l7-6 7 6 7-6 7 6 7-6 7 6 7-6 7 6 4-4v92l-4 4-7-6-7 6-7-6-7 6-7-6-7 6-7-6-7 6-4-4V18z"/><circle class="bgf ink" cx="60" cy="60" r="14"/>`,
+ mailer:`<rect class="pl ink" x="18" y="32" width="84" height="60" rx="4"/><path class="ink" d="M18 46h84" stroke-dasharray="4 5"/><path class="ink" d="M58 64h32M58 72h24"/>`,
+ clamshell:`<path class="pl ink" d="M20 58l7-18h66l7 18z"/><circle class="ink" cx="46" cy="54" r="7"/><circle class="ink" cx="62" cy="52" r="7"/><circle class="ink" cx="76" cy="55" r="6"/><path class="pl ink" d="M22 58h76l-8 38H30z"/>`,
+ jug:`<path class="pl ink" d="M62 40V22h22v18"/><rect class="pl ink" x="38" y="24" width="16" height="16" rx="2"/><path class="pl ink" d="M34 40h52v62a4 4 0 0 1-4 4H38a4 4 0 0 1-4-4z"/><path class="ink" d="M46 66h28M46 74h20"/>`,
+ yogurt:`<rect class="pl ink" x="32" y="28" width="56" height="8" rx="2"/><path class="pl ink" d="M37 36h46l-6 66H43z"/><path class="ink" d="M40 58h40M42 80h36"/>`,
+ straw:`<path d="M58 106V46l14-14V12" fill="none" stroke="var(--plastic-ink)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M58 106V46l14-14V12" fill="none" stroke="var(--plastic)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`,
+ lid:`<path class="kr ink" d="M38 46h44l-6 60H44z"/><path class="pl ink" d="M32 46h56v-6a4 4 0 0 0-4-4H36a4 4 0 0 0-4 4z"/><rect class="pl ink" x="44" y="26" width="32" height="10" rx="4"/><path class="ink" d="M40 66h40M41 82h38"/>`,
+ bag:`<path class="pl ink" d="M34 48l-5 58h62l-5-58z"/><path class="pl ink" d="M34 48V22h14v12q12 10 24 0V22h14v26"/>`,
+ razor:`<rect class="pl ink" x="36" y="18" width="48" height="16" rx="4"/><path class="ink" d="M40 26h40"/><rect class="pl ink" x="55" y="34" width="10" height="74" rx="5"/>`,
+ swab:`<path class="ink" d="M30 90L90 30" stroke-width="4" stroke="var(--plastic-ink)"/><ellipse class="bgf ink" cx="26" cy="94" rx="10" ry="7" transform="rotate(-45 26 94)"/><ellipse class="bgf ink" cx="94" cy="26" rx="10" ry="7" transform="rotate(-45 94 26)"/>`,
+ /* swapped */
+ bar:`<rect class="kr ink" x="22" y="44" width="76" height="40" rx="18"/><rect class="ms ink" x="50" y="40" width="20" height="48" rx="2"/>`,
+ can:`<rect class="ms ink" x="40" y="18" width="40" height="88" rx="7"/><path class="ink" d="M40 30h40M40 94h40M54 22h12"/>`,
+ carton:`<path class="kr ink" d="M42 38l8-18h20l8 18v68H42z"/><path class="ink" d="M42 38h36"/><rect class="ms ink" x="54" y="12" width="12" height="8" rx="2"/><path class="ink" d="M50 62h20"/>`,
+ sheets:`<rect class="bgf ink" x="38" y="16" width="44" height="22" rx="2"/><path class="ink" d="M44 22h32M44 28h32"/><rect class="kr ink" x="30" y="30" width="60" height="76" rx="3"/><path class="ink" d="M46 62h28"/>`,
+ tabs:`<rect class="ms ink" x="36" y="28" width="48" height="12" rx="3"/><rect class="bgf ink" x="38" y="40" width="44" height="64" rx="9"/><circle class="kr ink" cx="52" cy="66" r="6"/><circle class="kr ink" cx="68" cy="72" r="6"/><circle class="kr ink" cx="54" cy="86" r="6"/><circle class="kr ink" cx="70" cy="90" r="6"/>`,
+ bamboo:`<rect class="kr ink" x="55" y="44" width="10" height="64" rx="5"/><path class="ink" d="M55 64h10M55 86h10"/><rect class="kr ink" x="54" y="12" width="12" height="34" rx="5"/><path class="ink" d="M66 16h8M66 22h8M66 28h8M66 34h8M66 40h8"/>`,
+ tp:`<rect class="kr ink" x="32" y="26" width="56" height="76" rx="8"/><ellipse class="ms ink" cx="60" cy="28" rx="28" ry="8"/><ellipse class="bgf ink" cx="60" cy="28" rx="8" ry="3"/><path class="ink" d="M44 60l6 6M66 50l6 6M52 80l6 6M70 74l6 6"/>`,
+ canister:`<rect class="ms ink" x="34" y="22" width="52" height="12" rx="3"/><rect class="kr ink" x="38" y="34" width="44" height="72" rx="4"/><path class="ink" d="M38 60h44M38 76h44"/>`,
+ deo:`<rect class="ms ink" x="44" y="14" width="32" height="24" rx="14"/><rect class="kr ink" x="44" y="34" width="32" height="74" rx="4"/><path class="ink" d="M52 60h16"/>`,
+ spray:`<path class="ms ink" d="M50 36h20l-2-12H52z"/><path class="ink" d="M52 24h-14l-6 8"/><rect class="bgf ink" x="42" y="46" width="36" height="60" rx="8"/><path class="ink" d="M56 36v10M64 36v10"/><circle class="kr ink" cx="90" cy="92" r="10"/>`,
+ wrap:`<path class="kr ink" d="M22 62q38-34 76 0"/><path class="ms ink" d="M22 62h76q-4 40-38 40T22 62z"/><path class="ink" d="M40 46l6 10M60 40v12M80 46l-6 10"/>`,
+ milk:`<rect class="ms ink" x="48" y="10" width="24" height="10" rx="3"/><path class="bgf ink" d="M50 20h20v12q12 10 12 24v46a6 6 0 0 1-6 6H44a6 6 0 0 1-6-6V56q0-14 12-24z"/><path class="ink" d="M38 70h44"/>`,
+ eggs:`<path class="kr ink" d="M18 52h84l-4-14H22z"/><path class="kr ink" d="M18 58h84v18q-10 16-21 0-10 16-21 0-10 16-21 0-10 16-21 0z"/>`,
+ collar:`<rect class="ms ink" x="20" y="44" width="22" height="58" rx="4"/><rect class="ms ink" x="49" y="44" width="22" height="58" rx="4"/><rect class="ms ink" x="78" y="44" width="22" height="58" rx="4"/><rect class="kr ink" x="16" y="36" width="88" height="16" rx="3"/>`,
+ mushroom:`<rect class="kr ink" x="20" y="40" width="80" height="54" rx="10"/><path class="bgf ink" d="M54 46h12v10q8 6 8 16v16H46V72q0-10 8-16z"/><circle cx="32" cy="54" r="1.8" fill="var(--ink)"/><circle cx="86" cy="62" r="1.8" fill="var(--ink)"/><circle cx="30" cy="80" r="1.8" fill="var(--ink)"/><circle cx="88" cy="84" r="1.8" fill="var(--ink)"/>`,
+ paperpod:`<rect class="ms ink" x="32" y="36" width="56" height="8" rx="2"/><path class="kr ink" d="M38 44h44l-7 46H45z"/><path class="ink" d="M60 82q-12-10 0-26 12 16 0 26zM60 82V64"/>`
+};
+const svg=k=>`<svg viewBox="0 0 120 120" aria-hidden="true">${P[k]||""}</svg>`;
+
+/* ---------- STILL PLASTIC ---------- */
+const OECD_MISMANAGED=22;
+const STILL=[
+ {id:"bottle",name:"Water bottle",art:"bottle",resin:"PET #1",g:12,count:"~480 billion",scope:"sold worldwide a year (2016)",nr:71,nrSrc:"EPA 2018: 29% of PET bottles recycled",beach:true,swap:"Aluminum can, paper carton or refill station",brief:"Bottled still water, 500 ml, sold in stores and vending machines"},
+ {id:"bag",name:"Grocery bag",art:"bag",resin:"HDPE / LDPE",g:6,count:"up to 5 trillion",scope:"used worldwide a year",nr:90,nrSrc:"EPA 2018: about 10% of bags, sacks and wraps recycled",beach:true,swap:"Paper bag or reusable tote",brief:"Carry-out bags for a small grocery store"},
+ {id:"straw",name:"Straw",art:"straw",resin:"PP #5",g:0.4,count:"Billions",scope:"used a year in the US",nr:99,nrSrc:"Too small and light for sorting machines; almost never recycled",beach:true,swap:"Paper, sugarcane-fiber or reusable straw",brief:"Drinking straws for a café"},
+ {id:"lid",name:"Coffee cup lid",art:"lid",resin:"PS #6 / PP #5",g:3,count:"Billions",scope:"used a year in the US",nr:95,nrSrc:"Greenpeace USA 2022: #3–7 plastics under 5% reprocessed",beach:true,swap:"Molded-fiber lid",brief:"A takeaway coffee cup and lid for a coffee shop"},
+ {id:"chips",name:"Chip bag",art:"chips",resin:"Multilayer film",g:3,count:"Billions",scope:"sold a year worldwide",nr:99,nrSrc:"Layers of plastic and foil can't be separated, so curbside recycling won't take them",beach:true,swap:"Paper-based barrier bag or cellulose film",brief:"A bag for kettle-cooked potato chips"},
+ {id:"cutlery",name:"Takeout cutlery",art:"cutlery",resin:"PS #6 / PP #5",g:5,count:"~40 billion",scope:"pieces a year in the US (commonly cited)",nr:99,nrSrc:"Not accepted in most curbside programs",beach:false,swap:"Wood or molded-fiber cutlery",brief:"Takeout cutlery kits for a restaurant"},
+ {id:"toothbrush",name:"Toothbrush",art:"toothbrush",resin:"PP #5 + nylon",g:20,count:"~1 billion",scope:"thrown away a year in the US (commonly cited)",nr:99,nrSrc:"Mixed materials; not accepted curbside",beach:false,swap:"Bamboo handle in a paperboard box",brief:"A toothbrush and its retail packaging"},
+ {id:"pod",name:"Coffee pod",art:"pod",resin:"PP #5 + foil",g:3,count:"Billions",scope:"brewed a year worldwide",nr:95,nrSrc:"Greenpeace USA 2022: #5 reprocessed under 5%; grounds must be removed first",beach:false,swap:"Compostable paper pod or aluminum pod",brief:"Single-serve coffee pods"},
+ {id:"shampoo",name:"Shampoo bottle",art:"shampoo",resin:"HDPE #2",g:30,count:"Hundreds of millions",scope:"a year in the US",nr:71,nrSrc:"EPA 2018: 29% of natural HDPE bottles recycled",beach:false,swap:"Shampoo bar in paper, or aluminum refill",brief:"A shampoo, 250 ml, sold online and in stores"},
+ {id:"jug",name:"Detergent jug",art:"jug",resin:"HDPE #2",g:120,count:"Hundreds of millions",scope:"a year in the US",nr:71,nrSrc:"EPA 2018: HDPE bottles recycled at about 29–30%",beach:false,swap:"Laundry sheets or powder in a cardboard box",brief:"Laundry detergent for home use"},
+ {id:"yogurt",name:"Yogurt cup",art:"yogurt",resin:"PP #5",g:8,count:"Billions",scope:"a year in the US",nr:95,nrSrc:"Greenpeace USA 2022: #5 containers reprocessed under 5%",beach:false,swap:"Paperboard cup with plant-based lining, or glass",brief:"Single-serve yogurt cups"},
+ {id:"clamshell",name:"Berry clamshell",art:"clamshell",resin:"PET #1 thermoform",g:20,count:"Billions",scope:"a year in the US",nr:90,nrSrc:"Thermoforms are recycled far less often than PET bottles",beach:false,swap:"Molded-pulp punnet with a paper band",brief:"Packaging for fresh berries sold in grocery stores"},
+ {id:"mailer",name:"Poly mailer",art:"mailer",resin:"LDPE #4 film",g:15,count:"Billions",scope:"shipped a year worldwide",nr:90,nrSrc:"EPA 2018: about 10% of bags, sacks and wraps recycled",beach:false,swap:"Recycled paper mailer",brief:"Mailers for shipping clothing orders"},
+ {id:"film",name:"Cling film",art:"film",resin:"LDPE / PVC",g:2,count:"Billions of feet",scope:"a year",nr:99,nrSrc:"Food-soiled film is rejected by recyclers",beach:false,swap:"Beeswax or plant-wax wrap, cellulose film",brief:"Food wrap for home kitchens"},
+ {id:"razor",name:"Disposable razor",art:"razor",resin:"PP + steel",g:10,count:"Billions",scope:"a year worldwide",nr:99,nrSrc:"Mixed plastic and metal; not accepted curbside",beach:false,swap:"Metal handle with replaceable blades in paper",brief:"A razor and its replacement blade packaging"},
+ {id:"swab",name:"Cotton swab",art:"swab",resin:"PP #5 stick",g:0.3,count:"Billions",scope:"a year worldwide",nr:99,nrSrc:"Too small for sorting; often flushed",beach:true,swap:"Paper-stick swab in a cardboard box",brief:"Cotton swabs and their box"}
+];
+
+/* ---------- ALREADY SWAPPED ---------- */
+const SWAP=[
+ {name:"Shampoo bar",art:"bar",was:"HDPE shampoo bottle",now:"Solid bar wrapped in paperboard",eg:"Ethique, Lush",g:30,ease:"Easy"},
+ {name:"Canned water",art:"can",was:"PET water bottle",now:"Recycled aluminum can",eg:"Liquid Death, Open Water",g:12,ease:"Easy"},
+ {name:"Boxed water",art:"carton",was:"PET water bottle",now:"Plant-based paper carton",eg:"Boxed Water Is Better",g:10,ease:"Easy"},
+ {name:"Laundry sheets",art:"sheets",was:"HDPE detergent jug",now:"Dry sheets in a paper sleeve",eg:"Earth Breeze",g:120,ease:"Easy"},
+ {name:"Toothpaste tablets",art:"tabs",was:"Laminate toothpaste tube",now:"Tablets in glass jars, compostable refills",eg:"Bite",g:8,ease:"Medium"},
+ {name:"Bamboo toothbrush",art:"bamboo",was:"PP toothbrush in a blister pack",now:"Bamboo handle, paperboard box",eg:"Brush with Bamboo",g:20,ease:"Easy"},
+ {name:"Paper-wrapped toilet roll",art:"tp",was:"PE film multipack",now:"Paper wrap and cardboard box",eg:"Who Gives a Crap, Sainsbury's",g:15,ease:"Easy"},
+ {name:"Collagen canister",art:"canister",was:"HDPE tub",now:"About 80% paperboard canister",eg:"Vital Proteins",g:60,ease:"Medium"},
+ {name:"Paper deodorant",art:"deo",was:"PP deodorant stick",now:"Push-up paperboard tube",eg:"Native (plastic-free line), Ethique",g:20,ease:"Medium"},
+ {name:"Cleaning tablets",art:"spray",was:"Single-use spray bottles",now:"Tablets in paper, one reusable bottle",eg:"Blueland",g:40,ease:"Easy"},
+ {name:"Wax food wrap",art:"wrap",was:"Cling film",now:"Cotton coated in beeswax or plant wax",eg:"Bee's Wrap",g:2,ease:"Easy"},
+ {name:"Glass milk bottle",art:"milk",was:"HDPE milk jug",now:"Returnable glass bottle",eg:"Local dairies, Milk & More (UK)",g:40,ease:"Medium"},
+ {name:"Pulp egg carton",art:"eggs",was:"PET or foam carton",now:"Recycled molded pulp",eg:"Most grocery egg brands",g:15,ease:"Easy"},
+ {name:"Paper can carrier",art:"collar",was:"Plastic rings and shrink film",now:"Paperboard carrier",eg:"Coca-Cola CanCollar, KeelClip",g:5,ease:"Medium"},
+ {name:"Mushroom inserts",art:"mushroom",was:"EPS foam inserts",now:"Grown mycelium and hemp",eg:"Mushroom Packaging customers",g:60,ease:"Medium"},
+ {name:"Compostable coffee pod",art:"paperpod",was:"PP and foil pods",now:"Paper-pulp pod",eg:"Halo",g:3,ease:"Easy"}
+];
+
+/* ---------- MATERIALS ---------- */
+const M=[
+ {id:"molded-pulp",kind:"common",name:"Molded pulp",c:["#C9B79A","#B9A584"],made:"Recycled paper or sugarcane bagasse",origin:"US, Canada, EU; bagasse from India, Thailand, Brazil",suppliers:"UFP Technologies, Pulpworks, Huhtamaki",cost:[0.10,0.60],unit:"per insert",vs:[1.1,1.6],replaces:"EPS foam inserts, PET clamshells",lead:[3,8],eol:"Recyclable; home compostable if uncoated",co2:"About 50–70% lower than EPS",g:25,watch:"Custom tooling costs $3k–15k. Ask for PFAS-free.",tags:["fragile","insert","bottle","jar","glass","candle","food","tray","berry","egg","fruit"]},
+ {id:"corrugated",kind:"common",name:"Recycled corrugated",c:["#B98F5E","#A57C4C"],made:"Recycled wood fiber, starch glue",origin:"Made regionally nearly everywhere",suppliers:"International Paper, Smurfit Westrock, EcoEnclose",cost:[0.45,2.50],unit:"per mailer box",vs:[1.5,3.0],replaces:"Poly mailers, plastic totes",lead:[1,4],eol:"About 70% recovered in the US",co2:"Similar or lower per shipment",g:180,watch:"Heavier, so freight costs more.",tags:["shipping","ship","shipped","mailer","box","online","heavy","gift","detergent","laundry"]},
+ {id:"paperboard",kind:"common",name:"FSC paperboard",c:["#E4DCC8","#D3C8AF"],made:"Certified or recycled fiber",origin:"US, Canada, Finland, Sweden, China",suppliers:"Graphic Packaging, Stora Enso, Metsä Board",cost:[0.12,1.00],unit:"per carton",vs:[0.9,1.5],replaces:"Clamshells, blister packs",lead:[3,6],eol:"Recyclable if unlaminated",co2:"Often 30–60% lower than rigid plastic",g:40,watch:"Avoid plastic lamination.",tags:["retail","carton","cosmetic","box","gift","powder","supplement","tube","tea","toothbrush","razor","swab","cup","yogurt","deodorant"]},
+ {id:"kraft-paper",kind:"common",name:"Kraft paper",c:["#A9794A","#946538"],made:"Unbleached wood pulp",origin:"US Southeast, Scandinavia, Brazil",suppliers:"Ranpak, Noissue, EcoEnclose",cost:[0.05,0.80],unit:"per wrap or mailer",vs:[1.2,2.0],replaces:"Bubble wrap, poly mailers",lead:[1,3],eol:"Recyclable, home compostable",co2:"Lower than bubble wrap",g:30,watch:"Less padding than bubble mailers.",tags:["shipping","fragile","wrap","mailer","clothing","bag","grocery","chips"]},
+ {id:"glassine",kind:"common",name:"Glassine",c:["#EFEBDD","#E1DBC6"],made:"Supercalendered wood pulp",origin:"Italy, Germany, US",suppliers:"Nordic Paper, Ahlstrom",cost:[0.03,0.25],unit:"per bag",vs:[1.3,2.5],replaces:"Cello and OPP bags",lead:[2,5],eol:"Recyclable, compostable",co2:"Lower than OPP film",g:4,watch:"Light moisture barrier only.",tags:["food","snack","bakery","soap","dry","bag","chips","cookie"]},
+ {id:"glass",kind:"common",name:"Glass",c:["#BFD8D2","#A3C6BE"],made:"Sand, soda ash, recycled cullet",origin:"US, Mexico, France, Italy",suppliers:"O-I Glass, Verallia, Berlin Packaging",cost:[0.35,2.50],unit:"per jar",vs:[1.5,3.0],replaces:"PET and PP jars",lead:[2,10],eol:"Endlessly recyclable, refillable",co2:"Higher unless reused 3+ times",g:250,watch:"Heavy and breakable.",tags:["jar","bottle","candle","liquid","sauce","skincare","refill","milk","yogurt"]},
+ {id:"aluminum",kind:"common",name:"Recycled aluminum",c:["#C7CDD1","#AEB6BC"],made:"Bauxite plus recycled aluminum",origin:"US, Canada, Norway",suppliers:"Ball, Crown, Ardagh",cost:[0.12,1.50],unit:"per can or tin",vs:[1.2,2.5],replaces:"Plastic bottles and tins",lead:[3,10],eol:"Highly recycled",co2:"Low with recycled content",g:30,watch:"Thin liner inside most cans.",tags:["water","beverage","drink","liquid","balm","tin","shampoo","coffee","pod","refill"]},
+ {id:"mycelium",kind:"common",name:"Mycelium foam",c:["#E8E0CC","#D6CBB1"],made:"Hemp waste bound by mushroom roots",origin:"US (New York), UK, Netherlands",suppliers:"Mushroom Packaging, Magical Mushroom Co.",cost:[0.80,4.00],unit:"per piece",vs:[2.0,3.5],replaces:"EPS foam inserts",lead:[4,8],eol:"Home compostable in ~45 days",co2:"Up to ~90% lower than EPS",g:60,watch:"Costs more; keep dry.",tags:["fragile","electronics","insert","glass","wine","candle","gift"]},
+ {id:"pla",kind:"common",name:"PLA bioplastic",c:["#E6F0E3","#D2E3CD"],made:"Fermented plant sugars",origin:"US, Thailand, China",suppliers:"NatureWorks, TotalEnergies Corbion",cost:[0.05,0.40],unit:"per cup or window",vs:[1.2,2.0],replaces:"PET clamshells, windows",lead:[3,8],eol:"Industrial compost only",co2:"50–75% lower than PET",g:15,watch:"Won't break down at home or at sea.",tags:["window","clear","cup","clamshell","straw"]},
+ {id:"cellulose-film",kind:"common",name:"Cellulose film",c:["#F1F4EE","#E0E7DC"],made:"Wood pulp",origin:"UK, US, Japan",suppliers:"Futamura (NatureFlex)",cost:[0.04,0.30],unit:"per bag",vs:[2.0,4.0],replaces:"BOPP clear film",lead:[3,7],eol:"Home compostable",co2:"Lower than BOPP",g:5,watch:"Weaker moisture barrier.",tags:["window","clear","tea","coffee","snack","candy","wrap","film","chips"]},
+ {id:"cork",kind:"common",name:"Cork",c:["#B48B5C","#9F774B"],made:"Cork oak bark",origin:"Portugal, Spain",suppliers:"Amorim",cost:[0.15,1.50],unit:"per lid",vs:[1.5,3.0],replaces:"Plastic lids and caps",lead:[3,8],eol:"Compostable",co2:"Carbon-negative at forest level",g:8,watch:"Needs a liner to seal airtight.",tags:["lid","jar","candle","bottle","tea","cap"]},
+ {id:"bamboo",kind:"common",name:"Bamboo",c:["#D9C48E","#C7AF74"],made:"Solid bamboo",origin:"China, Vietnam, India",suppliers:"Specialty packaging makers",cost:[0.40,3.00],unit:"per lid or handle",vs:[1.5,4.0],replaces:"Plastic caps, handles",lead:[4,10],eol:"Compostable if solid",co2:"Low when unlacquered",g:20,watch:"Avoid melamine 'bamboo fiber'.",tags:["cosmetic","lid","cap","toothbrush","razor","cutlery","handle"]},
+ {id:"wood",kind:"common",name:"FSC birch wood",c:["#E3CFA6","#D2BC90"],made:"Thin-sliced birch from certified forests",origin:"China, Finland, Poland",suppliers:"Eco-Products, Vegware, Greenwood",cost:[0.02,0.08],unit:"per piece",vs:[1.5,3.0],replaces:"PS and PP cutlery, stirrers",lead:[2,6],eol:"Home compostable",co2:"Lower than PS cutlery",g:3,watch:"Can feel dry in the mouth; ask for food-safe, unwaxed.",tags:["cutlery","stirrer","spoon","fork","foodservice"]},
+ {id:"seaweed",kind:"dev",name:"Seaweed film",c:["#7FA685","#5F8E6A"],made:"Farmed seaweed extracts",origin:"UK, US, Indonesia",suppliers:"Notpla, Sway, Loliware",cost:[0.05,0.60],unit:"per sachet or film",vs:[3,10],replaces:"Sachets, film bags",lead:[6,16],eol:"Home compostable",co2:"Very low growing footprint",g:3,watch:"Pilot-scale pricing.",tags:["sachet","film","bag","sauce","straw","chips","wrap"]},
+ {id:"pha",kind:"dev",name:"PHA biopolymer",c:["#A8C5B4","#8DB39D"],made:"Polymer grown by bacteria",origin:"US, Japan, Korea",suppliers:"CJ Biomaterials, Kaneka, RWDC",cost:[0.15,1.20],unit:"per part",vs:[3,6],replaces:"PP straws, cutlery, caps",lead:[8,20],eol:"Breaks down in soil and seawater",co2:"Low with waste feedstock",g:10,watch:"Few suppliers.",tags:["straw","cutlery","cap","lid","coating","pod","swab"]},
+ {id:"paper-bottle",kind:"dev",name:"Fiber bottle",c:["#CDB892","#B9A27A"],made:"Molded pulp with thin lining",origin:"UK, Denmark",suppliers:"Pulpex, Paboco, Frugalpac",cost:[0.80,3.00],unit:"per bottle",vs:[2,5],replaces:"PET and glass bottles",lead:[12,30],eol:"Paper-stream recyclable",co2:"Up to 70–90% lower than glass",g:30,watch:"Long waits; most still have a liner.",tags:["bottle","water","liquid","wine","shampoo","detergent"]},
+ {id:"plant-protein",kind:"dev",name:"Plant-protein film",c:["#E6D7A9","#D4C28C"],made:"Pea protein",origin:"UK",suppliers:"Xampla (Morro)",cost:[0.05,0.50],unit:"per pouch",vs:[2.5,6],replaces:"Pouches, dissolvable pods",lead:[8,20],eol:"Home compostable",co2:"Low; food by-products",g:3,watch:"Very early supply.",tags:["pouch","pod","detergent","laundry","sachet","powder"]},
+ {id:"straw-pulp",kind:"dev",name:"Wheat-straw pulp",c:["#D8C38A","#C5AE70"],made:"Crop residue",origin:"US, China, India",suppliers:"Regional pilot mills",cost:[0.10,0.70],unit:"per tray",vs:[1.3,2.0],replaces:"Plastic trays",lead:[6,14],eol:"Recyclable, compostable",co2:"Lower than wood fiber",g:25,watch:"Few mills.",tags:["tray","food","carton","berry","lid","cup"]},
+ {id:"chitosan",kind:"dev",name:"Chitosan film",c:["#E9DCCB","#D8C7B0"],made:"Shellfish-shell waste",origin:"Norway, India, Vietnam",suppliers:"Research labs, small producers",cost:[0.20,1.00],unit:"per film",vs:[4,10],replaces:"Fresh-food film",lead:[12,30],eol:"Home compostable",co2:"Low",g:3,watch:"Shellfish allergen labeling.",tags:["film","fresh","produce","meat","wrap"]}
+];
+const byId=Object.fromEntries(M.map(m=>[m.id,m])); const mid=a=>(a[0]+a[1])/2;
+
+/* ---------- drawer ---------- */
+const drawer=$("#drawer"), scrim=$("#scrim"); let lastFocus=null;
+function openDrawer(html,modal){ lastFocus=document.activeElement; drawer.classList.add("modal"); drawer.innerHTML=`<button class="dclose" id="dClose">Close ✕</button>`+html; drawer.hidden=false; scrim.hidden=false; $("#dClose").onclick=closeDrawer; $("#dClose").focus(); drawer.scrollTop=0; }
+function closeDrawer(){ drawer.hidden=true; scrim.hidden=true; lastFocus?.focus?.(); }
+scrim.onclick=closeDrawer; addEventListener("keydown",e=>{ if(e.key==="Escape"&&!drawer.hidden) closeDrawer(); });
+const dots=p=>{ const n=Math.round(p/10); return `<div class="dots" aria-hidden="true">${Array.from({length:10},(_,i)=>`<i class="${i<n?"on":""}"></i>`).join("")}</div>`; };
+
+/* ---------- render galleries ---------- */
+function tile(art,name,stat,cls=""){ const b=document.createElement("button"); b.type="button"; b.className="tile "+cls; b.innerHTML=`<span class="art">${art}</span><span class="nm">${esc(name)}</span>${stat?`<span class="stat">${esc(stat)}</span>`:""}`; return b; }
+
+const ALTS={
+ bottle:[["bottle-can","Aluminum can"],["bottle-carton","Paper carton"]],
+ bag:[["bag-paper","Paper bag"],["bag-tote","Cotton tote"]],
+ straw:[["straw-paper","Paper straws"],["straw-bamboo","Bamboo straws"]],
+ lid:[["lid-fiber","Molded-fiber lid"]],
+ chips:[["chips-paper","Paper-based bag"],["chips-cellulose","Cellulose film bag"]],
+ cutlery:[["cutlery-wood","Wooden cutlery"],["cutlery-bamboo","Bamboo cutlery"]],
+ toothbrush:[["toothbrush-bamboo","Bamboo brush, paper box"]],
+ pod:[["pod-paper","Compostable paper pod"],["pod-aluminum","Aluminum pod"]],
+ shampoo:[["shampoo-bar","Shampoo bar in paper"],["shampoo-aluminum","Aluminum refill bottle"]],
+ jug:[["jug-sheets","Laundry sheets in paper"],["jug-powder","Powder in a cardboard box"]],
+ yogurt:[["yogurt-glass","Glass jar"],["yogurt-paper","Paperboard cup"]],
+ clamshell:[["clamshell-pulp","Molded-pulp punnet"]],
+ mailer:[["mailer-paper","Recycled paper mailer"],["mailer-box","Corrugated mailer box"]],
+ film:[["film-beeswax","Beeswax wrap"]],
+ razor:[["razor-safety","Metal razor, paper box"]],
+ swab:[["swab-paper","Paper-stick swabs"]]
+};
+/* plain-English cost difference vs the plastic version */
+const costDiff=p=>!isFinite(p)?"—":p>0?`${Math.round(p)}% more`:p<0?`${Math.round(-p)}% less`:"Same price";
+const costRange=(a,b)=>{ const lo=Math.round((a-1)*100), hi=Math.round((b-1)*100); const t=v=>v>=0?`${v}% more`:`${-v}% less`; return lo===hi?t(lo):(lo<0&&hi>=0?`${-lo}% less to ${hi}% more`:lo<0?`${-hi}–${-lo}% less`:`${lo}–${hi}% more`); };
+const pimg=id=>`img/p-${id}.png`, eimg=k=>`img/e-${k}.png`;
+let eco=false;
+function renderStill(){
+  const g=$("#g-still"); g.replaceChildren();
+  $("#stillTitle").textContent = eco ? "The same things, without the plastic." : "Easy to make plastic-free. Still plastic.";
+  $("#stillSub").textContent = eco ? "Every one of these swaps is on the market today." : "Tap an item to see what it leaves behind.";
+  STILL.forEach(it=>{
+    const alts=ALTS[it.id]||[];
+    const art = eco
+      ? `<span class="art ph"><span class="multi" style="--n:${alts.length}">${alts.map(([k,l])=>`<img src="${eimg(k)}" alt="${esc(l)}" loading="lazy">`).join("")}</span><span class="eco-badge">${alts.length>1?alts.length+" swaps":"Swap"}</span></span>`
+      : `<span class="art ph fan"><span class="peek" aria-hidden="true">${alts.map(([k,l],j)=>{ const o=alts.length>1?(j?{x:52,y:-30,r:7}:{x:-52,y:-34,r:-7}):{x:50,y:-30,r:6}; return `<span class="pk" style="--k:${j};--px:${o.x}%;--py:${o.y}%;--pr:${o.r}deg"><img src="${eimg(k)}" alt="" loading="lazy"><i>${esc(l)}</i></span>`; }).join("")}</span><img class="orig" src="${pimg(it.id)}" alt="${esc(it.name)}" loading="lazy"></span>`;
+    const b=document.createElement("button"); b.type="button"; b.className="tile"+(eco?" swap":" hoverswap");
+    b.innerHTML=`${art}<span class="nm">${esc(eco?alts.map(a=>a[1]).join(" · "):it.name)}</span>`;
+    b.onclick=()=>openStill(it);
+    g.append(b);
+  });
+}
+$("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
+/* which library material backs each eco alternative (null = reusable item, not in the library) */
+const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard"};
+const REUSE={"bag-tote":"Reusable cotton tote. Replaces hundreds of single-use bags over its life; needs ~130 uses to beat a plastic bag on carbon.","film-beeswax":"Reusable cotton coated in beeswax. Lasts about a year of washes, then composts."};
+const buyBox=k=>{ const b=(typeof BUY!=="undefined"&&BUY[k])||[]; const m=byId[ALT_MAT[k]]; const P=(typeof BUY_PRICE!=="undefined")?BUY_PRICE:{};
+  return b.length?`<div class="buy"><span class="label">Buy in bulk</span>${m?`<span class="src">Typical unit cost for ${esc(m.name.toLowerCase())}: ${money(m.cost[0])}–${money(m.cost[1])} ${esc(m.unit)}</span>`:""}${b.map(([n,u,note])=>{ const pr=P[u]; return `<a href="${esc(u)}" target="_blank" rel="noopener"><span class="bn">${esc(n)}<em>${esc(note||"")}</em></span><span class="bp">${pr?esc(pr.unit):"price on site"}${pr&&pr.basis?`<em>${esc(pr.basis)}</em>`:""}</span></a>`; }).join("")}<span class="src">Approximate listed prices as of ${DATA_ASOF}, before shipping and tax.</span></div>`:""; };
+function altCard(it,k,label){
+  const m=byId[ALT_MAT[k]];
+  const head=`<img class="dphoto" src="${eimg(k)}" alt="${esc(label)}"><h3>${esc(label)}</h3>`;
+  if(!m) return `<article class="alt">${head}<span class="pill g">Reusable</span><p class="src" style="margin:0">${esc(REUSE[k]||"")}</p><div class="anums"><div><span class="label">Plastic saved</span><b class="down">${fmt(it.g,it.g<1?1:0)} g</b><span class="src">per use</span></div></div>${buyBox(k)}</article>`;
+  const plasticCost=mid(m.cost)/mid(m.vs), pct=Math.round((mid(m.vs)-1)*100);
+  return `<article class="alt">${head}
+    <span class="src">${esc(m.name)} · ${esc(m.eol)}</span>
+    <div class="anums">
+      <div><span class="label">Unit cost</span><b>${money(m.cost[0])}–${money(m.cost[1])}</b><span class="src">plastic version ≈ ${money(plasticCost)}</span></div>
+      <div><span class="label">Cost compared with plastic</span><b class="up">${costDiff(pct)}</b><span class="src">per unit</span></div>
+      <div><span class="label">Arrives in</span><b>${m.lead[0]}–${m.lead[1]} wk</b></div>
+      <div><span class="label">Plastic saved</span><b class="down">${fmt(it.g,it.g<1?1:0)} g</b><span class="src">per unit</span></div>
+    </div>
+    <p class="src" style="margin:0"><b style="color:var(--ink);font-weight:600">From:</b> ${esc(m.origin)}. ${esc(m.suppliers)}.</p>
+    <p class="src" style="margin:0"><b style="color:var(--ink);font-weight:600">Carbon:</b> ${esc(m.co2)}</p>
+    ${buyBox(k)}
+  </article>`;
+}
+function openStill(it){
+  const alts=ALTS[it.id]||[];
+  const perM=it.g*1e6/1000; // kg per million units
+  openDrawer(`
+    <div class="mtop">
+      <img class="dphoto" src="${pimg(it.id)}" alt="${esc(it.name)}">
+      <div class="mstats">
+        <div><span class="label">${esc(it.resin)}</span><h2 id="dTitle">${esc(it.name)}</h2></div>
+        <div class="big"><b>${esc(it.count)}</b><span>${esc(it.scope)}</span>${["bottle","bag"].includes(it.id)?`<span class="pill g" style="justify-self:start;margin-top:6px">Sourced figure</span>`:/commonly cited/.test(it.scope)?`<span class="pill" style="justify-self:start;margin-top:6px">Commonly cited estimate</span>`:`<span class="pill r" style="justify-self:start;margin-top:6px">Order-of-magnitude estimate</span>`}</div>
+        <div class="big"><b>${it.nr}%</b><span>not recycled</span>${dots(it.nr)}<span class="src" style="margin-top:6px">${esc(it.nrSrc)}</span></div>
+        <div class="kv">
+          <div><span class="label">Mismanaged worldwide</span><b>${OECD_MISMANAGED}%</b><span class="src">of plastic waste is dumped, burned or leaked (OECD)</span></div>
+          <div><span class="label">Plastic per million</span><b>${perM>=1000?fmt(perM/1000,1)+" t":fmt(perM)+" kg"}</b><span class="src">at ~${it.g} g each</span></div>
+          <div class="wide">${it.beach?`<span class="pill">Top-10 beach litter item</span>`:`<span class="src">Not a top-10 beach item, but breaks into microplastics once loose</span>`}</div>
+        </div>
+      </div>
+    </div>
+    <div><span class="label">Plastic-free packaging</span><h2 style="font-size:22px;margin-top:4px">${alts.length>1?alts.length+" ways":"A way"} to make it without plastic</h2></div>
+    <div class="alts">${alts.map(([k,l])=>altCard(it,k,l)).join("")}</div>
+    <p class="src">Costs and lead times are indicative ranges at 1,000–50,000 units, before freight. <a href="#ideate" id="goIdeate">Get ideas tailored to your product →</a></p>`, true);
+  $("#goIdeate").onclick=e=>{ e.preventDefault(); closeDrawer(); $("#brief").value=it.brief; location.hash="ideate"; };
+}
+renderStill();
+
+const SWAP_WAS={"Shampoo bar":"p-shampoo","Canned water":"p-bottle","Boxed water":"p-bottle","Laundry sheets":"p-jug","Toothpaste tablets":"c-toothpaste","Bamboo toothbrush":"p-toothbrush","Paper-wrapped toilet roll":"w-tp","Collagen canister":"p-yogurt","Paper deodorant":"w-deo","Cleaning tablets":"c-spray","Wax food wrap":"p-film","Glass milk bottle":"w-milk","Pulp egg carton":"w-eggs","Paper can carrier":"w-rings","Mushroom inserts":"w-foam","Compostable coffee pod":"p-pod"};
+/* cost for each Swaps item: [material id for typical cost, alt key for bulk-buy prices] */
+const SWAP_COST={"Shampoo bar":["paperboard","shampoo-bar"],"Canned water":["aluminum","bottle-can"],"Boxed water":["paperboard","bottle-carton"],"Laundry sheets":["kraft-paper","jug-sheets"],"Toothpaste tablets":["glass",null],"Bamboo toothbrush":["bamboo","toothbrush-bamboo"],"Paper-wrapped toilet roll":["kraft-paper",null],"Collagen canister":["paperboard",null],"Paper deodorant":["paperboard",null],"Cleaning tablets":["kraft-paper",null],"Wax food wrap":[null,"film-beeswax"],"Glass milk bottle":["glass",null],"Pulp egg carton":["molded-pulp",null],"Paper can carrier":["paperboard",null],"Mushroom inserts":["mycelium",null],"Compostable coffee pod":["molded-pulp","pod-paper"]};
+function swapCost(name){ const [mid_,alt]=SWAP_COST[name]||[]; const m=byId[mid_];
+  const head=m?`<div><span class="label">What it costs</span><div class="anums" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:8px">
+    <div><span class="label">Packaging cost</span><b>${money(m.cost[0])}–${money(m.cost[1])}</b><span class="src">${esc(m.unit)} · ${esc(m.name)}</span></div>
+    <div><span class="label">Plastic version</span><b>≈ ${money(mid(m.cost)/mid(m.vs))}</b><span class="src">per unit</span></div>
+    <div><span class="label">Cost compared with plastic</span><b class="${m.vs[0]<1?"":"up"}">${costRange(m.vs[0],m.vs[1])}</b><span class="src">per unit</span></div></div>
+    <p class="src" style="margin:8px 0 0">Typical packaging cost at 1,000–50,000 units, before freight. The product inside isn't included.</p></div>`
+    :`<div><span class="label">What it costs</span><p style="margin:6px 0 0">Reusable item, so the cost is spread over many uses rather than per pack. Listed prices below.</p></div>`;
+  return head+(alt?buyBox(alt):""); }
+const SWAP_PH={"Shampoo bar":"e-shampoo-bar","Canned water":"e-bottle-can","Boxed water":"e-bottle-carton","Laundry sheets":"e-jug-sheets","Bamboo toothbrush":"e-toothbrush-bamboo","Wax food wrap":"e-film-beeswax","Compostable coffee pod":"e-pod-paper","Toothpaste tablets":"s-tabs","Paper-wrapped toilet roll":"s-tp","Collagen canister":"s-canister","Paper deodorant":"s-deo","Cleaning tablets":"s-spray","Glass milk bottle":"s-milk","Pulp egg carton":"s-eggs","Paper can carrier":"s-collar","Mushroom inserts":"s-mushroom"};
+const HAVE_S=new Set(["s-tabs","s-tp","s-canister","s-deo","s-spray","s-milk","s-eggs","s-collar","s-mushroom","e-shampoo-bar","e-bottle-can","e-bottle-carton","e-jug-sheets","e-toothbrush-bamboo","e-film-beeswax","e-pod-paper"]);
+const swapArt=it=>{ const k=SWAP_PH[it.name]; return k&&HAVE_S.has(k)?`<span class="art ph"><img src="img/${k}.png" alt="${esc(it.name)}" loading="lazy"></span>`:svg(it.art); };
+SWAP.forEach(it=>{
+  const t=document.createElement("button"); t.type="button"; t.className="tile swap"; t.innerHTML=`${swapArt(it)}<span class="nm">${esc(it.name)}</span>`;
+  const k=SWAP_PH[it.name], ph=k&&HAVE_S.has(k);
+  t.onclick=()=>openDrawer(`
+    ${ph?`<div class="pair"><figure><img src="img/${SWAP_WAS[it.name]||"p-bottle"}.png" alt="${esc(it.was)}"><figcaption><span class="pill">Before</span>${esc(it.was)}</figcaption></figure><svg class="arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12h56M46 3l12 9-12 9"/></svg><figure class="now"><img src="img/${k}.png" alt="${esc(it.now)}"><figcaption><span class="pill g">Now</span>${esc(it.now)}</figcaption></figure></div>`:""}
+    <div class="dhead" ${ph?'style="grid-template-columns:1fr"':""}>${ph?"":svg(it.art)}<div><span class="label">On the market</span><h2 id="dTitle">${esc(it.name)}</h2></div></div>
+    <div class="big"><b>~${fmt(it.g)} g</b><span>plastic avoided per unit</span></div>
+    <div class="kv">
+      <div class="wide"><span class="label">Replaced</span><b style="font-family:var(--body)">${esc(it.was)}</b></div>
+      <div class="wide"><span class="label">Now</span><b style="font-family:var(--body)">${esc(it.now)}</b></div>
+      <div><span class="label">Examples</span><span>${esc(it.eg)}</span></div>
+      <div><span class="label">To copy</span><span class="pill g">${esc(it.ease)}</span></div>
+    </div>
+    ${swapCost(it.name)}
+    <button class="btn" id="goIdeate">Use this idea for my product</button>`);
+  $("#g-swap").append(t);
+  t.addEventListener("click",()=>setTimeout(()=>{ const b=$("#goIdeate"); if(b) b.onclick=()=>{ closeDrawer(); $("#brief").value=`Something like a ${it.name.toLowerCase()}: ${it.now.toLowerCase()}`; location.hash="ideate"; }; }));
+});
+
+const MAT_REPL={
+"molded-pulp":[["p-clamshell","Berry clamshells","Fruit punnets"],["p-lid","Hot cup lids","Fiber sip lids"],["p-pod","Coffee pods","Compostable pulp pods"],["c-bubble","Foam and bubble padding","Protective inserts"],["c-saucecup","Sauce cups","Fiber portion cups"]],
+"corrugated":[["p-mailer","Poly mailers","Mailer boxes"],["c-shrink","Shrink-wrapped multipacks","Carton trays"],["p-jug","Detergent jugs","Powder boxes"],["c-bubble","Bubble wrap","Cardboard dividers"]],
+"paperboard":[["c-blister","Blister packs","Card backers and boxes"],["p-toothbrush","Toothbrush blisters","Folding cartons"],["p-razor","Razor packs","Die-cut card packs"],["p-yogurt","Yogurt cups","Paper cups"],["c-cosmetic","Cosmetic jars","Paper tubes"],["p-shampoo","Shampoo bottles","Bar boxes"]],
+"kraft-paper":[["p-bag","Plastic bags","Paper bags"],["p-mailer","Poly mailers","Padded paper mailers"],["c-bubble","Bubble wrap","Honeycomb wrap"],["p-straw","Straws","Paper straws"]],
+"glassine":[["c-wrapper","Candy wrappers","Twist wraps"],["p-film","Cling film","Bakery wrap"],["p-chips","Snack bags","Dry-goods bags"]],
+"glass":[["p-bottle","Water bottles","Refillable bottles"],["p-yogurt","Yogurt cups","Jars"],["c-cosmetic","Cosmetic jars","Glass jars"],["c-squeeze","Sauce bottles","Glass bottles"]],
+"aluminum":[["p-bottle","Water bottles","Cans"],["c-soda","Soda bottles","Cans"],["p-shampoo","Shampoo bottles","Refill bottles"],["p-pod","Coffee pods","Aluminum pods"],["c-mints","Mint boxes","Tins"]],
+"mycelium":[["c-bubble","Foam and bubble padding","Grown inserts"],["c-shrink","Foam corners for heavy goods","Grown corners"]],
+"pla":[["p-clamshell","Clear clamshells","PLA clamshells"],["c-coldcup","Cold cups","PLA cups"],["p-straw","Straws","PLA straws"],["p-cutlery","Cutlery","CPLA cutlery"]],
+"cellulose-film":[["p-film","Cling film","Compostable wrap"],["c-wrapper","Candy wrappers","Clear wraps"],["p-chips","Snack bags","Compostable bags"]],
+"cork":[["c-cosmetic","Cosmetic jar lids","Cork lids"],["p-bottle","Bottle caps","Stoppers"]],
+"bamboo":[["p-toothbrush","Toothbrushes","Bamboo handles"],["p-cutlery","Cutlery","Bamboo cutlery"],["p-straw","Straws","Bamboo straws"],["c-cosmetic","Cosmetic caps","Bamboo caps"]],
+"wood":[["p-cutlery","Cutlery","Wooden cutlery"],["p-swab","Swab sticks","Wooden sticks"]],
+"seaweed":[["c-sachet","Sachets","Edible sachets"],["c-saucecup","Sauce cups","Seaweed pods"],["p-straw","Straws","Seaweed straws"],["p-film","Plastic film","Seaweed film"]],
+"pha":[["p-straw","Straws","Marine-degradable straws"],["p-cutlery","Cutlery","PHA cutlery"],["c-coldcup","Cup lids and coatings","PHA lids"]],
+"paper-bottle":[["p-bottle","Water bottles","Fiber bottles"],["p-shampoo","Shampoo bottles","Fiber bottles"],["p-jug","Detergent jugs","Fiber bottles"],["c-soda","Soda bottles","Fiber bottles"]],
+"plant-protein":[["c-sachet","Sachets","Dissolvable sachets"],["c-petfood","Pouches","Protein-film pouches"],["p-film","Plastic film","Protein film"]],
+"straw-pulp":[["p-clamshell","Clamshells","Straw-pulp trays"],["c-saucecup","Sauce cups","Pulp cups"],["p-lid","Cup lids","Pulp lids"]],
+"chitosan":[["p-film","Cling film on fresh food","Antimicrobial film"],["p-clamshell","Produce packs","Coated trays"]]
+};
+/* ---------- specs, compliance flags, claim safeguards ---------- */
+const RATE=["None","Low","Medium","High"];
+const flag=(v,l)=>`<span class="pill ${v===1?"g":""}">${v===1?"✓":v===2?"~":"✕"} ${l}</span>`;
+function specHTML(id){ const x=SPEC[id]; if(!x) return "";
+  const bar=n=>`<i class="sbar"><i style="width:${n/3*100}%"></i></i>`;
+  return `<div><span class="label">How it performs</span><div class="spec">${[["Moisture barrier",x[0]],["Oxygen barrier",x[1]],["Grease resistance",x[2]],["Heat tolerance",x[3]]].map(([l,v])=>`<div><span>${l}</span>${bar(v)}<b>${RATE[v]}</b></div>`).join("")}</div>
+  <div class="kv" style="margin-top:14px"><div><span class="label">Food contact</span><span>${esc(x[4])}</span></div><div><span class="label">Production lines</span><span>${esc(x[5])}</span></div><div><span class="label">Supply scale</span><span>${esc(x[6])}</span></div><div><span class="label">UK packaging fee (EPR)</span><b>£${UK_EPR[x[10]]} / tonne</b><span class="src">${esc(x[10])} rate, 2025/26</span></div></div>
+  <div class="flags">${flag(x[7],"Curbside recyclable")}${flag(x[8],"Home compostable")}${flag(x[9],"Industrial compostable")}${x[11]===1?`<span class="pill r">Taxed as plastic in the UK</span>`:x[11]===2?`<span class="pill">Check UK plastic tax status</span>`:""}</div></div>`; }
+const CLAIM=`<div class="swapbox"><span class="label">Before you make a public claim</span><span>Carbon and impact notes here are indicative, not a life-cycle assessment. Public claims need an ISO 14040/44 LCA and must meet the FTC Green Guides (US) or EU green-claims rules. Paper isn't automatically lower-impact than plastic: weight, recycled content and what happens after use decide.</span></div>`;
+const ASOF=`<p class="src">Typical ranges compiled ${DATA_ASOF} from supplier listings and industry reports. Not quotes; specific grades and coatings change performance.</p>`;
+let kind="common";
+function renderMats(){
+  const g=$("#g-mats"); g.replaceChildren();
+  M.filter(m=>m.kind===kind).forEach(m=>{
+    const t=document.createElement("button"); t.type="button"; t.className="tile swap"; t.innerHTML=`<span class="art mat"><img src="img/m-${m.id}.jpg" alt="${esc(m.name)} close up" loading="lazy"></span><span class="nm">${esc(m.name)}</span>`;
+    t.onclick=()=>{ const R=(MAT_REPL[m.id]||[]); openDrawer(`
+      <div class="mtop">
+        <img src="img/m-${m.id}.jpg" alt="${esc(m.name)} close up" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:18px">
+        <div class="mstats">
+          <div><span class="label">${m.kind==="dev"?"In development":"Available now"}</span><h2 id="dTitle" style="font-size:30px">${esc(m.name)}</h2><p class="src" style="margin:6px 0 0">${esc(m.made)}</p></div>
+          <div class="anums" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+            <div><span class="label">Cost</span><b>${money(m.cost[0])}–${money(m.cost[1])}</b><span class="src">${esc(m.unit)}</span></div>
+            <div><span class="label">Cost compared with plastic</span><b class="up">${costRange(m.vs[0],m.vs[1])}</b><span class="src">than the plastic it replaces</span></div>
+            <div><span class="label">Arrives in</span><b>${m.lead[0]}–${m.lead[1]} weeks</b></div>
+          </div>
+          <div class="kv">
+            <div class="wide"><span class="label">Where it's from</span><span>${esc(m.origin)}</span><span class="src">${esc(m.suppliers)}</span></div>
+            <div class="wide"><span class="label">Carbon</span><span>${esc(m.co2)}</span></div>
+            <div class="wide"><span class="label">After use</span><span>${esc(m.eol)}</span></div>
+            <div class="wide"><span class="label">Watch</span><span>${esc(m.watch)}</span></div>
+          </div>
+        </div>
+      </div>
+      ${R.length?`<div><span class="label">What it can replace</span><h2 style="font-size:22px;margin-top:4px">${R.length} plastic thing${R.length>1?"s":""} ${esc(m.name.toLowerCase())} can stand in for</h2>
+      <div class="cofmt" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">${R.map(([img,pl,use])=>`<figure><img src="img/${img}.png" alt="${esc(pl)}"><figcaption>${esc(pl)}</figcaption><span class="src" style="margin-top:-4px">→ ${esc(use)}</span></figure>`).join("")}</div></div>`:""}${specHTML(m.id)}${CLAIM}${ASOF}`, true); };
+    g.append(t);
+  });
+}
+$$("[data-kind]").forEach(b=>b.onclick=()=>{ kind=b.dataset.kind; $$("[data-kind]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderMats(); });
+renderMats();
+
+/* ---------- tax and fee calculator ---------- */
+(function(){
+  const sel=$("#cMat"); sel.innerHTML=M.map(m=>`<option value="${m.id}"${m.id==="paperboard"?" selected":""}>${esc(m.name)}</option>`).join("");
+  const gbp=n=>"£"+fmt(n), usd=n=>"$"+fmt(n);
+  function calc(){ const r=$("#cRegion").value, u=Math.max(0,+$("#cUnits").value||0), pg=Math.max(0,+$("#cPg").value||0), ng=Math.max(0,+$("#cNg").value||0), rec=$("#cRec").checked, id=sel.value, x=SPEC[id], m=byId[id];
+    const pt=u*pg/1e6, nt=u*ng/1e6; let h="";
+    if(r==="UK"){ const pPPT=rec?0:pt*UK_PPT, pEPR=pt*UK_EPR.plastic, nPPT=(x[11]===1&&!rec)?nt*UK_PPT:0, nEPR=nt*UK_EPR[x[10]], pT=pPPT+pEPR, nT=nPPT+nEPR, d=pT-nT;
+      h=`<div class="ctab"><div><span class="label">Plastic pack</span><b>${gbp(pT)}</b><span class="src">a year: tax ${gbp(pPPT)} + EPR ${gbp(pEPR)} · ${fmt(pt,2)} t</span></div><div><span class="label">${esc(m.name)}</span><b>${gbp(nT)}</b><span class="src">a year: ${nPPT?`tax ${gbp(nPPT)} + `:""}EPR ${gbp(nEPR)} · ${fmt(nt,2)} t</span></div><div><span class="label">${d>=0?"Fees you'd avoid":"Extra fees"}</span><b class="${d>=0?"down":"up"}">${gbp(Math.abs(d))}</b><span class="src">${fmt(Math.abs(d)/Math.max(u,1)*100,2)}p per unit</span></div></div>`
+       +(x[11]===1?`<p class="src">${esc(m.name)} counts as plastic under UK rules, so it's taxed like plastic even though it's compostable.</p>`:"")
+       +(x[11]===2?`<p class="src">${esc(m.name)} may or may not count as plastic for the UK tax. Check with HMRC before relying on this.</p>`:"");
+    } else if(r==="OR"){ const [lo,hi]=OR_EPR;
+      h=`<div class="ctab"><div><span class="label">Plastic pack</span><b>${usd(pt*lo)}–${usd(pt*hi)}</b><span class="src">a year · ${fmt(pt,2)} t</span></div><div><span class="label">${esc(m.name)}</span><b>${usd(nt*lo)}–${usd(nt*hi)}</b><span class="src">a year · ${fmt(nt,2)} t</span></div><div><span class="label">Note</span><b style="font-size:16px">Rates differ by material</b><span class="src">This applies Oregon's overall range to both, so it mainly shows the effect of weight. Check Circular Action Alliance's fee schedule.</span></div></div>`;
+    } else if(r==="EU"){
+      h=`<div class="swapbox"><span class="label">EU: compliance more than a fee</span><span>The Packaging and Packaging Waste Regulation applies from 12 August 2026. From 2030 packaging must be recyclable (at least grade C), some single-use formats are restricted, and reuse targets apply. Fees are set nationally through each country's EPR scheme, so check the scheme where you sell.</span></div>`;
+    } else {
+      h=`<div class="swapbox"><span class="label">US states with packaging EPR laws</span><span>California, Colorado, Maine, Maryland, Minnesota, Oregon and Washington. Oregon already charges fees; California is expected from 2027, Maryland from 2028 and Minnesota from 2029. Dates are still moving, so check each state's program.</span></div>`;
+    }
+    $("#cOut").innerHTML=h; }
+  ["cRegion","cUnits","cPg","cRec","cMat","cNg"].forEach(i=>$("#"+i).addEventListener("input",calc));
+  $("#cSrc").innerHTML=`Rates as of ${DATA_ASOF}. UK EPR uses Defra's 2025/26 base fees; from year 2 fees also vary with how recyclable the pack is. Sources: `+FEE_SRC.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")+".";
+  calc();
+})();
+$$(".foot").forEach(f=>f.insertAdjacentHTML("beforeend",` Data compiled ${DATA_ASOF}.`));
+
+/* ---------- case studies (50) ---------- */
+const CASE_BRAND_SRC={"Sainsbury's": "https://uk.fsc.org/sites/default/files/2024-03/Sainsbury%27s%20packaging%20image.png", "Walkers": "https://www.packagingstrategies.com/ext/resources/2023/10/31/Walkers-Paper.webp?t=1699398578", "Coca-Cola": "https://i0.wp.com/thedieline.com/wp-content/uploads/2022/08/0c0eba5a-c6be-4e74-ac85-f1f20756906d_Coke_Stacked62f27e06cec63png.webp?w=800&quality=65&ssl=1", "Orkla Salvequick": "https://www.smurfitkappa.com/-/m/images/image-text-teaser-680-x-450/case-studies/orkla-salvequick_680x450_approach.jpg", "Carlsberg": "https://media.madisonpublications.eu/uploads/2018/09/06075942/2C86FC9A-B79F-47A8-932A-81C741192423.jpeg", "Heineken UK": "https://www.grocerygazette.co.uk/wp-content/uploads/2022/10/Heineken-topper-1024x683.jpg", "Nestle": "https://i0.wp.com/thedieline.com/wp-content/uploads/2021/02/8bd5ff2c-5a2d-4f8d-8903-84c938bf5093_smartiespaperpackaging_web.jpg", "Nestle Japan": "https://soranews24.com/wp-content/uploads/sites/3/2019/08/japanese-kit-kats-kitkats-plastic-paper-packaging-new-recycle-environmentally-friendly-packaging-sustainable-chocolates-japan-new-marketing-6-1.jpg", "Nesquik": "https://d2dyh47stel7w4.cloudfront.net/Pictures/1120xAny/9/5/9/155959_nesquikallnatural1_883464_crop.jpg", "Mars Wrigley Australia": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/8/6/5/10865_image21_81815.jpg", "Arla": "https://images.arla.com/recordid/8756524F-7668-47F7-A66DD67069E1E4D6/picture.jpg?width=1200&height=630&mode=max&format=jpg", "Diageo": "https://www.packagingstrategies.com/ext/resources/2020-Postings/New-Packages/JW-Black-for-web.png?height=635&t=1613505211&width=1200", "Absolut": "https://www.circularonline.co.uk/wp-content/uploads/2023/06/2fc0565e-bd59-4c1a-a14f-1dc01cb850bd-1-768x768-1.webp", "Tetra Pak": "https://papermart.in/wp-content/uploads/2019/07/Tetra-Pak-Introduces-Paper-Straws-for-Beverage-Products-in-Europe-799x1024-1.jpg", "Tesco": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/9/6/2/224962_beanswithoutplasticwrap_593232.jpg", "Waitrose": "https://d3fwccq2bzlel7.cloudfront.net/Pictures/1120xAny/2/0/8/49208_2_1213621.jpg", "Lidl GB": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/5/5/0/295550_birchwood_vacpackmince_10_75731_crop.jpeg", "Aldi UK": "https://media.madisonpublications.eu/uploads/2020/02/06075021/Aldi-Chicken-Pesto-Pizza1.jpg", "Iceland": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/8/1/1/125811_Hungry-Heroes-Too-Cool_WEB.jpg", "Woolworths Australia": "https://www.australianmanufacturing.com.au/wp-content/uploads/2021/05/3.-Woolworths-packaging-pulp-tray-for-mini-tomatoes-and-paper-meat-trays.jpg", "Morrisons": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/7/5/7/132757_Morrisons-paper-packaging-web.jpg", "Amazon": "https://imgproxy.divecdn.com/lkF51ux4RQ0kMffqmzCWJ1YIZzqP1A4jijM4WhwkvcE/g:ce/rs:fit:770:435/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9BTVpOX0Fpcl9QaWxsb3dfUmVtb3ZhbF83LmpwZw==.webp", "McDonald's UK & Ireland": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/9/9/6/180996_happymeals_682859.jpg", "McDonald's UK": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/2/1/3/164213_mcflurry_432687.jpg", "Burger King UK": "https://cms.dandad.org/images/f4nPfIUZap-O7gg_c7E_SLywcvk=/32700/width-1600/3000x2400_YwUAuDd.jpg", "Starbucks": "https://www.packagingstrategies.com/ext/resources/2020-Postings/Packager-News/Starbucks-for-web.jpg", "Just Eat": "https://ethicalmarketingnews.com/wp-content/uploads/2019/11/justeat-hellmans.jpg", "IKEA": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/6/6/0/4660_ikeapace020320.jpg", "Samsung": "https://images.samsung.com/is/image/samsung/assets/us/explore/brand/take-charge-of-sustainability-with-galaxy/01042022/Galaxy_S21_packaging.jpg", "LEGO": "https://www.esgtoday.com/wp-content/uploads/2025/11/Lego-paper-bag2.jpg", "Hasbro": "https://www.hasbro.com/common/productimages/en_US/145BAA1FC0404F5CA6C1AEC1CEF13487/235f34beb043f5480f1cb99c6a82bef9cd69de10.jpg", "Ethique": "https://cdn.shopify.com/s/files/1/0025/1717/2339/files/PDP_GENTLE-Shampoo_ETHIQUE_2026_2000x2000-1.jpg?v=1778009760", "Apple": "https://upload.wikimedia.org/wikipedia/commons/8/8c/IPhone_15_Pro_Max_and_the_box%2C_2023%2C_01.jpg", "Dell": "https://cdn.pokde.net/wp-content/uploads/2022/04/dell-sustainable-packaging.jpg", "Google": "https://fdn.gsmarena.com/imgroot/news/23/10/google-pixel-8-unboxing/-1200w5/gsmarena_001.jpg", "HP": "https://www.hp.com/content/dam/sites/garage-press/press/press-releases/2020/molded-fiber-announcement/HP%20MF_HP%20Desktop%20Mini%202.jpg", "Mattel": "https://i0.wp.com/thedieline.com/wp-content/uploads/2020/10/24bb2957-9906-4b59-9b9b-a2f909c498f2_https___hypebeastcom_image_2020_10_mattelunonothinbutpapersustainabilitydesign001.jpg", "Gillette": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1024x536/1/4/6/228146_00000000_glltt_557_proglide_we_razor_1up_v2_tabletop_page_2_843620.jpg", "Logitech": "https://www.logitech.com/blog/wp-content/uploads/2025/04/Copy-of-PR_image_boxes_wiped.png", "Microsoft": "https://i0.wp.com/thedieline.com/wp-content/uploads/2025/04/df51e440-5ba7-4536-9d42-8f449b1c3d2c.jpg", "Lush": "https://lush.co.za/cdn/shop/files/honey_shampoo_bar.jpg?v=1721733777", "Lenor (P&G)": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/9/7/3/2973_lenor-20-07.jpg", "Dove (Unilever)": "https://assets.unileversolutions.com/v1/33161020.jpg", "Garnier": "https://static.thcdn.com/productimg/original/12732545-2085086944127479.jpg", "Sony": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgpZVCdGrCxNu5-eerbvThr-g6If1RcAPIOOlo85pbr0_17VdEtxcDDfN-i8iRRznb6xXAnulwcKJFudkoZ4Xvv-V_qHKKN7fJhQvNI1WQCn6jDMpMIviTuWJLmc3WqpOIQTCd0xn_930xa/s16000/Sony-WF-1000XM4-Packaging.jpg", "La Roche-Posay": "https://prix.formesdeluxe.com/app/uploads/2021/05/la-roche-posay-carton.png", "Native": "https://cdn.shopify.com/s/files/1/1361/9483/products/COCONUT_PlasticTube_Front_01f0203f-3266-4a20-b532-1e8c472c8a60.png?v=1571183541", "H&M Group": "https://www.theindustry.fashion/wp-content/uploads/2021/07/HandM-e1632941770731.jpg", "adidas": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhFaCStx8Ja6s3ytO2h5mDv-h5b_loiV4fsBUTagbcmnpuUx2pr2nKowQQxGVCx8gCax4kV4bQlVSdqOM-xElc_6a0pfv1KVYPdI5z3VZTiWWO2X92uiQp23WxDItvdmZBI1-wExCSRUrWo/s1600/adidas+new+policy.jpg", "Vital Proteins": ""};
+/* real branded product photos, shown on hover; add a file to img/brand/ and a line here */
+const CASE_BRAND={"Vital Proteins": "vital-proteins.png", "Sainsbury's": "sainsbury-s.png", "Walkers": "walkers.png", "Coca-Cola": "coca-cola.png", "Orkla Salvequick": "orkla-salvequick.png", "Carlsberg": "carlsberg.png", "Heineken UK": "heineken-uk.png", "Nestle": "nestle.png", "Nestle Japan": "nestle-japan.png", "Nesquik": "nesquik.png", "Mars Wrigley Australia": "mars-wrigley-australia.png", "Arla": "arla.png", "Diageo": "diageo.png", "Absolut": "absolut.png", "Tetra Pak": "tetra-pak.png", "Tesco": "tesco.png", "Waitrose": "waitrose.png", "Lidl GB": "lidl-gb.png", "Aldi UK": "aldi-uk.png", "Iceland": "iceland.png", "Woolworths Australia": "woolworths-australia.png", "Morrisons": "morrisons.png", "Amazon": "amazon.png", "McDonald's UK & Ireland": "mcdonald-s-uk-ireland.png", "McDonald's UK": "mcdonald-s-uk.png", "Burger King UK": "burger-king-uk.png", "Starbucks": "starbucks.png", "Just Eat": "just-eat.png", "IKEA": "ikea.png", "Samsung": "samsung.png", "LEGO": "lego.png", "Hasbro": "hasbro.png", "Ethique": "ethique.png", "Apple": "apple.png", "Dell": "dell.png", "Google": "google.png", "HP": "hp.png", "Mattel": "mattel.png", "Gillette": "gillette.png", "Logitech": "logitech.png", "Microsoft": "microsoft.png", "Lush": "lush.png", "Lenor (P&G)": "lenor-p-g.png", "Dove (Unilever)": "dove-unilever.png", "Garnier": "garnier.png", "Sony": "sony.png", "La Roche-Posay": "la-roche-posay.png", "Native": "native.png", "H&M Group": "h-m-group.png", "adidas": "adidas.png"};
+const pick=(map,nb)=>map[nb]||(Object.entries(map).find(([k])=>nb.startsWith(k))||[])[1];
+
+const CASE_IMG={"Vital Proteins":"s-canister.png","Sainsbury's":"s-tp.png","Walkers":"e-chips-paper.png","Coca-Cola":"s-collar.png","Orkla Salvequick":"k-plasters.png","Carlsberg":"e-bottle-can.png","Heineken UK":"s-collar.png","Nestle":"c-mints.png","Nestle Japan":"c-wrapper.png","Mars Wrigley Australia":"c-wrapper.png","Arla":"e-yogurt-paper.png","Diageo":"k-paperbottle.png","Absolut":"k-paperbottle.png","Tetra Pak":"e-straw-paper.png","Tesco":"k-tins.png","Waitrose":"e-clamshell-pulp.png","Lidl GB":"k-mince.png","Aldi UK":"k-pizza.png","Iceland":"k-tray.png","Woolworths Australia":"e-bag-paper.png","Morrisons":"e-bag-paper.png","Amazon":"e-mailer-paper.png","McDonald's UK & Ireland":"k-toy.png","McDonald's UK":"e-yogurt-paper.png","Burger King UK":"k-toy.png","Starbucks":"c-coldcup.png","Just Eat":"k-seaweed.png","IKEA":"e-mailer-box.png","Samsung":"k-phone.png","LEGO":"k-bricks.png","Hasbro":"k-game.png","Ethique":"e-shampoo-bar.png","Apple":"k-phone.png","Dell":"s-mushroom.png","Google":"k-phone.png","HP":"k-electronics.png","Mattel":"k-game.png","Gillette":"e-razor-safety.png","Logitech":"k-electronics.png","Microsoft":"k-electronics.png","Lush":"e-shampoo-bar.png","Lenor (P&G)":"k-paperbottle.png","Dove (Unilever)":"s-deo.png","Garnier":"e-shampoo-bar.png","Sony":"k-electronics.png","La Roche-Posay":"k-tube.png","Native":"s-deo.png","H&M Group":"e-mailer-paper.png","adidas":"e-bag-paper.png"};
+
+const tfmt=t=>t>=1000?fmt(t/1000,t>=10000?0:1)+"k":fmt(t,t<10?1:0);
+const CATS=["All",...[...new Set(CASES.map(c=>c.cat))].sort()];
+let cat="All";
+(function(){
+  const rep=CASES.filter(c=>c.t!=null), tot=rep.reduce((s,c)=>s+c.t,0);
+  $("#caseStats").innerHTML=`
+    <div><b>${CASES.length}</b><span>brands that switched</span></div>
+    <div><b>${fmt(tot)} t</b><span>plastic saved, from the ${rep.length} that reported tonnes</span></div>
+    <div><b>≈ ${fmt(tot/12/1000,1)}B</b><span>plastic water bottles by weight (12 g each)</span></div>`;
+  $("#caseSeg").innerHTML=CATS.map(c=>`<button type="button" aria-pressed="${c===cat}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  $$("#caseSeg button").forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; $$("#caseSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderCases(); });
+})();
+function renderCases(){
+  const g=$("#g-cases"); g.replaceChildren();
+  CASES.filter(c=>cat==="All"||c.cat===cat).slice().sort((a,b)=>(b.t??-1)-(a.t??-1)).forEach(c=>{
+    const nb=c.brand.normalize("NFD").replace(/[\u0300-\u036f]/g,""), ph=CASE_IMG[nb]||(Object.entries(CASE_IMG).find(([k])=>nb.startsWith(k))||[])[1];
+    const t=document.createElement("button"); t.type="button"; t.className="tile swap case";
+    const br=pick(CASE_BRAND,/^Nesquik/.test(c.product)?"Nesquik":nb);
+    if(br) t.classList.add("has-brand");
+    t.innerHTML=`<span class="art ph${br?" flip":""}">${ph?`<img class="now" src="img/${ph}" alt="${esc(c.to)}" loading="lazy">`:""}${br?`<img class="brand" src="img/brand/${br}" alt="${esc(c.brand)} ${esc(c.product)} as sold" loading="lazy">`:""}</span><span class="nm" style="color:var(--ink);font-weight:600;font-size:14px">${esc(c.brand)}</span><span class="cnum">${c.t!=null?fmt(c.t,c.t<10?1:0)+" tonnes":"Not reported"}</span><span class="nm">${c.t!=null?"of plastic saved":"&nbsp;"}</span>`;
+    t.onclick=()=>openDrawer(`
+      <div class="mtop">
+        ${ph?`<figure style="margin:0;display:grid;gap:8px;justify-items:center;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px"><img src="img/${ph}" alt="${esc(c.to)}" style="width:100%;max-width:260px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption class="src" style="text-align:center">Their solution: ${esc(c.to)}<br><span style="font-size:11px">Unbranded example</span></figcaption></figure>`:""}
+        <div class="mstats"><div><span class="label">${esc(c.cat)} · ${c.year}</span><h2 id="dTitle" style="font-size:30px">${esc(c.brand)}</h2><p class="src" style="margin:4px 0 0">${esc(c.product)}</p></div>
+      <div class="big">${c.t!=null?`<b>${fmt(c.t,c.t<10?1:0)} tonnes</b><span>of plastic saved ${esc(c.note)}</span><span class="src">≈ ${fmt(c.t*1e6/12)} plastic water bottles by weight</span>`:`<b style="font-size:28px">No tonnage</b><span>${esc(c.note)}</span>`}</div>
+      <div class="kv">
+        <div class="wide"><span class="label">Switch</span><span>${esc(c.from)} → <b style="font-family:var(--body);font-size:14px">${esc(c.to)}</b></span></div>
+        <div class="wide"><span class="label">Impact</span><span>${esc(c.benefit)}</span></div>
+        <div class="wide"><span class="label">Cost</span><span>${esc(c.cost)}</span></div>
+      </div>
+      <div class="swapbox"><span class="label">Lesson for makers</span><span>${esc(c.lesson)}</span></div>
+      </div></div>
+      <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}. Company-reported figures.${br?` Branded photo © ${esc(c.brand)}${(()=>{ const u=pick(CASE_BRAND_SRC,/^Nesquik/.test(c.product)?"Nesquik":nb); try{ return u?`, via <a href="${u}" target="_blank" rel="noopener">${new URL(u).hostname}</a>`:""; }catch(_){ return ""; } })()}; shown for study, not for commercial reuse.`:""}</p>`);
+    g.append(t);
+  });
+}
+renderCases();
+
+/* ---------- companies ---------- */
+(function(){
+  const withT=COS.filter(c=>c.t!=null).sort((a,b)=>b.t-a.t), max=withT[0].t, sum=withT.reduce((s,c)=>s+c.t,0);
+  $("#coStats").innerHTML=`
+    <div><b>${fmt(sum/1e6,1)}M t</b><span>a year from these ${withT.length} companies</span></div>
+    <div><b>≈ ${fmt(sum/12/1000)}B</b><span>plastic water bottles by weight, every year</span></div>
+    <div><b>142M t</b><span>plastic packaging waste worldwide in 2019 (OECD)</span></div>`;
+  const statusPill=s=>s==="on"?`<span class="pill g">On track</span>`:s==="off"?`<span class="pill r">Off track</span>`:`<span class="pill">Mixed progress</span>`;
+  const F={soda:["c-soda","PET soda bottles"],water:["p-bottle","PET water bottles"],shrink:["c-shrink","Shrink-wrapped multipacks"],chips:["p-chips","Multilayer snack bags"],wrapper:["c-wrapper","Candy wrappers"],pod:["p-pod","Coffee capsules"],sachet:["c-sachet","Single-use sachets"],jug:["p-jug","Detergent jugs"],shampoo:["p-shampoo","Shampoo and soap bottles"],wipes:["c-wipes","Wipes and diaper packs"],yogurt:["p-yogurt","Yogurt cups"],spray:["c-spray","Trigger spray bottles"],toothpaste:["c-toothpaste","Toothpaste tubes"],petfood:["c-petfood","Pet-food pouches"],cosmetic:["c-cosmetic","Cosmetic bottles and jars"],mailer:["p-mailer","Poly mailers"],bubble:["c-bubble","Bubble wrap"],bag:["p-bag","Plastic bags"],film:["p-film","Plastic film"],clamshell:["p-clamshell","Clamshells"],squeeze:["c-squeeze","Squeeze bottles"],mints:["c-mints","Plastic candy boxes"],blister:["c-blister","Blister packs"],coldcup:["c-coldcup","Cold cups and lids"],straw:["p-straw","Straws"],lid:["p-lid","Hot cup lids"],cutlery:["p-cutlery","Cutlery"],sauce:["c-saucecup","Sauce cups"],cig:["c-cigbutt","Plastic cigarette filters"]};
+  const CF={"Coca-Cola":["soda","water","shrink"],"PepsiCo":["soda","chips","water"],"Nestle":["water","wrapper","pod","sachet"],"Procter & Gamble":["jug","shampoo","sachet","wipes"],"Danone":["water","yogurt"],"Unilever":["sachet","shampoo","jug"],"Henkel":["jug","spray"],"Colgate-Palmolive":["toothpaste","shampoo","jug"],"Keurig Dr Pepper":["soda","pod"],"Mars":["wrapper","petfood"],"Mondelez":["wrapper","chips"],"Reckitt":["spray","jug"],"L'Oreal":["cosmetic","shampoo"],"Amazon":["mailer","bubble"],"Walmart":["bag","film","clamshell"],"Kraft Heinz":["squeeze","film"],"Kimberly-Clark":["wipes","film"],"Ferrero":["wrapper","mints"],"Kenvue":["cosmetic","blister"],"Starbucks":["coldcup","straw","lid"],"McDonald's":["lid","straw","cutlery","sauce"],"Philip Morris Intl.":["cig","film"]};
+  const open=c=>{ const fm=(CF[c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"")]||[]).map(k=>F[k]).filter(Boolean); openDrawer(`
+    <div><span class="label">${esc(c.hq)}${c.yr?" · "+c.yr+" data":""}</span><h2 id="dTitle" style="font-size:30px">${esc(c.co)}</h2></div>
+    ${fm.length?`<div><span class="label">The plastic they put out</span><div class="cofmt">${fm.map(([img,l])=>`<figure><img src="img/${img}.png" alt="${esc(l)}"><figcaption>${esc(l)}</figcaption></figure>`).join("")}</div><p class="src" style="margin:8px 0 0">Unbranded examples of the main single-use formats, not the company's own products.</p></div>`:""}
+    <div class="co2col">
+      <div class="mstats">
+        <div class="big">${c.t!=null?`<b>${fmt(c.t)} t</b><span>plastic packaging a year</span><span class="src">≈ ${fmt(c.t/12/1000,1)} billion plastic water bottles by weight</span>`:`<b style="font-size:28px">Not published</b><span>${esc(c.trend||"")}</span>`}</div>
+        ${c.virgin!=null?`<div class="big"><b>${c.virgin}%</b><span>virgin plastic (${c.rec}% recycled content)</span>${dots(c.virgin)}</div>`:c.rec!=null?`<div class="big"><b>${c.rec}%</b><span>recycled content</span></div>`:""}
+      </div>
+      <div class="kv">
+        ${c.t!=null&&c.trend?`<div class="wide"><span class="label">Trend</span><span>${esc(c.trend)}</span></div>`:""}
+        <div class="wide"><span class="label">Main single-use plastic</span><span>${esc(c.use)}</span></div>
+        ${c.audit?`<div class="wide"><span class="label">Found as litter</span><span>${esc(c.audit)}</span></div>`:""}
+        <div class="wide"><span class="label">Data type</span><span>${c.co==="Amazon"?"Self-reported by Amazon; third-party estimates (Oceana) are higher and disputed":"Self-reported by the company"}${c.yr?", "+c.yr:""}</span></div>
+        <div class="wide"><span class="label">Pledge</span>${statusPill(c.status)}<span style="margin-top:6px">${esc(c.pledge)}</span></div>
+      </div>
+    </div>
+    <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}</p>`, true); };
+  const rows=$("#coRows");
+  withT.forEach(c=>{
+    const b=document.createElement("button"); b.type="button"; b.className="corow";
+    const w=Math.max(0.6,c.t/max*100);
+    b.innerHTML=`<span class="nm">${esc(c.co)}${c.rank?` <span class="pill r" style="margin-left:4px">#${c.rank} litter</span>`:""}</span>
+      <span><span class="bar ${c.virgin!=null?"v":""}" style="display:block;width:${w}%;${c.virgin!=null?`--v:${c.virgin}%`:""}"></span></span>
+      <span class="val">${c.t>=1e6?fmt(c.t/1e6,2)+"M":fmt(c.t/1000)+"k"} t</span>`;
+    b.onclick=()=>open(c); rows.append(b);
+  });
+  COS.filter(c=>c.t==null).forEach(c=>{ const b=document.createElement("button"); b.type="button"; b.textContent=c.co; b.onclick=()=>open(c); $("#coND").append(b); });
+})();
+
+/* ---------- home reel: crossfades through short clips ---------- */
+const REEL=[ /* free Pexels footage, trimmed; credit in each caption */
+ {src:"video/pellets.mp4",cap:"Plastic resin pellets poured into a hopper · Usman AbdulrasheedGambo / Pexels"},
+ {src:"video/preforms.mp4",cap:"Bottle preforms at a plastic bottle factory · Ivan Fedorych / Pexels"},
+ {src:"video/film.mp4",cap:"Plastic film on an extrusion line · Nova lv / Pexels"},
+ {src:"video/tanks.mp4",cap:"Chemical storage tanks · Tom Fisk / Pexels"},
+ {src:"video/smoke.mp4",cap:"Smokestack at an industrial site · Tom Fisk / Pexels"},
+ {src:"video/outfall.mp4",cap:"Outfall pipes discharging into a river · Tom Fisk / Pexels"},
+ {src:"video/oily.mp4",cap:"Polluted water with an oily film · Engin Akyurt / Pexels"},
+ {src:"video/landfill.mp4",cap:"A landfill of plastic waste · Eliza / Pexels"}];
+(function(){
+  const box=$("#reel"), cap=$("#reelCap"), pauseBtn=$("#reelPause");
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let vids=[], i=0, timer=null, running=false, paused=reduce;
+  function build(){ if(vids.length||!REEL.length) return;
+    vids=REEL.map((c,k)=>{ const v=document.createElement("video"); v.muted=true; v.playsInline=true; v.setAttribute("playsinline",""); v.preload=k<2?"auto":"metadata"; v.src=c.src; v.loop=false; box.append(v); return v; }); }
+  function show(k){ vids.forEach((v,j)=>{ v.classList.toggle("on",j===k); if(j!==k){ setTimeout(()=>{ if(!v.classList.contains("on")) v.pause(); },1300); } });
+    const v=vids[k]; try{ v.currentTime=0; }catch(_){} if(!paused) v.play().catch(()=>{}); cap.textContent=REEL[k].cap||"";
+    if(vids[(k+1)%vids.length]) vids[(k+1)%vids.length].preload="auto"; }
+  function next(){ i=(i+1)%vids.length; show(i); schedule(); }
+  function schedule(){ clearTimeout(timer); if(!paused&&running&&vids.length>1) timer=setTimeout(next,6500); }
+  window.__reel=on=>{ running=on; build(); if(!vids.length) return; if(on){ show(i); schedule(); } else { clearTimeout(timer); vids.forEach(v=>v.pause()); } };
+  pauseBtn.onclick=()=>{ paused=!paused; pauseBtn.textContent=paused?"Play":"Pause"; pauseBtn.setAttribute("aria-label",paused?"Play video":"Pause video"); if(paused){ clearTimeout(timer); vids[i]&&vids[i].pause(); } else { vids[i]&&vids[i].play().catch(()=>{}); schedule(); } };
+  if(reduce){ pauseBtn.textContent="Play"; }
+  document.addEventListener("visibilitychange",()=>{ if(document.hidden){ clearTimeout(timer); vids[i]&&vids[i].pause(); } else if(running&&!paused){ vids[i]&&vids[i].play().catch(()=>{}); schedule(); } });
+})();
+
+
+/* ---------- router ---------- */
+const SHOW_HOME=false; /* video home page put away for now */
+const VIEWS=[...(SHOW_HOME?["home"]:[]),"still-plastic","already-swapped","ideate","materials","case-studies","companies"];
+function route(){ const h=(location.hash||"").slice(1); const v=VIEWS.includes(h)?h:(SHOW_HOME?"home":"still-plastic"); document.body.classList.toggle("is-home",v==="home"); window.__reel&&window.__reel(v==="home");
+  $$("[data-view]").forEach(s=>s.hidden=!(s.id==="v-"+v||(v==="home"&&s.id==="v-still-plastic")));
+  $$("nav a").forEach(a=>a.dataset.v===v?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));
+  if(!drawer.hidden) closeDrawer(); window.scrollTo(0,0); }
+addEventListener("hashchange",route); route();
+(function(){ const hero=$("#v-home");
+  new IntersectionObserver(([e])=>{ const on=e.isIntersecting&&e.intersectionRatio>0.12&&document.body.classList.contains("is-home"); document.body.classList.toggle("over-hero",on); window.__reel&&window.__reel(on); },{threshold:[0,0.12,0.5]}).observe(hero);
+  $("#heroGo").onclick=e=>{ e.preventDefault(); $("#v-still-plastic").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); };
+})();
+
+/* ---------- ideate studio ---------- */
+const pad=$("#pad"), surface=$("#surface"), board=$("#board"), ctx=pad.getContext("2d");
+let ops=[], cur=null, tool="pen", color="#1C1F1D";
+function fitPad(){ const r=surface.getBoundingClientRect(), d=Math.min(2,window.devicePixelRatio||1); if(!r.width) return; pad.width=Math.round(r.width*d); pad.height=Math.round(r.height*d); redraw(); }
+function drawOp(o,c=ctx,W=pad.width,H=pad.height){
+  if(o.kind==="img"){ const s=Math.min(W*o.w/o.img.width,H*o.h/o.img.height); const w=o.img.width*s,h=o.img.height*s; c.drawImage(o.img,W*o.x-w/2,H*o.y-h/2,w,h); return; }
+  c.save(); c.globalCompositeOperation=o.erase?"destination-out":"source-over"; c.strokeStyle=o.color; c.lineWidth=o.size*(W/1000); c.lineCap="round"; c.lineJoin="round";
+  c.beginPath(); o.pts.forEach(([x,y],i)=>i?c.lineTo(x*W,y*H):c.moveTo(x*W,y*H)); if(o.pts.length===1) c.lineTo(o.pts[0][0]*W+0.1,o.pts[0][1]*H); c.stroke(); c.restore();
+}
+function redraw(){ ctx.clearRect(0,0,pad.width,pad.height); ops.forEach(o=>drawOp(o)); $("#boardHint").classList.toggle("gone",ops.length>0); }
+const ptOf=e=>{ const r=pad.getBoundingClientRect(); return [(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]; };
+pad.addEventListener("pointerdown",e=>{ pad.setPointerCapture(e.pointerId); cur={kind:"stroke",erase:tool==="erase",color,size:tool==="erase"?28:4,pts:[ptOf(e)]}; ops.push(cur); redraw(); });
+pad.addEventListener("pointermove",e=>{ if(!cur) return; cur.pts.push(ptOf(e)); redraw(); });
+["pointerup","pointercancel"].forEach(t=>pad.addEventListener(t,()=>{ cur=null; }));
+$$(".tool[data-tool]").forEach(b=>b.onclick=()=>{ tool=b.dataset.tool; $$(".tool[data-tool]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); });
+$$(".swatch").forEach(b=>b.onclick=()=>{ color=b.dataset.color; tool="pen"; $$(".swatch").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); $$(".tool[data-tool]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.tool==="pen"))); });
+$("#undoBtn").onclick=()=>{ ops.pop(); redraw(); };
+$("#clearBtn").onclick=()=>{ ops=[]; redraw(); };
+const fileIn=$("#file");
+$("#upBtn").onclick=()=>fileIn.click();
+function addImage(f){ if(!f||!/^image\//.test(f.type)){ $("#ideaStatus").textContent="Drop a JPG, PNG or WebP image."; return; }
+  const img=new Image(); img.onload=()=>{ ops.push({kind:"img",img,x:.5,y:.45,w:.7,h:.7}); redraw(); }; img.src=URL.createObjectURL(f); }
+fileIn.onchange=()=>{ addImage(fileIn.files[0]); fileIn.value=""; };
+["dragenter","dragover"].forEach(t=>board.addEventListener(t,e=>{e.preventDefault();board.classList.add("over");}));
+["dragleave","drop"].forEach(t=>board.addEventListener(t,e=>{e.preventDefault();board.classList.remove("over");}));
+board.addEventListener("drop",e=>addImage(e.dataTransfer.files[0]));
+document.addEventListener("paste",e=>{ if(location.hash!=="#ideate") return; const f=[...(e.clipboardData?.files||[])][0]; if(f) addImage(f); });
+new ResizeObserver(fitPad).observe(surface);
+function boardBlob(){ if(!ops.length) return Promise.resolve(null); const c=document.createElement("canvas"); c.width=1200; c.height=Math.round(1200*pad.height/pad.width)||900; const x=c.getContext("2d"); x.fillStyle="#FFFFFF"; x.fillRect(0,0,c.width,c.height); ops.forEach(o=>drawOp(o,x,c.width,c.height)); return new Promise(r=>c.toBlob(r,"image/png")); }
+
+/* material cards */
+function concept(m,qty,extra={}){ const pl=mid(m.cost)/mid(m.vs); return {name:extra.name||m.name,material_id:m.id,format:extra.format||m.name,why:extra.why||(m.name+" replaces "+m.replaces.toLowerCase()+"."),unit_cost_usd:{low:m.cost[0],high:m.cost[1]},plastic_unit_cost_usd:+pl.toFixed(2),cost_vs_plastic_pct:Math.round((mid(m.vs)-1)*100),lead_time_weeks:{low:m.lead[0],high:m.lead[1]},plastic_avoided_g_per_unit:m.g,co2_note:m.co2,end_of_life:m.eol,sourcing:m.origin+". "+m.suppliers,readiness:m.kind==="dev"?"pilot":"available"}; }
+function localIdeas(brief){
+  const w=new Set((brief.toLowerCase().match(/[a-z]+/g)||[]).flatMap(x=>[x,x.replace(/s$/,"")]));
+  const sc=m=>m.tags.filter(t=>w.has(t)).length*3-mid(m.vs)*0.3;
+  const r=M.map(m=>({m,s:sc(m)})).sort((a,b)=>b.s-a.s);
+  const com=r.filter(x=>x.m.kind==="common").map(x=>x.m), dev=r.find(x=>x.m.kind==="dev").m;
+  return [concept(com[0]),concept(com[1]),concept(com[2]),concept(dev)];
+}
+function card(c,qty){
+  const m=byId[c.material_id]||null, uc=c.unit_cost_usd||{}, lt=c.lead_time_weeks||{}, pct=Number(c.cost_vs_plastic_pct), g=Number(c.plastic_avoided_g_per_unit)||0, kg=g*qty/1000;
+  const el=document.createElement("button"); el.type="button"; el.className="mcard";
+  el.innerHTML=`${m?`<img src="img/m-${m.id}.jpg" alt="">`:`<span class="ghost" style="height:76px"></span>`}
+    <div><span class="pill ${c.readiness==="available"?"g":""}" style="font-size:9.5px">${c.readiness==="available"?"Available now":"In development"}</span>
+    <h4>${esc(c.name)}</h4><span class="src" style="font-size:11px">${c._src==="claude"?"Claude estimate for your brief":"Library data"}</span>
+    <div class="row"><span><b>${isFinite(uc.low)?money(uc.low)+"–"+money(uc.high):"—"}</b> /unit</span><span class="${pct>0?"up":"down"}"><b>${costDiff(pct)}</b> than plastic</span><span><b>${isFinite(lt.low)?lt.low+"–"+lt.high:"—"}</b> wk</span><span><b>${kg>=1000?fmt(kg/1000,1)+" t":fmt(kg)+" kg"}</b> plastic saved/yr</span></div></div>`;
+  el.onclick=()=>openDrawer(`
+    ${m?`<img src="img/m-${m.id}.jpg" alt="" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px">`:""}
+    <div><span class="label">${esc(m?m.name:"Material")}</span><h2 id="dTitle">${esc(c.name)}</h2><p class="src" style="margin:6px 0 0">${esc(c.format||"")}</p></div>
+    <p style="margin:0">${esc(c.why||"")}</p>
+    <div class="anums" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+      <div><span class="label">Unit cost</span><b>${isFinite(uc.low)?money(uc.low)+"–"+money(uc.high):"—"}</b><span class="src">plastic version ≈ ${c.plastic_unit_cost_usd!=null?money(c.plastic_unit_cost_usd):"—"}</span></div>
+      <div><span class="label">Cost compared with plastic</span><b class="${pct>0?"up":"down"}">${costDiff(pct)}</b><span class="src">per unit</span></div>
+      <div><span class="label">Arrives in</span><b>${isFinite(lt.low)?lt.low+"–"+lt.high+" weeks":"—"}</b></div>
+      <div><span class="label">Plastic saved a year</span><b class="down">${kg>=1000?fmt(kg/1000,1)+" t":fmt(kg)+" kg"}</b><span class="src">${fmt(g,g<1?1:0)} g × ${fmt(qty)} units</span></div>
+    </div>
+    <div class="kv">
+      <div class="wide"><span class="label">Where it's from</span><span>${esc(c.sourcing||"")}</span></div>
+      <div class="wide"><span class="label">Environment</span><span>${esc(c.co2_note||"")}</span><span class="src">After use: ${esc(c.end_of_life||"")}</span></div>
+      ${m?`<div class="wide"><span class="label">Watch</span><span>${esc(m.watch)}</span></div>`:""}
+    </div>
+    ${specHTML(c.material_id)}${CLAIM}<p class="src">${c._src==="claude"?"Estimated by Claude for your brief":"From the Pulp Lab material library"}, ${DATA_ASOF}. Get supplier quotes before you commit.</p>`, true);
+  return el;
+}
+const stack=$("#ideas"), st=$("#ideaStatus");
+function ghosts(n){ RUN.concepts=[]; stack.replaceChildren(...Array.from({length:n},()=>{ const d=document.createElement("div"); d.className="ghost"; return d; })); }
+let RUN={brief:"Example: soy candle in a jar",qty:5000,region:"United States",date:new Date().toISOString().slice(0,10),concepts:[]};
+function pushCard(c,qty){ RUN.concepts.push(c); const g=stack.querySelector(".ghost"); const el=card(c,qty); g?g.replaceWith(el):stack.append(el); }
+async function playLocal(list,qty){ ghosts(list.length); for(const c of list){ c._src=c._src||"library"; await new Promise(r=>setTimeout(r,260)); pushCard(c,qty); } stack.querySelectorAll(".ghost").forEach(g=>g.remove()); }
+
+const LIB=M.map(m=>`${m.id} | ${m.name} | ${m.kind==="dev"?"IN DEVELOPMENT":"available"} | ${m.made} | from ${m.origin} | ${m.suppliers} | $${m.cost[0]}-${m.cost[1]} ${m.unit} | ${m.vs[0]}-${m.vs[1]}x plastic (${m.replaces}) | ${m.lead[0]}-${m.lead[1]} wk | ${m.eol} | ${m.co2}`).join("\n");
+const FORMAT=`Reply in JSON Lines: one JSON object per line, no other text, no code fences.
+If an image is attached, line 1 is {"type":"read","text":"one sentence on what the drawing shows"}.
+Then exactly 4 lines, one per material the maker would need, each:
+{"type":"concept","name":"short role, e.g. Outer box","material_id":"<id from the library>","format":"what part it makes","why":"one sentence","unit_cost_usd":{"low":n,"high":n},"plastic_unit_cost_usd":n,"cost_vs_plastic_pct":n,"lead_time_weeks":{"low":n,"high":n},"plastic_avoided_g_per_unit":n,"co2_note":"short, with % if reasonable","end_of_life":"short","sourcing":"where from + example supplier","readiness":"available"|"pilot"}
+Use library ids only. The first 3 should be available materials covering the different parts of the package; the 4th one IN DEVELOPMENT material worth watching. Realistic planning numbers.`;
+const samplePromise=(window.claude?.use?window.claude.use("sample"):Promise.resolve(null)).catch(()=>null);
+
+
+/* brief export: copy, download (viewer confirms), save in this browser */
+function briefText(){ const L=[`# Packaging brief: ${RUN.brief}`,`${fmt(RUN.qty)} units a year · ${RUN.region} · ${RUN.date}`,""];
+  RUN.concepts.forEach((c,k)=>{ const m=byId[c.material_id], x=SPEC[c.material_id]||[], uc=c.unit_cost_usd||{}, lt=c.lead_time_weeks||{};
+    L.push(`## ${k+1}. ${c.name}${m?` (${m.name})`:""}`, c.why||"", `- Unit cost: $${uc.low}–$${uc.high} (plastic ≈ $${c.plastic_unit_cost_usd}); ${costDiff(c.cost_vs_plastic_pct)} than plastic per unit`, `- Lead time: ${lt.low}–${lt.high} weeks`, `- Plastic avoided: ${c.plastic_avoided_g_per_unit} g per unit`, `- After use: ${c.end_of_life||""}`, `- Sourcing: ${c.sourcing||""}`);
+    if(x.length) L.push(`- Moisture/oxygen/grease barrier: ${RATE[x[0]]}/${RATE[x[1]]}/${RATE[x[2]]}; food contact: ${x[4]}; lines: ${x[5]}; UK EPR £${UK_EPR[x[10]]}/t`);
+    L.push(`- Source: ${c._src==="claude"?"Claude estimate":"Pulp Lab library"}`,""); });
+  L.push("Planning estimates only, not supplier quotes or an LCA. Check claims against the FTC Green Guides / EU green-claims rules.");
+  return L.join("\n"); }
+$("#copyBrief").onclick=async()=>{ const t=briefText(); try{ await navigator.clipboard.writeText(t); st.textContent="Brief copied"; }catch(_){ const a=document.createElement("textarea"); a.value=t; document.body.append(a); a.select(); st.textContent="Press ⌘C to copy"; setTimeout(()=>a.remove(),8000); } };
+(async()=>{ const dl=await (window.claude?.use?window.claude.use("downloads"):Promise.resolve(null)).catch(()=>null); if(!dl) return; const b=$("#dlBrief"); b.hidden=false;
+  b.onclick=async()=>{ try{ await dl.save({filename:`pulp-lab-brief-${RUN.date}.md`,data:briefText()}); st.textContent="Brief saved"; }catch(e){ if(e?.code==="unavailable") b.hidden=true; } }; })();
+const SKEY="pl-briefs"; const loadSaved=()=>{ try{ return JSON.parse(localStorage.getItem(SKEY)||"[]"); }catch(_){ return []; } };
+function fillSaved(){ const sel=$("#savedBriefs"), list=loadSaved(); sel.innerHTML=`<option value="">Saved briefs (${list.length})</option>`+list.map((r,k)=>`<option value="${k}">${esc(r.brief.slice(0,40))} · ${r.date}</option>`).join(""); }
+$("#saveBrief").onclick=()=>{ if(!RUN.concepts.length) return; const list=loadSaved(); list.unshift(JSON.parse(JSON.stringify(RUN))); try{ localStorage.setItem(SKEY,JSON.stringify(list.slice(0,12))); st.textContent="Saved in this browser"; }catch(_){ st.textContent="Couldn't save in this browser"; } fillSaved(); };
+$("#savedBriefs").onchange=e=>{ const r=loadSaved()[+e.target.value]; if(!r) return; RUN=r; const cs=r.concepts.slice(); ghosts(0); RUN={...r,concepts:[]}; cs.forEach(c=>pushCard(c,r.qty)); st.textContent=r.brief.slice(0,30); e.target.value=""; };
+fillSaved();
+playLocal(localIdeas("soy candle glass jar shipped online"),5000);
+st.textContent="Example: soy candle in a jar";
+
+$("#ideaForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const brief=$("#brief").value.trim(), qty=Number($("#qty").value)||1000, region=$("#region").value;
+  const img=await boardBlob();
+  RUN={brief:brief||"(from drawing)",qty,region,date:new Date().toISOString().slice(0,10),concepts:[]};
+  if(!brief&&!img){ st.textContent="Draw something or describe it"; $("#brief").focus(); return; }
+  $("#sketchRead").hidden=true;
+  const sample=await samplePromise;
+  if(!sample){ st.textContent="From the material library"; return playLocal(localIdeas(brief),qty); }
+  const ctl=new AbortController(), btn=$("#ideaBtn"), stop=$("#ideaStop");
+  btn.disabled=true; stop.hidden=false; stop.onclick=()=>ctl.abort();
+  st.textContent=img?"Reading your drawing…":"Thinking…"; ghosts(4);
+  let pending="", got=0;
+  const eat=line=>{ line=line.trim().replace(/^```\w*|```$/g,""); if(!line) return; try{ const o=JSON.parse(line); if(o.type==="read"){ const r=$("#sketchRead"); r.textContent="In your drawing: "+o.text; r.hidden=false; } else if(o.type==="concept"){ o._src="claude"; pushCard(o,qty); got++; st.textContent=`Found ${got} of 4`; } }catch(_){} };
+  try{
+    const prompt=`You are a sustainable packaging engineer helping a maker in an open design studio.${img?" The attached image is their drawing on the board.":""}\nWhat they're making: ${brief||"see the drawing"}\nVolume: ${qty} units/year\nBased in: ${region}\n\nMaterial library (id | name | status | ...):\n${LIB}\n\n${FORMAT}`;
+    const opts={signal:ctl.signal,cache:false,onText:({delta})=>{ const parts=(pending+delta).split("\n"); pending=parts.pop(); parts.forEach(eat); }};
+    if(img) opts.images=img;
+    await sample(prompt,opts); eat(pending); pending="";
+    stack.querySelectorAll(".ghost").forEach(g=>g.remove());
+    if(!got){ st.textContent="From the material library"; playLocal(localIdeas(brief),qty); } else st.textContent=`${got} materials`;
+  }catch(err){
+    const c=err?.code; stack.querySelectorAll(".ghost").forEach(g=>g.remove());
+    if(c==="cancelled") st.textContent="Stopped";
+    else if(c==="rate_limited") st.textContent="Busy. Try again in a minute";
+    else if(c==="image_rejected") st.textContent="Couldn't read that image";
+    else if(!got){ st.textContent="From the material library"; playLocal(localIdeas(brief),qty); }
+  }finally{ btn.disabled=false; stop.hidden=true; }
+});
+/* ---------- logo: dot-grid PULP LAB (temporary switcher to compare 4 options) ---------- */
+(function(){
+const G={
+3:{P:["111","101","111","100","100"],U:["101","101","101","101","111"],L:["100","100","100","100","111"],A:["111","101","111","101","101"],B:["110","101","110","101","110"]},
+4:{P:["1110","1001","1110","1000","1000"],U:["1001","1001","1001","1001","0110"],L:["1000","1000","1000","1000","1111"],A:["0110","1001","1111","1001","1001"],B:["1110","1001","1110","1001","1110"]}};
+function svg(lines,w,{cell=10,r=.46,ghost=false,vary=false,h=30}={}){
+  const font=G[w], rows=font.P.length; let dots=[], y0=0, maxW=0;
+  lines.forEach(line=>{ let x0=0;
+    [...line].forEach(ch=>{ if(ch===" "){x0+=w*0.6;return;} const g=font[ch];
+      g.forEach((row,ry)=>[...row].forEach((b,rx)=>{ const on=b==="1";
+        if(on||ghost){ let rr=r; if(vary&&on){ const n=Math.sin((x0+rx)*12.9898+(y0+ry)*78.233)*43758.5453; rr=r*(0.72+0.34*(n-Math.floor(n))); }
+          dots.push(`<circle cx="${((x0+rx+.5)*cell).toFixed(1)}" cy="${((y0+ry+.5)*cell).toFixed(1)}" r="${((on?rr:r*.55)*cell).toFixed(2)}" class="${on?"on":"off"}"/>`);} }));
+      x0+=w+1; });
+    maxW=Math.max(maxW,x0-1); y0+=rows+1.4; });
+  const W=maxW*cell, H=(y0-1.4)*cell;
+  return `<svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" style="height:${h}px;width:auto;display:block" role="img" aria-label="Pulp Lab">${dots.join("")}</svg>`;
+}
+const LOGOS=[
+  ["Chunky",()=>svg(["PULP LAB"],3,{cell:10,r:.47,h:26})],
+  ["Stacked",()=>svg(["PULP","LAB"],4,{cell:10,r:.46,h:40})],
+  ["LED grid",()=>svg(["PULP LAB"],4,{cell:10,r:.44,ghost:true,h:26})],
+  ["Pulp fiber",()=>svg(["PULP","LAB"],4,{cell:10,r:.5,vary:true,h:40})]
+];
+const i=2; /* chosen: LED grid */
+const brand=document.querySelector(".brand");
+function show(){ brand.innerHTML=LOGOS[i][1](); }
+show();
+})();
+})();
+</script>
