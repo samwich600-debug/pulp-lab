@@ -704,6 +704,11 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 /* Plastic page, eco mode: the swap photos sit almost touching, separated by a few pixels */
 #g-still .art.ph .multi{gap:0;grid-template-columns:repeat(var(--n,1),minmax(0,1fr))}
 #g-still .art.ph .multi img{width:100%;max-width:none;height:100%;object-fit:contain;margin:0;transform:scale(1.12)}
+/* Plastic page: the eco toggle sits at the far right of the heading row; the index view is removed */
+@media (min-width:700px){
+  #v-still-plastic .vhrow{position:relative;flex-direction:column}
+  #v-still-plastic .vhrow #ecoSwitch{position:absolute;right:0;top:50%;transform:translateY(-50%)}
+}
 </style>
 
 <header class="top"><div class="wrap">
@@ -740,7 +745,6 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
       <div class="vh"><h1 id="stillTitle">Easy to make plastic-free. Still plastic.</h1><p id="stillSub">Tap an item to see what it leaves behind.</p></div>
       <button type="button" class="switch" id="ecoSwitch" role="switch" aria-checked="false">Show eco versions <span class="knob" aria-hidden="true"></span></button>
     </div>
-    <div class="seg layoutseg" role="group" aria-label="Layout" id="layoutSeg"><button type="button" aria-pressed="true" data-layout="grid">Grid</button><button type="button" aria-pressed="false" data-layout="index">Index</button></div>
     <div class="gallery four" id="g-still"></div>
     <div class="ocean">
       <p class="foot"><span class="ocean-lead">Worldwide, only 9% of plastic waste is recycled and 22% is mismanaged: dumped, burned in the open or leaked into nature.</span> <span class="ocean-sub">About 1.7 million tonnes reached the ocean in 2019 (<a href="https://www.oecd.org/en/publications/global-plastics-outlook_de747aef-en.html" target="_blank" rel="noopener">OECD Global Plastics Outlook</a>).</span><span class="ocean-note">Item recycling rates are US figures from the <a href="https://www.epa.gov/facts-and-figures-about-materials-waste-and-recycling/plastics-material-specific-data" target="_blank" rel="noopener">EPA</a> and <a href="https://www.greenpeace.org/usa/reports/circular-claims-fall-flat-again/" target="_blank" rel="noopener">Greenpeace USA (2022)</a>.</span></p>
@@ -1118,7 +1122,6 @@ function renderStill(){
   });
   watchCats();
 }
-$("#layoutSeg").onclick=e=>{ const b=e.target.closest("button[data-layout]"); if(!b) return; layout=b.dataset.layout; $$("#layoutSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderStill(); };
 $("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
 /* which library material backs each eco alternative (null = reusable item, not in the library) */
 const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null,"multipack-carton":"paperboard","blister-box":"paperboard","candy-paper":"glassine","spray-aluminum":"aluminum","soap-bar":"paperboard","sponge-cellulose":null,"storage-glass":"glass","liner-compost":"kraft-paper","tea-loose":null,"milk-glass":"glass","bread-paper":"kraft-paper","deo-card":"paperboard","floss-silk":null,"tp-paper":"kraft-paper","pods-powder":"corrugated","tape-paper":"kraft-paper","hanger-wood":null};
