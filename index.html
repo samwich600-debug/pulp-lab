@@ -532,6 +532,12 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 @keyframes scrimIn{from{opacity:0}to{opacity:1}}
 @keyframes popIn{from{opacity:0;transform:translate(-50%,-46%) scale(.97);filter:blur(6px)}to{opacity:1;transform:translate(-50%,-50%) scale(1);filter:blur(0)}}
 
+/* Plastic grid: item names appear on hover (always shown on touch screens, which have no hover) */
+@media (hover:hover){
+  .tile.hoverswap .nm{opacity:0;transition:opacity .35s ease}
+  .tile.hoverswap:hover .nm,.tile.hoverswap:focus-visible .nm{opacity:1}
+}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -728,7 +734,10 @@ const STILL=[
  {id:"mailer",name:"Poly mailer",art:"mailer",resin:"LDPE #4 film",g:15,count:"Billions",scope:"shipped a year worldwide",nr:90,nrSrc:"EPA 2018: about 10% of bags, sacks and wraps recycled",beach:false,swap:"Recycled paper mailer",brief:"Mailers for shipping clothing orders"},
  {id:"film",name:"Cling film",art:"film",resin:"LDPE / PVC",g:2,count:"Billions of feet",scope:"a year",nr:99,nrSrc:"Food-soiled film is rejected by recyclers",beach:false,swap:"Beeswax or plant-wax wrap, cellulose film",brief:"Food wrap for home kitchens"},
  {id:"razor",name:"Disposable razor",art:"razor",resin:"PP + steel",g:10,count:"Billions",scope:"a year worldwide",nr:99,nrSrc:"Mixed plastic and metal; not accepted curbside",beach:false,swap:"Metal handle with replaceable blades in paper",brief:"A razor and its replacement blade packaging"},
- {id:"swab",name:"Cotton swab",art:"swab",resin:"PP #5 stick",g:0.3,count:"Billions",scope:"a year worldwide",nr:99,nrSrc:"Too small for sorting; often flushed",beach:true,swap:"Paper-stick swab in a cardboard box",brief:"Cotton swabs and their box"}
+ {id:"swab",name:"Cotton swab",art:"swab",resin:"PP #5 stick",g:0.3,count:"Billions",scope:"a year worldwide",nr:99,nrSrc:"Too small for sorting; often flushed",beach:true,swap:"Paper-stick swab in a cardboard box",brief:"Cotton swabs and their box"},
+ {id:"soda",name:"Soda bottle",art:"bottle",resin:"PET #1",g:20,count:"600+ billion",scope:"single-use bottles a year worldwide (one industry-cited estimate)",nr:67,nrSrc:"Industry report (Bevi, 2023): 33% of PET bottles recycled",beach:false,swap:"Aluminum can",brief:"Sparkling drinks in cans for a café menu"},
+ {id:"toothpaste",name:"Toothpaste tube",art:"toothbrush",resin:"PE + aluminum laminate",g:20,count:"~400 million",scope:"tubes discarded a year in the US (industry-cited estimate)",nr:83,nrSrc:"UK trial: only 16.7% recovered when paste was left in the tube",beach:false,swap:"Toothpaste tablets in a glass jar",brief:"Toothpaste tablets for a zero-waste bathroom shop"},
+ {id:"coldcup",name:"Cold cup",art:"lid",resin:"PET or PP",g:10,count:"Billions",scope:"used a year in the US (rough estimate; no national figure found)",nr:99,nrSrc:"EPA, as cited in 2022 press: under 1% of cups and plates recycled",beach:false,swap:"Paperboard cup",brief:"Cold drink cups for an iced-coffee bar"}
 ];
 
 /* ---------- ALREADY SWAPPED ---------- */
@@ -801,7 +810,10 @@ const ALTS={
  mailer:[["mailer-paper","Recycled paper mailer"],["mailer-box","Corrugated mailer box"]],
  film:[["film-beeswax","Beeswax wrap"]],
  razor:[["razor-safety","Metal razor, paper box"]],
- swab:[["swab-paper","Paper-stick swabs"]]
+ swab:[["swab-paper","Paper-stick swabs"]],
+ soda:[["bottle-can","Aluminum can"]],
+ toothpaste:[["toothpaste-tabs","Toothpaste tablets"]],
+ coldcup:[["yogurt-paper","Paperboard cup"]]
 };
 /* plain-English cost difference vs the plastic version */
 const costDiff=p=>!isFinite(p)?"—":p>0?`${Math.round(p)}% more`:p<0?`${Math.round(-p)}% less`:"Same price";
@@ -854,7 +866,7 @@ function renderStill(){
 $("#layoutSeg").onclick=e=>{ const b=e.target.closest("button[data-layout]"); if(!b) return; layout=b.dataset.layout; $$("#layoutSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderStill(); };
 $("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
 /* which library material backs each eco alternative (null = reusable item, not in the library) */
-const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard"};
+const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null};
 const REUSE={"bag-tote":"Reusable cotton tote. Replaces hundreds of single-use bags over its life; needs ~130 uses to beat a plastic bag on carbon.","film-beeswax":"Reusable cotton coated in beeswax. Lasts about a year of washes, then composts."};
 const buyBox=k=>{ const b=(typeof BUY!=="undefined"&&BUY[k])||[]; const m=byId[ALT_MAT[k]]; const P=(typeof BUY_PRICE!=="undefined")?BUY_PRICE:{};
   return b.length?`<div class="buy"><span class="label">Buy in bulk</span>${m?`<span class="src">Typical unit cost for ${esc(m.name.toLowerCase())}: ${money(m.cost[0])}–${money(m.cost[1])} ${esc(m.unit)}</span>`:""}${b.map(([n,u,note])=>{ const pr=P[u]; return `<a href="${esc(u)}" target="_blank" rel="noopener"><span class="bn">${esc(n)}<em>${esc(note||"")}</em></span><span class="bp">${pr?esc(pr.unit):"price on site"}${pr&&pr.basis?`<em>${esc(pr.basis)}</em>`:""}</span></a>`; }).join("")}<span class="src">Approximate listed prices as of ${DATA_ASOF}, before shipping and tax.</span></div>`:""; };
