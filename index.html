@@ -506,6 +506,22 @@ aside.drawer.modal img{filter:var(--shadow)}
 .dots i.on{background:var(--ink)}
 .hoverswap .nm .ec{color:var(--ink)}
 
+/* ---- Index layout ---- */
+.gallery.plain{display:block}
+.idx{display:grid;grid-template-columns:clamp(56px,6vw,76px) minmax(0,1fr);gap:clamp(20px,4vw,64px);align-items:start}
+.idx-nav{position:sticky;top:120px;display:grid;gap:10px;justify-items:center}
+.idx-nav button{all:unset;cursor:pointer;box-sizing:border-box;width:clamp(48px,5.4vw,68px);height:clamp(48px,5.4vw,68px);border-radius:6px;display:grid;place-items:center;background:var(--sheet);border:1px solid var(--line);opacity:.4;transition:opacity .25s,border-color .25s}
+.idx-nav button img{width:82%;height:82%;object-fit:contain}
+.idx-nav button:hover{opacity:.8}
+.idx-nav button[aria-current="true"]{opacity:1;border-color:var(--ink)}
+.idx-nav button:focus-visible,.idx-item:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.idx-stage{display:grid;min-width:0}
+.idx-item{all:unset;box-sizing:border-box;cursor:pointer;min-height:88vh;display:grid;justify-items:center;align-content:center;gap:18px;text-align:center;scroll-margin-top:50vh;padding:40px 0}
+.idx-item img{width:min(46vh,78%);aspect-ratio:1;object-fit:contain;filter:var(--shadow);transition:transform .6s var(--ease)}
+.idx-item:hover img{transform:scale(1.03)}
+.idx-item .idx-n{font-size:11px;letter-spacing:.14em;color:var(--muted)}
+.idx-item h3{font-family:var(--serif);font-weight:400;font-size:clamp(34px,4.6vw,64px);letter-spacing:-.02em;line-height:1}
+@media (max-width:560px){.idx{grid-template-columns:44px minmax(0,1fr);gap:14px}.idx-nav{top:112px;gap:6px}.idx-nav button{width:44px;height:44px}.idx-item{min-height:80vh}}
 </style>
 
 <header class="top"><div class="wrap">
@@ -539,6 +555,7 @@ aside.drawer.modal img{filter:var(--shadow)}
       <div class="vh"><h1 id="stillTitle">Easy to make plastic-free. Still plastic.</h1><p id="stillSub">Tap an item to see what it leaves behind.</p></div>
       <button type="button" class="switch" id="ecoSwitch" role="switch" aria-checked="false">Show eco versions <span class="knob" aria-hidden="true"></span></button>
     </div>
+    <div class="seg layoutseg" role="group" aria-label="Layout" id="layoutSeg"><button type="button" aria-pressed="true" data-layout="grid">Grid</button><button type="button" aria-pressed="false" data-layout="index">Index</button></div>
     <div class="gallery four" id="g-still"></div>
     <p class="foot">Worldwide, only 9% of plastic waste is recycled and 22% is mismanaged: dumped, burned in the open or leaked into nature. About 1.7 million tonnes reached the ocean in 2019 (<a href="https://www.oecd.org/en/publications/global-plastics-outlook_de747aef-en.html" target="_blank" rel="noopener">OECD Global Plastics Outlook</a>). Item recycling rates are US figures from the <a href="https://www.epa.gov/facts-and-figures-about-materials-waste-and-recycling/plastics-material-specific-data" target="_blank" rel="noopener">EPA</a> and <a href="https://www.greenpeace.org/usa/reports/circular-claims-fall-flat-again/" target="_blank" rel="noopener">Greenpeace USA (2022)</a>.</p>
   </section>
@@ -780,11 +797,39 @@ const ALTS={
 const costDiff=p=>!isFinite(p)?"—":p>0?`${Math.round(p)}% more`:p<0?`${Math.round(-p)}% less`:"Same price";
 const costRange=(a,b)=>{ const lo=Math.round((a-1)*100), hi=Math.round((b-1)*100); const t=v=>v>=0?`${v}% more`:`${-v}% less`; return lo===hi?t(lo):(lo<0&&hi>=0?`${-lo}% less to ${hi}% more`:lo<0?`${-hi}–${-lo}% less`:`${lo}–${hi}% more`); };
 const pimg=id=>`img/p-${id}.png`, eimg=k=>`img/e-${k}.png`;
-let eco=false;
+let eco=false, layout="grid", idxIO=null;
+/* Index layout: sticky column of thumbnails on the left, one large item per screen on the right */
+function renderIndex(){
+  const g=$("#g-still");
+  if(idxIO){ idxIO.disconnect(); idxIO=null; }
+  const wrap=document.createElement("div"); wrap.className="idx";
+  const nav=document.createElement("nav"); nav.className="idx-nav"; nav.setAttribute("aria-label","Items");
+  const stage=document.createElement("div"); stage.className="idx-stage";
+  STILL.forEach((it,i)=>{
+    const alt=(ALTS[it.id]||[])[0];
+    const src=eco&&alt?eimg(alt[0]):pimg(it.id);
+    const label=eco&&alt?alt[1]:it.name;
+    const t=document.createElement("button"); t.type="button"; t.setAttribute("aria-label",label);
+    t.innerHTML=`<img src="${src}" alt="" loading="lazy">`;
+    t.onclick=()=>document.getElementById("ix"+i).scrollIntoView({behavior:"smooth",block:"center"});
+    nav.append(t);
+    const s=document.createElement("button"); s.type="button"; s.className="idx-item"; s.id="ix"+i;
+    s.innerHTML=`<span class="idx-n">${String(i+1).padStart(2,"0")}</span><img src="${src}" alt="${esc(label)}" loading="lazy"><h3>${esc(label)}</h3><span class="src">${eco?"Tap to see the swap":"Tap to see what it leaves behind"}</span>`;
+    s.onclick=()=>openStill(it);
+    stage.append(s);
+  });
+  wrap.append(nav,stage); g.append(wrap);
+  const tiles=$$("button",nav);
+  idxIO=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ const i=+e.target.id.slice(2); tiles.forEach((b,j)=>b.setAttribute("aria-current",String(j===i))); } }); },{rootMargin:"-45% 0px -45% 0px"});
+  $$(".idx-item",stage).forEach(el=>idxIO.observe(el));
+  if(tiles[0]) tiles[0].setAttribute("aria-current","true");
+}
 function renderStill(){
   const g=$("#g-still"); g.replaceChildren();
   $("#stillTitle").textContent = eco ? "The same things, without the plastic." : "Easy to make plastic-free. Still plastic.";
   $("#stillSub").textContent = eco ? "Every one of these swaps is on the market today." : "Tap an item to see what it leaves behind.";
+  g.classList.toggle("plain", layout==="index");
+  if(layout==="index"){ renderIndex(); return; }
   STILL.forEach(it=>{
     const alts=ALTS[it.id]||[];
     const art = eco
@@ -796,6 +841,7 @@ function renderStill(){
     g.append(b);
   });
 }
+$("#layoutSeg").onclick=e=>{ const b=e.target.closest("button[data-layout]"); if(!b) return; layout=b.dataset.layout; $$("#layoutSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderStill(); };
 $("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
 /* which library material backs each eco alternative (null = reusable item, not in the library) */
 const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard"};
