@@ -585,6 +585,23 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .ocean .foot{position:relative;z-index:1;margin:0 auto;max-width:820px;font-family:var(--serif);font-size:clamp(20px,1.9vw,27px);line-height:1.25;letter-spacing:-.01em;color:var(--ink);text-align:center}
 .ocean .foot a{color:var(--ink)}
 
+/* Item view (replaces the popup on the Plastic page) */
+#v-still-plastic .focus{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(32px,5vw,88px);align-items:start;margin:0 0 80px;scroll-margin-top:110px}
+.focusing .vhrow{display:none}
+.fimg{margin:0;position:sticky;top:120px;display:grid;place-items:center;min-height:min(62vh,600px)}
+.fimg img{width:min(100%,560px);max-height:min(66vh,620px);aspect-ratio:1;object-fit:contain;filter:var(--shadow)}
+.fbody{display:grid;gap:26px;min-width:0}
+.fbody .mtop{display:block}
+.fbody .mstats{gap:22px}
+.fback{all:unset;cursor:pointer;justify-self:start;font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:6px 0}
+.fback:hover,.fback:focus-visible{color:var(--ink)}
+.fback:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+#g-still.dim .tile{opacity:.14;filter:blur(2.5px);transition:opacity .6s var(--ease),filter .6s var(--ease)}
+#g-still.dim .tile:hover{opacity:.5}
+#g-still.dim .tile.cur{opacity:1;filter:none}
+#g-still.dim .tile .art.fan .pk{display:none}
+@media (max-width:860px){#v-still-plastic .focus{grid-template-columns:minmax(0,1fr)}.fimg{position:static;min-height:0}}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -614,6 +631,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
     <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
   </section>
   <section id="v-still-plastic" data-view>
+    <div class="focus" id="stillFocus" hidden></div>
     <div class="vhrow">
       <div class="vh"><h1 id="stillTitle">Easy to make plastic-free. Still plastic.</h1><p id="stillSub">Tap an item to see what it leaves behind.</p></div>
       <button type="button" class="switch" id="ecoSwitch" role="switch" aria-checked="false">Show eco versions <span class="knob" aria-hidden="true"></span></button>
@@ -944,6 +962,7 @@ function renderStill(){
       : `<span class="art ph fan"><span class="peek" aria-hidden="true">${alts.map(([k,l],j)=>{ const o=alts.length>1?(j?{x:52,y:-30,r:7}:{x:-52,y:-34,r:-7}):{x:50,y:-30,r:6}; return `<span class="pk" style="--k:${j};--px:${o.x}%;--py:${o.y}%;--pr:${o.r}deg"><img src="${eimg(k)}" alt="" loading="lazy"><i>${esc(l)}</i></span>`; }).join("")}</span><img class="orig" src="${pimg(it.id)}" alt="${esc(it.name)}" loading="lazy"></span>`;
     const b=document.createElement("button"); b.type="button"; b.className="tile"+(eco?" swap":" hoverswap");
     b.innerHTML=`${art}<span class="nm">${esc(eco?alts.map(a=>a[1]).join(" · "):it.name)}</span>`;
+    b.dataset.id=it.id;
     b.onclick=()=>openStill(it);
     g.append(b);
   });
@@ -973,10 +992,10 @@ function altCard(it,k,label){
     ${buyBox(k)}
   </article>`;
 }
-function openStill(it){
+function stillHTML(it){
   const alts=ALTS[it.id]||[];
   const perM=it.g*1e6/1000; // kg per million units
-  openDrawer(`
+  return `
     <div class="mtop">
       <img class="dphoto" src="${pimg(it.id)}" alt="${esc(it.name)}">
       <div class="mstats">
@@ -992,9 +1011,33 @@ function openStill(it){
     </div>
     <div><span class="label">Plastic-free packaging</span><h2 style="font-size:22px;margin-top:4px">${alts.length>1?alts.length+" ways":"A way"} to make it without plastic</h2></div>
     <div class="alts">${alts.map(([k,l])=>altCard(it,k,l)).join("")}</div>
-    <p class="src">Costs and lead times are indicative ranges at 1,000–50,000 units, before freight. <a href="#ideate" id="goIdeate">Get ideas tailored to your product →</a></p>`, true);
-  $("#goIdeate").onclick=e=>{ e.preventDefault(); closeDrawer(); $("#brief").value=it.brief; location.hash="ideate"; };
+    <p class="src">Costs and lead times are indicative ranges at 1,000–50,000 units, before freight. <a href="#ideate" id="goIdeate">Get ideas tailored to your product →</a></p>`;
 }
+
+/* Item view: the chosen item moves to the left, its details fill the right; the other items fade back */
+let focusOpen=false;
+function openStill(it){
+  const panel=$("#stillFocus"), grid=$("#g-still"), sec=$("#v-still-plastic");
+  panel.hidden=false; focusOpen=true;
+  panel.innerHTML=`<figure class="fimg"><img src="${pimg(it.id)}" alt="${esc(it.name)}"></figure><div class="fbody"><button type="button" class="fback" id="fBack">← All items</button>${stillHTML(it).replace(/<img class="dphoto"[^>]*>/,"")}</div>`;
+  sec.classList.add("focusing");
+  grid.classList.add("dim");
+  grid.querySelectorAll(".tile").forEach(t=>t.classList.toggle("cur", t.dataset.id===it.id));
+  $("#fBack").onclick=closeFocus;
+  const go=$("#goIdeate");
+  if(go) go.onclick=e=>{ e.preventDefault(); $("#brief").value=it.brief; closeFocus(); location.hash="ideate"; };
+  panel.scrollIntoView({behavior:"smooth",block:"start"});
+  panel.focus?.({preventScroll:true});
+}
+function closeFocus(){
+  const panel=$("#stillFocus"), grid=$("#g-still"), sec=$("#v-still-plastic");
+  panel.hidden=true; panel.innerHTML=""; focusOpen=false;
+  sec.classList.remove("focusing");
+  grid.classList.remove("dim");
+  grid.querySelectorAll(".tile.cur").forEach(t=>t.classList.remove("cur"));
+  grid.scrollIntoView({behavior:"smooth",block:"start"});
+}
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&focusOpen) closeFocus(); });
 renderStill();
 
 const SWAP_WAS={"Shampoo bar":"p-shampoo","Canned water":"p-bottle","Boxed water":"p-bottle","Laundry sheets":"p-jug","Toothpaste tablets":"c-toothpaste","Bamboo toothbrush":"p-toothbrush","Paper-wrapped toilet roll":"w-tp","Collagen canister":"p-yogurt","Paper deodorant":"w-deo","Cleaning tablets":"c-spray","Wax food wrap":"p-film","Glass milk bottle":"w-milk","Pulp egg carton":"w-eggs","Paper can carrier":"w-rings","Mushroom inserts":"w-foam","Compostable coffee pod":"p-pod"};
@@ -1414,6 +1457,7 @@ show();
     queued=false;
     const g=document.getElementById("g-still");
     if(reduce||!g||g.classList.contains("plain")||g.offsetParent===null) return;
+    if(g.classList.contains("dim")){ g.querySelectorAll(".tile").forEach(t=>{ t.style.filter=""; }); g.querySelectorAll(".lit").forEach(x=>x.classList.remove("lit")); return; }
     const mid=innerHeight/2;
     g.querySelectorAll(".lit").forEach(x=>x.classList.remove("lit"));
     let best=null, bestD=Infinity;
