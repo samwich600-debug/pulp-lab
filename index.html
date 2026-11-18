@@ -753,6 +753,11 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .carousel .stack>*{flex:0 0 min(300px,80%);scroll-snap-align:start}
 .car{all:unset;cursor:pointer;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:22px;line-height:1;color:var(--ink);background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
 .car:hover,.car:focus-visible{box-shadow:inset 0 0 0 1px var(--ink)}
+/* Material Lab: scroll left and right through the materials */
+.mats-car{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
+.mats-car .stack{display:flex;gap:clamp(14px,2vw,24px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:8px 2px 18px}
+.mats-car .stack::-webkit-scrollbar{display:none}
+.mats-car .stack>*{flex:0 0 min(240px,60%);scroll-snap-align:start}
 </style>
 
 <header class="top"><div class="wrap">
@@ -862,7 +867,11 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
       <button type="button" aria-pressed="true" data-kind="common">Available now</button>
       <button type="button" aria-pressed="false" data-kind="dev">In development</button>
     </div>
-    <div class="gallery" id="g-mats"></div>
+    <div class="carousel mats-car">
+      <button type="button" class="car prev" aria-label="Previous material">‹</button>
+      <div class="stack mats-stack" id="g-mats"></div>
+      <button type="button" class="car next" aria-label="Next material">›</button>
+    </div>
     <section class="calc" aria-labelledby="calcT">
       <div class="vh" style="margin-bottom:28px"><span class="label">Tax and fee check</span><h2 id="calcT" style="font-size:clamp(28px,3.4vw,42px)">What plastic packaging costs in fees</h2><p>Plastic tax and packaging fees (EPR) for your pack, compared with a swap.</p></div>
       <div class="calc-grid">
@@ -1869,5 +1878,13 @@ document.querySelectorAll(".suggest button[data-s]").forEach(b=>b.addEventListen
 }));
 </script>
 
+<script>
+/* Material Lab: the arrows scroll the row of materials */
+document.querySelectorAll(".mats-car").forEach(c=>{
+  const st=c.querySelector(".mats-stack"), step=()=>(st.firstElementChild?.offsetWidth||240)+24;
+  c.querySelector(".prev").onclick=()=>st.scrollBy({left:-step(),behavior:"smooth"});
+  c.querySelector(".next").onclick=()=>st.scrollBy({left:step(),behavior:"smooth"});
+});
+</script>
 
 </body></html>
