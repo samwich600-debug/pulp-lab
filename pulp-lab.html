@@ -1233,7 +1233,7 @@ const swapArt=it=>{ const k=SWAP_PH[it.name]; return k&&HAVE_S.has(k)?`<span cla
 SWAP.forEach(it=>{
   const t=document.createElement("button"); t.type="button"; t.className="tile swap hoverswap"; t.setAttribute("aria-label",it.name);
   const wasKey=SWAP_WAS[it.name];
-  const wasPk=wasKey?`<span class="pk" style="--k:0;--px:-44%;--py:-30%;--pr:-7deg"><img src="img/${wasKey}.png" alt=""><i>${esc(it.was)}</i></span>`:"";
+  const wasPk=wasKey?`<span class="pk" style="--k:0;--px:44%;--py:-30%;--pr:7deg"><img src="img/${wasKey}.png" alt=""></span>`:"";
   const nowKey=SWAP_PH[it.name], nowHave=nowKey&&HAVE_S.has(nowKey);
   const nowImg=nowHave?`<img class="orig" src="img/${nowKey}.png" alt="${esc(it.name)}" loading="lazy">`:svg(it.art);
   t.innerHTML=`<span class="art ph fan"><span class="peek" aria-hidden="true">${wasPk}</span>${nowImg}</span>`;
