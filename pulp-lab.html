@@ -2400,7 +2400,7 @@ renderCases();
     const shareTxt=share<1?share.toFixed(1):Math.round(share);
     return `<div class="profit graphic">
       <div class="facts">
-        <div class="fact hero"><span class="label">Profit that would go to switching</span><b>${shareTxt}%</b><span class="src">of ${pr.y} profit, about ${money(premium)} a year</span></div>
+        <div class="fact hero"><span class="label">Portion of profit that would go to switching</span><b>${shareTxt}%</b><span class="src">of ${pr.y} profit, about ${money(premium)} a year</span></div>
         <div class="fact"><span class="label">Total profit</span><b>${money(pr.p)}</b><span class="src">${pr.y}</span></div>
         <div class="fact"><span class="label">Cost per unit</span><b>${Math.abs(Math.round(extra))}% ${extra>=0?"more":"less"}</b><span class="src">than plastic, for ${esc(m.name)}</span></div>
       </div>
