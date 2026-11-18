@@ -898,6 +898,15 @@ aside.drawer.modal figcaption span{font-size:13px}
 .totbar .legend span{display:inline-flex;align-items:center;gap:6px}
 .totbar .legend i{width:10px;height:10px;border-radius:2px;background:var(--line);display:inline-block}
 .totbar .legend i.on{background:var(--ink)}
+/* hover the total (tan) part to see what the rest of the company's plastic is */
+.totbar .tw{position:relative;display:grid;gap:8px;cursor:help;outline:none;border-radius:4px}
+.totbar .tw:focus-visible{box-shadow:0 0 0 2px var(--ink)}
+.totbar .tw .legend u{text-decoration:underline dotted;text-underline-offset:3px;color:var(--muted)}
+.totbar .tw:hover .track,.totbar .tw:focus-visible .track{background:#CFCBB8}
+.totbar .mixtip{position:absolute;right:0;bottom:calc(100% + 10px);width:min(360px,86vw);display:grid;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.45;color:var(--ink);box-shadow:0 10px 28px rgba(0,0,0,.10);opacity:0;pointer-events:none;transform:translateY(4px);transition:opacity .2s,transform .2s;z-index:6}
+.totbar .mixtip b{font-family:var(--body);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.totbar .mixtip em{font-style:normal;font-size:12px;color:var(--muted)}
+.totbar .tw:hover .mixtip,.totbar .tw:focus .mixtip{opacity:1;transform:none}
 
 /* Plastic item: companies that made this change */
 .itemcases{display:grid;gap:10px}
@@ -1128,6 +1137,7 @@ aside.drawer.modal figcaption span{font-size:13px}
 <script src="data-prices.js" charset="utf-8"></script>
 <script src="data-shares.js" charset="utf-8"></script>
 <script src="data-case-totals.js" charset="utf-8"></script>
+<script src="data-case-mix.js" charset="utf-8"></script>
 <script src="data-case-money.js" charset="utf-8"></script>
 <script>
 (function(){
@@ -1979,12 +1989,13 @@ function totalBar(c){
   if(c.t==null) return "";
   if(!T) return `<div class="totbar"><span class="label">Out of how much plastic?</span><span class="src">${esc(c.brand)} doesn't publish its total plastic packaging, so we can't show what share this saving is.</span></div>`;
   const p=c.t/T.t*100, w=Math.max(p,0.6);
+  const M=(typeof CASE_MIX!=="undefined")&&CASE_MIX[T.who];
   const pTxt=p>=10?Math.round(p)+"%":p>=1?p.toFixed(1)+"%":p>=0.1?p.toFixed(2)+"%":"less than 0.1%";
   return `<div class="totbar"><span class="label">Out of how much plastic?</span>
     <b>${pTxt} <span>of ${esc(T.who)}'s plastic packaging</span></b>
-    <span class="track" aria-hidden="true"><i style="width:${w}%"></i></span>
-    <span class="legend"><span><i class="on"></i>${fmt(c.t,c.t<10?1:0)} t saved (${c.year})</span><span><i></i>${fmt(T.t)} t a year in total (${esc(T.year)})${T.est?", estimate":""}</span></span>
-    <span class="src">${T.parent?`No figure for ${esc(c.brand)} alone, so this uses the whole group's worldwide total. `:""}${T.year!==String(c.year)?"The total is from a different year than the saving. ":""}Source: <a href="${esc(T.url)}" target="_blank" rel="noopener">${esc(T.src)}</a>.</span></div>`;
+    ${M?'<span class="tw" tabindex="0">':""}<span class="track" aria-hidden="true"><i style="width:${w}%"></i></span>
+    <span class="legend"><span><i class="on"></i>${fmt(c.t,c.t<10?1:0)} t saved (${c.year})</span><span><i></i>${fmt(T.t)} t a year in total (${esc(T.year)})${T.est?", estimate":""}${M?' <u>what is it?</u>':""}</span></span>${M?`<span class="mixtip" role="tooltip"><b>What the rest is made of (${esc(M.year)})</b>${esc(M.txt)}<em>Source: ${esc(M.src)}</em></span></span>`:""}
+    <span class="src">${T.parent?`No figure for ${esc(c.brand)} alone, so this uses the whole group's worldwide total. `:""}${T.year!==String(c.year)?"The total is from a different year than the saving. ":""}Source: <a href="${esc(T.url)}" target="_blank" rel="noopener">${esc(T.src)}</a>.${M?` What the rest is made of: <a href="${esc(M.url)}" target="_blank" rel="noopener">${esc(M.src)}</a>.`:""}</span></div>`;
 }
 function tonEq(t){
   const n=t*1e6/12, km=n*0.22/1000, earth=km/40075;
