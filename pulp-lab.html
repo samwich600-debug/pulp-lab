@@ -1605,7 +1605,7 @@ function renderCases(){
       <div class="swapbox"><span class="label">Lesson for makers</span><span>${esc(c.lesson)}</span>${lessonImgs?`<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:10px">${lessonImgs}</div>`:""}</div>
       </div></div>
       <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}. Company-reported figures.${br?` Branded photo © ${esc(c.brand)}${(()=>{ const u=pick(CASE_BRAND_SRC,/^Nesquik/.test(c.product)?"Nesquik":nb); try{ return u?`, via <a href="${u}" target="_blank" rel="noopener">${new URL(u).hostname}</a>`:""; }catch(_){ return ""; } })()}; shown for study, not for commercial reuse.`:""}</p>`;
-    t.onclick=()=>openCase(c,t,caseBody,ph);
+    t.onclick=()=>openCase(c,t,caseBody,aft);
     g.append(t);
   });
 }
