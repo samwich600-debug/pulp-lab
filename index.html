@@ -637,6 +637,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .ton-view{position:relative;margin:-40px calc(50% - 50vw) -120px;width:100vw;background:#fff;color:var(--ink);overflow:hidden}
 .ton-stage{position:relative;height:calc(100vh - 64px);height:calc(100dvh - 64px);min-height:560px;overflow:hidden;background:#fff}
 .ton-pile{position:absolute;inset:0;z-index:1;pointer-events:none}
+.ton-pile canvas{position:absolute;inset:0;width:100%;height:100%}
 .ton-b{position:absolute;perspective:900px;transform-style:preserve-3d}
 .ton-i{display:block;width:100%;height:100%;object-fit:contain;transform-origin:50% 50%;transform-style:preserve-3d;transform:rotateZ(var(--a)) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--s));filter:drop-shadow(calc(var(--s)*6px) calc(var(--s)*16px) calc(var(--s)*12px) rgba(0,0,0,.24))}
 .ton-b.far .ton-i{filter:blur(1px) drop-shadow(calc(var(--s)*4px) calc(var(--s)*10px) calc(var(--s)*8px) rgba(0,0,0,.16));opacity:.9}
@@ -890,7 +891,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 
   <section id="v-every-day" data-view hidden class="ton-view" aria-label="Every day">
     <div class="ton-stage" id="tonStage">
-      <div class="ton-pile" id="tonPile" aria-hidden="true"></div>
+      <div class="ton-pile" id="tonPile" aria-hidden="true"><canvas id="tonCanvas"></canvas></div>
       <div class="ton-earth"><img src="img/earth.png" alt="Planet Earth"></div>
       <div class="ton-copy">
         <span class="label">Every day</span>
@@ -1783,63 +1784,79 @@ show();
 })();
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 <script>
-/* Every day: water bottles (the Plastic page photo) drop onto the screen with depth and pile up. Each lands on its side, the tonnes counter climbs to 4,700. */
+/* Every day: water bottles (the Plastic page photo) fall under real gravity. They bounce on the ground, knock into each other and hit the Earth, and roll off to the side. The tonnes counter climbs with each bottle that drops in. */
 (()=>{
-  const stage=document.getElementById("tonStage"), pile=document.getElementById("tonPile"), out=document.getElementById("tonCount");
-  if(!stage||!pile||!out) return;
-  const TOTAL=4700, N=360, BATCH=5, EVERY=60;
-  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const fmt=n=>n.toLocaleString("en-US");
-  const probe=new Image(); probe.src="img/p-bottle.png";
-  let started=false;
-  function run(){
-    const W=stage.clientWidth, H=stage.clientHeight;
-    const ratio=probe.naturalWidth?probe.naturalHeight/probe.naturalWidth:3;
-    const L=Math.max(288,Math.min(420,W*0.28));   // bottle length on screen (about three times the earlier size)
-    const T=L/ratio;                              // bottle thickness
-    const colW=L*0.42, cols=Math.max(6,Math.ceil(W/colW));
-    const layer=T*0.55;
-    const top=new Array(cols).fill(0);
-    const floor=H-T*0.5;
-    let n=0, placed=0;
-    const R=(lo,hi)=>lo+Math.random()*(hi-lo);
-    function drop(){
-      const c=[0,1,2].map(()=>Math.floor(Math.random()*cols)).reduce((x,y)=>top[x]<=top[y]?x:y);
-      const x=c*colW+colW/2+R(-0.45,0.45)*colW;
-      const y=floor-top[c]-T/2;
-      top[c]+=layer*R(0.8,1.3);
-      const depth=R(0.78,1.2);                    // nearer bottles are larger and sharper
-      const a=(Math.random()<0.5?90:-90)+R(-35,35); // lying on its side, slightly off square
-      const rx=R(-28,28), ry=R(-40,40);
-      const outer=document.createElement("div");
-      outer.className="ton-b"+(depth<0.92?" far":"");
-      outer.style.width=T+"px"; outer.style.height=L+"px";
-      outer.style.left=(stage.clientWidth/2-T/2+R(-0.12,0.12)*W)+"px";
-      outer.style.top=(-L-R(0,0.2)*H)+"px";
-      const img=document.createElement("img");
-      img.className="ton-i"; img.src="img/p-bottle.png"; img.alt="";
-      img.style.setProperty("--a",a.toFixed(1)+"deg");
-      img.style.setProperty("--rx",rx.toFixed(1)+"deg");
-      img.style.setProperty("--ry",ry.toFixed(1)+"deg");
-      img.style.setProperty("--s",depth.toFixed(2));
-      outer.appendChild(img);
-      pile.appendChild(outer);
-      n++;
-      if(reduce){ outer.style.left=(x-T/2)+"px"; outer.style.top=(y-L/2)+"px"; out.textContent=fmt(n>=N?TOTAL:Math.round(n*TOTAL/N)); return; }
-      const fall=0.9+Math.random()*0.5+(y/H)*0.5;
-      outer.style.transition=`top ${fall.toFixed(2)}s cubic-bezier(.45,0,.9,.5), left ${fall.toFixed(2)}s linear`;
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{ outer.style.left=(x-T/2)+"px"; outer.style.top=(y-L/2)+"px"; }));
-      setTimeout(()=>{ outer.classList.add("land"); out.textContent=fmt(Math.min(TOTAL,Math.round(n*TOTAL/N))); }, fall*1000);
+  const stage=document.getElementById("tonStage"), canvas=document.getElementById("tonCanvas"), out=document.getElementById("tonCount");
+  if(!stage||!canvas||!out||typeof Matter==="undefined") return;
+  const {Engine,World,Bodies,Body}=Matter;
+  const TOTAL=4700, N=260, EVERY=70;
+  const ctx=canvas.getContext("2d");
+  const img=new Image(); img.src="img/p-bottle.png";
+  const R_=(lo,hi)=>lo+Math.random()*(hi-lo);
+  let started=false, engine, bodies=[], spawned=0, W=0, H=0, L=0, T=0, dpr=1, ratio=3;
+
+  function start(){
+    W=stage.clientWidth; H=stage.clientHeight; dpr=window.devicePixelRatio||1;
+    canvas.width=W*dpr; canvas.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    ratio=img.naturalWidth?img.naturalHeight/img.naturalWidth:3;
+    L=Math.max(288,Math.min(420,W*0.28)); T=L/ratio;
+
+    // the Earth is a real circle in the physics, matching the picture on the page
+    const sr=stage.getBoundingClientRect(), er=stage.querySelector(".ton-earth").getBoundingClientRect();
+    const ex=er.left-sr.left+er.width/2, ey=er.top-sr.top+er.height/2, ER=er.width/2;
+
+    engine=Engine.create();
+    engine.gravity.y=1;
+    const ground=Bodies.rectangle(W/2,H+30,W*4,60,{isStatic:true,friction:0.9,restitution:0.15});
+    const wallL=Bodies.rectangle(-30,H/2,60,H*4,{isStatic:true});
+    const wallR=Bodies.rectangle(W+30,H/2,60,H*4,{isStatic:true});
+    const earth=Bodies.circle(ex,ey,ER,{isStatic:true,restitution:0.5,friction:0.3});
+    World.add(engine.world,[ground,wallL,wallR,earth]);
+
+    let last=performance.now();
+    function frame(now){
+      const dt=Math.min(32,now-last); last=now;
+      if(spawned<N && (spawned===0 || (now-(frame.t||0))>EVERY)){
+        frame.t=now; spawn();
+      }
+      Engine.update(engine,dt);
+      draw();
+      requestAnimationFrame(frame);
     }
-    if(reduce){ for(let k=0;k<N;k++) drop(); return; }
-    const timer=setInterval(()=>{
-      for(let k=0;k<BATCH&&placed<N;k++,placed++) drop();
-      if(placed>=N) clearInterval(timer);
-    },EVERY);
+    requestAnimationFrame(frame);
   }
+
+  function spawn(){
+    const x=R_(0.12,0.88)*W;
+    const b=Bodies.rectangle(x,-L,L,T,{
+      chamfer:{radius:T*0.42},
+      restitution:0.3, friction:0.7, frictionAir:0.004, density:0.0015
+    });
+    Body.setAngle(b,R_(0,Math.PI*2));
+    Body.setAngularVelocity(b,R_(-0.04,0.04));
+    Body.setVelocity(b,{x:R_(-1.5,1.5),y:R_(0,2)});
+    bodies.push(b); World.add(engine.world,b);
+    spawned++;
+    out.textContent=Math.round(spawned*TOTAL/N).toLocaleString("en-US");
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    bodies=bodies.filter(b=>b.position.y<H+400);
+    bodies.forEach(b=>{
+      ctx.save();
+      ctx.translate(b.position.x,b.position.y);
+      ctx.rotate(b.angle+Math.PI/2);
+      ctx.shadowColor="rgba(0,0,0,.12)"; ctx.shadowBlur=6; ctx.shadowOffsetY=3;
+      ctx.drawImage(img,-T/2,-L/2,T,L);
+      ctx.restore();
+    });
+  }
+
   const io=new IntersectionObserver(es=>{
-    if(es[0].isIntersecting&&!started){ started=true; io.disconnect(); if(probe.complete) run(); else probe.onload=run; }
+    if(es[0].isIntersecting&&!started){ started=true; io.disconnect(); if(img.complete) start(); else img.onload=start; }
   },{threshold:.35});
   io.observe(stage);
 })();
