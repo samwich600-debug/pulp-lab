@@ -814,6 +814,11 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .bar-track i{display:block;height:100%;border-radius:99px;background:var(--ink)}
 #v-companies .bar-track.cost i{background:#B0561E}
 #v-companies .profit.graphic .src{font-size:12px;line-height:1.5}
+/* Rankings: the share of profit is the headline of the switching graphic */
+#v-companies .headline{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px}
+#v-companies .headline b{font-family:var(--serif);font-weight:400;font-size:clamp(64px,8vw,112px);line-height:.9;letter-spacing:-.04em;color:#B0561E}
+#v-companies .headline span{font-size:16px;line-height:1.3;color:var(--ink)}
+#v-companies .profit.graphic .evidence{border-top:1px solid var(--line);padding-top:12px}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1581,13 +1586,16 @@ renderCases();
     const altC=mid(m.cost), plasticC=altC/mid(m.vs), extra=(mid(m.vs)-1)*100;
     const premium=c.t*1200*(mid(m.vs)-1)/1e9;
     const share=Math.min(100,premium/pr.p*100);
+    const shareTxt=share<1?share.toFixed(1):Math.round(share);
     return `<div class="profit graphic">
+      <div class="headline"><b>${shareTxt}%</b><span>of ${money(pr.p)} profit would go on switching</span></div>
       <div class="swapline"><span class="from">${esc(sw[0])}<b>$${plasticC.toFixed(2)}</b></span><span class="arr">→</span><span class="to">${esc(m.name)}<b>$${altC.toFixed(2)}</b></span><span class="more">${extra>=0?"+":""}${Math.round(extra)}% more</span></div>
       <div class="bars">
         <div class="bar-row"><span class="bar-lab">Net profit, ${pr.y}</span><span class="bar-track"><i style="width:100%"></i></span><b>${money(pr.p)}</b></div>
         <div class="bar-row"><span class="bar-lab">Switching cost</span><span class="bar-track cost"><i style="width:${share.toFixed(1)}%"></i></span><b>${money(premium)}</b></div>
       </div>
-      <p class="src">Switching all ${fmt(c.t)} tonnes would cost about ${money(premium)} a year, ${Math.round(share)}% of profit. Resin at US$1,200 a tonne; rough estimate.</p>
+      <p class="src">Switching all ${fmt(c.t)} tonnes would cost about ${money(premium)} a year. Resin at US$1,200 a tonne; rough estimate.</p>
+      <p class="src evidence"><b>Does it pay back?</b> Products with sustainability claims on their packs grew faster in US sales, 2018–22 (McKinsey and NielsenIQ). Unilever's sustainable brands outgrew the rest of its business through 2018. Mostly company and industry data, so it doesn't prove a packaging-only effect.</p>
     </div>`;
   };
   const profitHTML=c=>{
