@@ -586,7 +586,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .ocean .foot a{color:var(--ink)}
 
 /* Item view (replaces the popup on the Plastic page) */
-#v-still-plastic .focus{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(32px,5vw,88px);align-items:start;margin:0 0 80px;scroll-margin-top:110px}
+.focus-host .focus{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(32px,5vw,88px);align-items:start;margin:0 0 80px;scroll-margin-top:110px}
 .focusing .vhrow{display:none}
 .fimg{margin:0;position:sticky;top:120px;display:grid;place-items:center;min-height:min(62vh,600px)}
 .fimg img{width:min(100%,560px);max-height:min(66vh,620px);aspect-ratio:1;object-fit:contain;filter:var(--shadow)}
@@ -600,37 +600,37 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #g-still.dim .tile:hover{opacity:.5}
 #g-still.dim .tile.cur{opacity:1;filter:none}
 #g-still.dim .tile .art.fan .pk{display:none}
-@media (max-width:860px){#v-still-plastic .focus{grid-template-columns:minmax(0,1fr)}.fimg{position:static;min-height:0}}
+@media (max-width:860px){.focus-host .focus{grid-template-columns:minmax(0,1fr)}.fimg{position:static;min-height:0}}
 
 /* Item view motion: the photo grows out of its place, the alternatives fan out behind it, the details slide in from the right */
-#v-still-plastic .focus .fimg{margin:0;position:sticky;top:120px;display:grid;place-items:center;min-height:min(62vh,600px);opacity:0;transform:scale(.7) translateY(24px);transform-origin:50% 40%}
-#v-still-plastic .focus .fimg .art.fan{position:relative;display:block;width:min(100%,540px);aspect-ratio:1;overflow:visible}
-#v-still-plastic .focus .fimg .art.fan .orig{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;filter:var(--shadow);transition:transform .9s var(--ease)}
-#v-still-plastic .focus .fimg .art.fan .peek{position:absolute;inset:0;z-index:1;pointer-events:none}
-#v-still-plastic .focus .fbody{opacity:0;transform:translateX(56px)}
-#v-still-plastic .focus.open .fimg{animation:itemGrow 1.1s var(--ease) both}
-#v-still-plastic .focus.open .fbody{animation:infoIn .95s var(--ease) .18s both}
-#v-still-plastic .focus.open .fimg .art.fan .pk{opacity:1;transition-delay:calc(var(--k) * 110ms + 850ms);transform:translate(var(--px),var(--py)) rotate(var(--pr)) scale(1)}
-#v-still-plastic .focus.open .fimg .art.fan .orig{transform:translateY(10px) scale(1.03);transition-delay:.7s}
-#v-still-plastic .focus.leaving .fimg{animation:itemShrink .5s var(--ease) both}
-#v-still-plastic .focus.leaving .fbody{animation:infoOut .4s ease both}
+.focus-host .focus .fimg{margin:0;position:sticky;top:120px;display:grid;place-items:center;min-height:min(62vh,600px);opacity:0;transform:scale(.7) translateY(24px);transform-origin:50% 40%}
+.focus-host .focus .fimg .art.fan{position:relative;display:block;width:min(100%,540px);aspect-ratio:1;overflow:visible}
+.focus-host .focus .fimg .art.fan .orig{position:relative;z-index:2;width:100%;height:100%;object-fit:contain;filter:var(--shadow);transition:transform .9s var(--ease)}
+.focus-host .focus .fimg .art.fan .peek{position:absolute;inset:0;z-index:1;pointer-events:none}
+.focus-host .focus .fbody{opacity:0;transform:translateX(56px)}
+.focus-host .focus.open .fimg{animation:itemGrow 1.1s var(--ease) both}
+.focus-host .focus.open .fbody{animation:infoIn .95s var(--ease) .18s both}
+.focus-host .focus.open .fimg .art.fan .pk{opacity:1;transition-delay:calc(var(--k) * 110ms + 850ms);transform:translate(var(--px),var(--py)) rotate(var(--pr)) scale(1)}
+.focus-host .focus.open .fimg .art.fan .orig{transform:translateY(10px) scale(1.03);transition-delay:.7s}
+.focus-host .focus.leaving .fimg{animation:itemShrink .5s var(--ease) both}
+.focus-host .focus.leaving .fbody{animation:infoOut .4s ease both}
 @keyframes itemGrow{from{opacity:0;transform:scale(.7) translateY(24px)}to{opacity:1;transform:none}}
 @keyframes itemShrink{from{opacity:1;transform:none}to{opacity:0;transform:scale(.8) translateY(16px)}}
 @keyframes infoIn{from{opacity:0;transform:translateX(56px)}to{opacity:1;transform:none}}
 @keyframes infoOut{from{opacity:1;transform:none}to{opacity:0;transform:translateX(40px)}}
-#v-still-plastic .focus .fimg .art.fan .pk{transition:transform .9s var(--ease),opacity .6s var(--ease)}
+.focus-host .focus .fimg .art.fan .pk{transition:transform .9s var(--ease),opacity .6s var(--ease)}
 @media (prefers-reduced-motion:reduce){
-  #v-still-plastic .focus .fimg,#v-still-plastic .focus .fbody{animation:none!important;opacity:1;transform:none}
-  #v-still-plastic .focus .fimg .art.fan .pk{transition:none}
+  .focus-host .focus .fimg,.focus-host .focus .fbody{animation:none!important;opacity:1;transform:none}
+  .focus-host .focus .fimg .art.fan .pk{transition:none}
 }
 
 /* Item view: alternative names appear only when you hover over that alternative */
-#v-still-plastic .focus .fimg .art.fan .pk i{opacity:0;transition:opacity .25s ease}
-#v-still-plastic .focus .fimg .art.fan .pk:hover i{opacity:1}
-#v-still-plastic .focus .fimg .art.fan .pk{pointer-events:auto}
+.focus-host .focus .fimg .art.fan .pk i{opacity:0;transition:opacity .25s ease}
+.focus-host .focus .fimg .art.fan .pk:hover i{opacity:1}
+.focus-host .focus .fimg .art.fan .pk{pointer-events:auto}
 
 /* The open item takes the full width of its grid row; the heading stays put so the page does not jump */
-#stillFocus.inline{grid-column:1/-1;margin:24px 0 56px}
+.focus.inline{grid-column:1/-1;margin:24px 0 56px}
 .focusing .vhrow{display:flex}
 
 /* ---- Every day: Earth in the middle of a screen that fills up with bottles ---- */
@@ -675,25 +675,25 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .cats button[aria-current="true"] i{background:var(--ink);box-shadow:0 0 0 1px var(--ink)}
 
 /* Item view: more room for the details, the photo sits further left, and the category timeline steps aside */
-#v-still-plastic .focus{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(24px,3.4vw,64px)}
-#v-still-plastic .focus .fimg{justify-self:start;place-items:center start;padding-left:0}
+.focus-host .focus{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(24px,3.4vw,64px)}
+.focus-host .focus .fimg{justify-self:start;place-items:center start;padding-left:0}
 .focusing .cats{display:none}
 /* Item view: the photo sits centred in the left space, the not-recycled figure sits large on the right */
-#v-still-plastic.focusing{padding-left:24px}
-#v-still-plastic .focus .fimg{justify-self:stretch;place-items:center;padding-left:0}
-#v-still-plastic .focus .fimg .art.fan{margin:0 auto}
+.focus-host.focusing{padding-left:24px}
+.focus-host .focus .fimg{justify-self:stretch;place-items:center;padding-left:0}
+.focus-host .focus .fimg .art.fan{margin:0 auto}
 /* not-recycled figure: left-aligned with the count above it, a little smaller */
-#v-still-plastic .fbody .nrbig{justify-self:start;text-align:left;justify-items:start}
-#v-still-plastic .fbody .nrbig b{font-family:var(--serif);font-weight:400;font-size:clamp(44px,4.2vw,64px);line-height:1;letter-spacing:-.03em}
-#v-still-plastic .fbody .nrbig span{font-size:13px;letter-spacing:.02em}
+.focus-host .fbody .nrbig{justify-self:start;text-align:left;justify-items:start}
+.focus-host .fbody .nrbig b{font-family:var(--serif);font-weight:400;font-size:clamp(44px,4.2vw,64px);line-height:1;letter-spacing:-.03em}
+.focus-host .fbody .nrbig span{font-size:13px;letter-spacing:.02em}
 /* alternatives: the material name larger, and the unit cost set large */
-#v-still-plastic .fbody .alt h3{font-family:var(--serif);font-weight:400;font-size:clamp(28px,2.6vw,38px);line-height:1.05;letter-spacing:-.02em}
-#v-still-plastic .fbody .alt .anums>div:first-child b{font-family:var(--serif);font-weight:400;font-size:clamp(32px,3vw,44px);line-height:1;letter-spacing:-.02em}
+.focus-host .fbody .alt h3{font-family:var(--serif);font-weight:400;font-size:clamp(28px,2.6vw,38px);line-height:1.05;letter-spacing:-.02em}
+.focus-host .fbody .alt .anums>div:first-child b{font-family:var(--serif);font-weight:400;font-size:clamp(32px,3vw,44px);line-height:1;letter-spacing:-.02em}
 
 /* Item view: the two headline figures sit under the not-recycled percentage, set large */
-#v-still-plastic .fbody .kvbig{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px;margin:4px 0 2px}
-#v-still-plastic .fbody .kvbig b{font-family:var(--serif);font-weight:400;font-size:clamp(38px,3.6vw,56px);line-height:1;letter-spacing:-.025em}
-#v-still-plastic .fbody .kvbig .label{font-size:11px}
+.focus-host .fbody .kvbig{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px;margin:4px 0 2px}
+.focus-host .fbody .kvbig b{font-family:var(--serif);font-weight:400;font-size:clamp(38px,3.6vw,56px);line-height:1;letter-spacing:-.025em}
+.focus-host .fbody .kvbig .label{font-size:11px}
 
 /* Sources line: the lead sentence set large, the OECD figures and notes as a smaller line beneath */
 .ocean .foot .ocean-lead{display:block;font-size:clamp(28px,2.9vw,42px);line-height:1.12;letter-spacing:-.02em}
@@ -710,6 +710,9 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #g-still .art.eco-fan .pk{width:64%;opacity:1;transform:translate(var(--px),var(--py)) rotate(var(--pr)) scale(1)}
 #g-still .art.eco-fan .pk img{width:100%;aspect-ratio:1;object-fit:contain;filter:var(--shadow)}
 #g-still .art.eco-fan .pk i{display:none}
+#g-swap.dim .tile{opacity:.14;filter:blur(2.5px);transition:opacity .6s var(--ease),filter .6s var(--ease)}
+#g-swap.dim .tile:hover{opacity:.5}
+#g-swap.dim .tile.cur{opacity:1;filter:none}
 </style>
 
 <header class="top"><div class="wrap">
@@ -739,7 +742,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
     <button type="button" class="reel-pause" id="reelPause" aria-label="Pause video">Pause</button>
     <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
   </section>
-  <section id="v-still-plastic" data-view>
+  <section id="v-still-plastic" data-view class="focus-host">
     <nav class="cats" id="catNav" aria-label="Categories"></nav>
     <div class="focus" id="stillFocus" hidden></div>
     <div class="vhrow">
@@ -752,8 +755,9 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
     </div>
   </section>
 
-  <section id="v-already-swapped" data-view hidden>
+  <section id="v-already-swapped" data-view hidden class="focus-host">
     <div class="vh"><h1>Already on shelves, plastic-free.</h1><p>Everyday products that made the switch. Tap one to see how.</p></div>
+    <div class="focus" id="swapFocus" hidden></div>
     <div class="gallery four" id="g-swap"></div>
   </section>
 
@@ -1175,7 +1179,7 @@ function stillHTML(it){
 /* Item view: the chosen item moves to the left, its details fill the right; the other items fade back */
 let focusOpen=false;
 function openStill(it){
-  const panel=$("#stillFocus"), grid=$("#g-still"), sec=$("#v-still-plastic");
+  const panel=$("#stillFocus"), grid=$("#g-still"), sec=$(".focus-host");
   panel.hidden=false; focusOpen=true;
   const alts=ALTS[it.id]||[];
   const peeks=alts.map(([k,l],j)=>{ const o=alts.length>1?(j?{x:52,y:-30,r:7}:{x:-52,y:-34,r:-7}):{x:50,y:-30,r:6}; return `<span class="pk" style="--k:${j};--px:${o.x}%;--py:${o.y}%;--pr:${o.r}deg"><img src="${eimg(k)}" alt="" loading="lazy"><i>${esc(l)}</i></span>`; }).join("");
@@ -1197,7 +1201,7 @@ function openStill(it){
   window.scrollTo({top:panel.getBoundingClientRect().top+scrollY-120,behavior:"smooth"});
 }
 function closeFocus(){
-  const panel=$("#stillFocus"), grid=$("#g-still"), sec=$("#v-still-plastic");
+  const panel=$("#stillFocus"), grid=$("#g-still"), sec=$(".focus-host");
   focusOpen=false;
   panel.classList.remove("open"); panel.classList.add("leaving");
   sec.classList.remove("focusing");
@@ -1231,6 +1235,44 @@ function swapCost(name){ const [mid_,alt]=SWAP_COST[name]||[]; const m=byId[mid_
 const SWAP_PH={"Shampoo bar":"e-shampoo-bar","Canned water":"e-bottle-can","Boxed water":"e-bottle-carton","Laundry sheets":"e-jug-sheets","Bamboo toothbrush":"e-toothbrush-bamboo","Wax food wrap":"e-film-beeswax","Compostable coffee pod":"e-pod-paper","Toothpaste tablets":"s-tabs","Paper-wrapped toilet roll":"s-tp","Collagen canister":"s-canister","Paper deodorant":"s-deo","Cleaning tablets":"s-spray","Glass milk bottle":"s-milk","Pulp egg carton":"s-eggs","Paper can carrier":"s-collar","Mushroom inserts":"s-mushroom"};
 const HAVE_S=new Set(["s-tabs","s-tp","s-canister","s-deo","s-spray","s-milk","s-eggs","s-collar","s-mushroom","e-shampoo-bar","e-bottle-can","e-bottle-carton","e-jug-sheets","e-toothbrush-bamboo","e-film-beeswax","e-pod-paper"]);
 const swapArt=it=>{ const k=SWAP_PH[it.name]; return k&&HAVE_S.has(k)?`<span class="art ph"><img src="img/${k}.png" alt="${esc(it.name)}" loading="lazy"></span>`:svg(it.art); };
+const swapBodies=new Map();
+let swapOpen=false;
+function placeInRow(grid,panel,tile){
+  const row=[...grid.querySelectorAll(".tile")].find(x=>x.offsetTop===tile.offsetTop);
+  grid.insertBefore(panel,row||null); panel.classList.add("inline");
+}
+function openSwap(it,t){
+  const panel=$("#swapFocus"), grid=$("#g-swap"), sec=$("#v-already-swapped");
+  const wasKey=SWAP_WAS[it.name], k=SWAP_PH[it.name], have=k&&HAVE_S.has(k);
+  const peek=wasKey?`<span class="pk" style="--k:0;--px:44%;--py:-30%;--pr:7deg"><img src="img/${wasKey}.png" alt=""></span>`:"";
+  const now=have?`<img class="orig" src="img/${k}.png" alt="${esc(it.name)}">`:svg(it.art);
+  panel.classList.remove("open","leaving"); panel.hidden=false; swapOpen=true;
+  panel.innerHTML=`<figure class="fimg"><span class="art ph fan"><span class="peek" aria-hidden="true">${peek}</span>${now}</span></figure><div class="fbody"><button type="button" class="fback" id="sBack">← All swaps</button>${swapBodies.get(t)||""}</div>`;
+  sec.classList.add("focusing"); grid.classList.add("dim");
+  grid.querySelectorAll(".tile").forEach(x=>x.classList.toggle("cur",x===t));
+  placeInRow(grid,panel,t);
+  $("#sBack").onclick=closeSwap;
+  const go=$("#goIdeate");
+  if(go) go.onclick=e=>{ e.preventDefault(); $("#brief").value=`Something like a ${it.name.toLowerCase()}: ${it.now.toLowerCase()}`; closeSwap(); location.hash="ideate"; };
+  requestAnimationFrame(()=>requestAnimationFrame(()=>panel.classList.add("open")));
+  window.scrollTo({top:panel.getBoundingClientRect().top+scrollY-120,behavior:"smooth"});
+}
+function closeSwap(){
+  const panel=$("#swapFocus"), grid=$("#g-swap"), sec=$("#v-already-swapped");
+  swapOpen=false;
+  panel.classList.remove("open"); panel.classList.add("leaving");
+  sec.classList.remove("focusing"); grid.classList.remove("dim");
+  grid.querySelectorAll(".tile.cur").forEach(x=>x.classList.remove("cur"));
+  setTimeout(()=>{ if(!swapOpen){ panel.hidden=true; panel.innerHTML=""; panel.classList.remove("leaving","inline"); sec.prepend(panel); } },520);
+}
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&swapOpen) closeSwap(); });
+document.addEventListener("click",e=>{
+  if(!swapOpen) return;
+  const panel=$("#swapFocus");
+  if(panel&&panel.contains(e.target)) return;
+  if(e.target.closest&&e.target.closest("#g-swap .tile")) return;
+  closeSwap();
+});
 SWAP.forEach(it=>{
   const t=document.createElement("button"); t.type="button"; t.className="tile swap hoverswap"; t.setAttribute("aria-label",it.name);
   const wasKey=SWAP_WAS[it.name];
@@ -1239,7 +1281,8 @@ SWAP.forEach(it=>{
   const nowImg=nowHave?`<img class="orig" src="img/${nowKey}.png" alt="${esc(it.name)}" loading="lazy">`:svg(it.art);
   t.innerHTML=`<span class="art ph fan"><span class="peek" aria-hidden="true">${wasPk}</span>${nowImg}</span>`;
   const k=SWAP_PH[it.name], ph=k&&HAVE_S.has(k);
-  t.onclick=()=>openDrawer(`
+  t.onclick=()=>openSwap(it,t);
+  swapBodies.set(t,`
     ${ph?`<div class="pair"><figure><img src="img/${SWAP_WAS[it.name]||"p-bottle"}.png" alt="${esc(it.was)}"><figcaption><span class="pill">Before</span>${esc(it.was)}</figcaption></figure><svg class="arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12h56M46 3l12 9-12 9"/></svg><figure class="now"><img src="img/${k}.png" alt="${esc(it.now)}"><figcaption><span class="pill g">Now</span>${esc(it.now)}</figcaption></figure></div>`:""}
     <div class="dhead" ${ph?'style="grid-template-columns:1fr"':""}>${ph?"":svg(it.art)}<div><span class="label">On the market</span><h2 id="dTitle">${esc(it.name)}</h2></div></div>
     <div class="big"><b>~${fmt(it.g)} g</b><span>plastic avoided per unit</span></div>
@@ -1252,7 +1295,6 @@ SWAP.forEach(it=>{
     ${swapCost(it.name)}
     <button class="btn" id="goIdeate">Use this idea for my product</button>`);
   $("#g-swap").append(t);
-  t.addEventListener("click",()=>setTimeout(()=>{ const b=$("#goIdeate"); if(b) b.onclick=()=>{ closeDrawer(); $("#brief").value=`Something like a ${it.name.toLowerCase()}: ${it.now.toLowerCase()}`; location.hash="ideate"; }; }));
 });
 
 const MAT_REPL={
