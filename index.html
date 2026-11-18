@@ -633,19 +633,20 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #stillFocus.inline{grid-column:1/-1;margin:24px 0 56px}
 .focusing .vhrow{display:flex}
 
-/* ---- Every day: Earth at the top, plastic bottles falling onto the floor of the screen and piling up ---- */
-.ton-view{position:relative;margin:-40px calc(50% - 50vw) -120px;width:100vw;background:#fff;color:var(--ink);overflow:hidden;padding:48px max(16px,env(safe-area-inset-left,0px)) 36px}
-.ton-copy{text-align:center;display:grid;gap:12px;justify-items:center;max-width:760px;margin:0 auto;position:relative;z-index:3}
-.ton-copy h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,3.8vw,52px);line-height:1.05;letter-spacing:-.02em;margin:0}
-.ton-stage{position:relative;height:min(92vh,960px);min-height:640px;margin-top:10px;overflow:hidden}
-.ton-earth{position:absolute;left:50%;top:6px;width:min(30vmin,300px);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;overflow:hidden;z-index:2}
-.ton-earth img{position:absolute;width:116%;height:116%;left:-8%;top:-8%;object-fit:cover;display:block}
-.ton-count{position:absolute;left:0;top:0;z-index:3;display:grid;gap:2px}
-.ton-count b{font-family:var(--serif);font-weight:400;font-size:clamp(48px,6vw,96px);line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.ton-count span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+/* ---- Every day: Earth in the middle of a screen that fills up with bottles ---- */
+.ton-view{position:relative;margin:-40px calc(50% - 50vw) -120px;width:100vw;background:#fff;color:var(--ink);overflow:hidden}
+.ton-stage{position:relative;height:calc(100vh - 64px);height:calc(100dvh - 64px);min-height:560px;overflow:hidden;background:#fff}
 .ton-pile{position:absolute;inset:0;z-index:1;pointer-events:none}
-.ton-b{position:absolute;height:auto;transform-origin:50% 100%;filter:drop-shadow(0 3px 3px rgba(0,0,0,.12))}
-.ton-src{max-width:640px;margin:18px auto 0;text-align:center;font-size:12px;line-height:1.6;color:var(--muted)}
+.ton-b{position:absolute;width:auto;transform-origin:50% 50%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.14))}
+.ton-earth{position:absolute;left:50%;top:50%;width:min(56vmin,640px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;z-index:2}
+.ton-earth img{position:absolute;width:116%;height:116%;left:-8%;top:-8%;object-fit:cover;display:block}
+.ton-copy{position:absolute;top:22px;left:50%;transform:translateX(-50%);z-index:3;text-align:center;display:grid;gap:8px;justify-items:center;width:min(760px,92%)}
+.ton-copy h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3vw,42px);line-height:1.05;letter-spacing:-.02em;margin:0;background:rgba(255,255,255,.7);padding:0 10px;border-radius:6px}
+.ton-count{position:absolute;left:24px;top:18px;z-index:3;display:grid;gap:2px}
+.ton-count b{font-family:var(--serif);font-weight:400;font-size:clamp(44px,5.4vw,88px);line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.7);padding:0 6px;border-radius:6px;align-self:start}
+.ton-count span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,.7);padding:0 6px}
+.ton-src{position:absolute;right:24px;top:18px;z-index:3;max-width:300px;margin:0;text-align:right;font-size:12px;line-height:1.55;color:var(--muted);background:rgba(255,255,255,.7);padding:4px 8px;border-radius:6px}
+@media (max-width:760px){.ton-src{display:none}.ton-copy h1{font-size:24px}}
 
 </style>
 
@@ -767,16 +768,16 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
   </section>
 
   <section id="v-every-day" data-view hidden class="ton-view" aria-label="Every day">
-    <div class="ton-copy">
-      <span class="label">Every day</span>
-      <h1>About 4,700 tonnes of plastic reach the ocean, every day.</h1>
-    </div>
     <div class="ton-stage" id="tonStage">
-      <div class="ton-earth"><img src="img/earth.png" alt="Planet Earth"></div>
-      <div class="ton-count" aria-live="off"><b id="tonCount">0</b><span>tonnes so far</span></div>
       <div class="ton-pile" id="tonPile" aria-hidden="true"></div>
+      <div class="ton-earth"><img src="img/earth.png" alt="Planet Earth"></div>
+      <div class="ton-copy">
+        <span class="label">Every day</span>
+        <h1>About 4,700 tonnes of plastic reach the ocean, every day.</h1>
+      </div>
+      <div class="ton-count" aria-live="off"><b id="tonCount">0</b><span>tonnes so far</span></div>
+      <p class="ton-src">OECD: 1.7 million tonnes reached the ocean in 2019; divided by 365, about 4,700 tonnes a day (a rough average). Each bottle stands for about 5 tonnes.</p>
     </div>
-    <p class="ton-src">The OECD estimates 1.7 million tonnes reached the ocean in 2019; divided by 365, that is about 4,700 tonnes a day, a rough average. Each bottle on screen stands for about 15 tonnes.</p>
   </section>
 
   <section id="v-companies" data-view hidden>
@@ -1550,57 +1551,57 @@ show();
 </script>
 
 <script>
-/* Every day: bottles drop from under the Earth and pile up along the floor of the screen. One bottle = about 15 tonnes. */
+/* Every day: bottles fall from above the screen, land on their sides at random angles and heap up until the screen is full. */
 (()=>{
   const stage=document.getElementById("tonStage"), pile=document.getElementById("tonPile"), out=document.getElementById("tonCount");
   if(!stage) return;
-  const TOTAL=4700, N=320;
+  const TOTAL=4700, N=900, BATCH=6, EVERY=60;
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
   const fmt=n=>n.toLocaleString("en-US");
+  const probe=new Image(); probe.src="img/p-bottle.png";
   let started=false;
-  const probe=new Image();
-  probe.onload=()=>{ /* ratio is read when the run starts */ };
-  probe.src="img/p-bottle.png";
   function run(){
     const W=stage.clientWidth, H=stage.clientHeight;
-    const ratio=probe.naturalWidth?probe.naturalHeight/probe.naturalWidth:2.6;
-    const bw=Math.max(26,Math.min(44,W/30));
-    const bh=bw*ratio;
-    const colW=bw*0.9, cols=Math.max(8,Math.floor(W/colW));
-    const heights=new Array(cols).fill(0);
-    const floor=H-4;
-    const earth=stage.querySelector(".ton-earth");
-    const spawnX=W/2, spawnY=(earth?earth.offsetTop+earth.offsetHeight:H*0.4)-bw;
-    let landed=0, i=0;
+    const ratio=probe.naturalWidth?probe.naturalHeight/probe.naturalWidth:3;
+    const L=Math.max(96,Math.min(150,W/10));        // bottle length on screen
+    const T=L/ratio;                                // bottle thickness when lying down
+    const colW=L*0.42, cols=Math.max(6,Math.ceil(W/colW));
+    const layer=T*0.55;                             // how far each lying bottle lifts the heap
+    const top=new Array(cols).fill(0);              // how high each column has been built, px from the floor
+    const floor=H-T*0.5;
+    let n=0;
     function drop(){
-      // lowest of three random columns, so the pile spreads evenly
-      const c=[0,1,2].map(()=>Math.floor(Math.random()*cols)).reduce((a,b)=>heights[a]<=heights[b]?a:b);
-      const x=c*colW+colW/2+(Math.random()-0.5)*bw*0.3-bw/2;
-      const targetTop=floor-heights[c]-bh;
-      heights[c]+=bh*0.5;
+      // land in the lowest of three random columns so the heap spreads and fills
+      const c=[0,1,2].map(()=>Math.floor(Math.random()*cols)).reduce((x,y)=>top[x]<=top[y]?x:y);
+      const x=c*colW+colW/2+(Math.random()-0.5)*colW*0.9;
+      const y=floor-top[c]-T/2;
+      top[c]+=layer*(0.8+Math.random()*0.5);
+      const angle=(Math.random()<0.5?0:180)+(Math.random()*120-60);  // lying, roughly on its side
       const el=document.createElement("img");
       el.className="ton-b"; el.src="img/p-bottle.png"; el.alt="";
-      el.style.width=bw+"px";
-      el.style.left=(spawnX-bw/2+(Math.random()-0.5)*bw*2)+"px";
-      el.style.top=spawnY+"px";
-      el.style.transform=`rotate(${(Math.random()*30-15).toFixed(1)}deg)`;
+      el.style.height=L+"px";
+      el.style.left=(x-(L/ratio)/2)+"px";
+      el.style.top=(-L-Math.random()*H*0.2)+"px";
+      el.style.transform=`rotate(${angle.toFixed(1)}deg)`;
       pile.appendChild(el);
-      if(reduce){ el.style.left=x+"px"; el.style.top=targetTop+"px"; }
+      n++;
+      if(reduce){ el.style.top=(y-L/2)+"px"; }
       else{
-        const fall=1.0+Math.random()*0.5;
-        el.style.transition=`top ${fall.toFixed(2)}s cubic-bezier(.55,0,.9,.35), left ${fall.toFixed(2)}s linear`;
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.left=x+"px"; el.style.top=targetTop+"px"; }));
-        setTimeout(()=>{ bump(); }, fall*1000);
-        return;
+        const fall=0.9+Math.random()*0.5+(y/H)*0.5;
+        el.style.transition=`top ${fall.toFixed(2)}s cubic-bezier(.45,0,.9,.5)`;
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.top=(y-L/2)+"px"; }));
       }
-      bump();
+      out.textContent=fmt(n>=N?TOTAL:Math.round(n*TOTAL/N));
     }
-    function bump(){ landed++; out.textContent=fmt(landed>=N?TOTAL:Math.round(landed*TOTAL/N)); }
     if(reduce){ for(let k=0;k<N;k++) drop(); return; }
-    const timer=setInterval(()=>{ drop(); if(++i>=N) clearInterval(timer); },70);
+    let placed=0;
+    const timer=setInterval(()=>{
+      for(let k=0;k<BATCH&&placed<N;k++,placed++) drop();
+      if(placed>=N) clearInterval(timer);
+    },EVERY);
   }
   const io=new IntersectionObserver(es=>{
-    if(es[0].isIntersecting && !started){ started=true; io.disconnect(); run(); }
+    if(es[0].isIntersecting&&!started){ started=true; io.disconnect(); if(probe.complete) run(); else probe.onload=run; }
   },{threshold:.35});
   io.observe(stage);
 })();
