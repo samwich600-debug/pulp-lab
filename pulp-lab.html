@@ -703,11 +703,12 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 /* Plastic page, eco mode: the swap photos sit almost touching, separated by a few pixels */
 #g-still .art.ph .multi{gap:0;grid-template-columns:repeat(var(--n,1),minmax(0,1fr))}
 #g-still .art.ph .multi img{width:100%;max-width:none;height:100%;object-fit:contain;margin:0;transform:scale(1.12)}
-/* Plastic page: the eco toggle sits at the far right of the heading row; the index view is removed */
-@media (min-width:700px){
-  #v-still-plastic .vhrow{position:relative;flex-direction:column}
-  #v-still-plastic .vhrow #ecoSwitch{position:absolute;right:0;top:50%;transform:translateY(-50%)}
-}
+/* Plastic page: the eco toggle sits on its own line under the heading, at the right */
+#v-still-plastic .vhrow #ecoSwitch{align-self:flex-end;margin-top:8px}
+/* Eco versions: the alternatives fan out diagonally and overlap a little, like the hover on a plastic item */
+#g-still .art.eco-fan .pk{width:64%;opacity:1;transform:translate(var(--px),var(--py)) rotate(var(--pr)) scale(1)}
+#g-still .art.eco-fan .pk img{width:100%;aspect-ratio:1;object-fit:contain;filter:var(--shadow)}
+#g-still .art.eco-fan .pk i{display:none}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1111,7 +1112,7 @@ function renderStill(){
     const it=item;
     const alts=ALTS[it.id]||[];
     const art = eco
-      ? `<span class="art ph"><span class="multi" style="--n:${alts.length}">${alts.map(([k,l])=>`<img src="${eimg(k)}" alt="${esc(l)}" loading="lazy">`).join("")}</span><span class="eco-badge">${alts.length>1?alts.length+" swaps":"Swap"}</span></span>`
+      ? `<span class="art ph fan eco-fan"><span class="peek" aria-hidden="true">${alts.map(([k,l],j)=>{ const c=alts.length-1; const o=alts.length>1?{x:(j-c/2)*48,y:(j-c/2)*40,r:(j-c/2)*8}:{x:0,y:0,r:0}; return `<span class="pk" style="--k:${j};--px:${o.x}%;--py:${o.y}%;--pr:${o.r}deg"><img src="${eimg(k)}" alt="${esc(l)}" loading="lazy"><i>${esc(l)}</i></span>`; }).join("")}</span></span>`
       : `<span class="art ph fan"><span class="peek" aria-hidden="true">${alts.map(([k,l],j)=>{ const o=alts.length>1?(j?{x:52,y:-30,r:7}:{x:-52,y:-34,r:-7}):{x:50,y:-30,r:6}; return `<span class="pk" style="--k:${j};--px:${o.x}%;--py:${o.y}%;--pr:${o.r}deg"><img src="${eimg(k)}" alt="" loading="lazy"><i>${esc(l)}</i></span>`; }).join("")}</span><img class="orig" src="${pimg(it.id)}" alt="${esc(it.name)}" loading="lazy"></span>`;
     const b=document.createElement("button"); b.type="button"; b.className="tile"+(eco?" swap":" hoverswap");
     b.innerHTML=`${art}<span class="nm">${esc(eco?alts.map(a=>a[1]).join(" · "):it.name)}</span>`;
