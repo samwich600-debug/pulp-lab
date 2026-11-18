@@ -1816,8 +1816,8 @@ show();
     const ex=er.left-sr.left+er.width/2, ey=er.top-sr.top+er.height/2, ER=er.width/2;
 
     engine=Engine.create();
-    engine.gravity.y=1;
-    const ground=Bodies.rectangle(W/2,H+30,W*4,60,{isStatic:true,friction:0.9,restitution:0.15});
+    engine.gravity.y=1; engine.positionIterations=12; engine.velocityIterations=8;
+    const ground=Bodies.rectangle(W/2,H+100,W*4,200,{isStatic:true,friction:0.9,restitution:0.15});
     const wallL=Bodies.rectangle(-30,H/2,60,H*4,{isStatic:true});
     const wallR=Bodies.rectangle(W+30,H/2,60,H*4,{isStatic:true});
     const earth=Bodies.circle(ex,ey,ER,{isStatic:true,restitution:0.5,friction:0.3});
@@ -1829,7 +1829,7 @@ show();
       if(spawned<N && (spawned===0 || (now-(frame.t||0))>EVERY)){
         frame.t=now; spawn();
       }
-      Engine.update(engine,dt);
+      for(let acc=dt; acc>0; acc-=16.67) Engine.update(engine,Math.min(16.67,acc));
       draw();
       requestAnimationFrame(frame);
     }
@@ -1852,7 +1852,7 @@ show();
 
   function draw(){
     ctx.clearRect(0,0,W,H);
-    bodies=bodies.filter(b=>b.position.y<H+400);
+    bodies=bodies.filter(b=>b.position.y<H+1200);
     bodies.forEach(b=>{
       ctx.save();
       ctx.translate(b.position.x,b.position.y);
