@@ -1423,7 +1423,7 @@ const fmt=(n,d=0)=>Number(n).toLocaleString(undefined,{maximumFractionDigits:d,m
 /* where each eco swap fans out behind a plastic item on hover: one or two keep the original spots; three or more
    spread evenly in an arc, smaller, so none of them stack on top of each other */
 const fanPos=(j,n)=>{ if(n<=1) return {x:50,y:-30,r:6}; if(n===2) return j?{x:52,y:-30,r:7}:{x:-52,y:-34,r:-7};
-  const t=j/(n-1), x=Math.round(-78+156*t), y=Math.round(-40+Math.abs(t-.5)*28), r=Math.round(-10+20*t); return {x,y,r,w:44}; };
+  const t=j/(n-1), x=Math.round(-82+164*t), y=Math.round(-26-(1-Math.abs(2*t-1))*40), r=Math.round(-10+20*t); return {x,y,r,w:44}; };
 const money=n=>"$"+(Math.abs(n)<100?Number(n).toFixed(2):fmt(n));
 
 /* ---------- drawings (viewBox 0 0 120 120) ---------- */
