@@ -974,6 +974,7 @@ aside.drawer.modal figcaption span{font-size:13px}
     <a href="#materials" data-v="materials">Material Lab</a>
     <a href="#circular" data-v="circular">Circular</a>
     <a href="#every-day" data-v="every-day">Every day</a>
+    <a href="#about" data-v="about">About</a>
   </nav>
 </div></header>
 
@@ -1169,8 +1170,8 @@ aside.drawer.modal figcaption span{font-size:13px}
         .cx-swipe{display:block}
         .cx-notes{grid-template-columns:minmax(0,1fr)}
       }
-      /* eight nav tabs: tighten spacing on phones so they stay on two rows */
-      @media (max-width:480px){header.top nav a{margin-left:0;margin-right:14px;letter-spacing:.1em}.cx-tip{font-size:18px}}
+      /* nine nav tabs: tighten spacing on phones so they stay on two rows */
+      @media (max-width:480px){header.top nav a{margin-left:0;margin-right:11px;letter-spacing:.07em;font-size:10.5px}.cx-tip{font-size:18px}}
     </style>
     <div class="vh"><h1>Keep materials in the loop.</h1><p>The circular economy in one diagram. Green materials can safely go back to nature; blue ones should stay in use. The tighter the loop, the more value it keeps. Tap any step.</p></div>
     <div class="cx-key" aria-hidden="true"><span><i style="background:var(--bio)"></i>Biological cycle</span><span><i style="background:var(--tech)"></i>Technical cycle</span><span><i style="background:var(--leak)"></i>Leakage</span></div>
@@ -1325,6 +1326,26 @@ aside.drawer.modal figcaption span{font-size:13px}
       setTimeout(sync,0);
     })();
     </script>
+  </section>
+  <!-- ===== About ===== -->
+  <section id="v-about" data-view hidden aria-label="About">
+    <style>
+      .ab{max-width:680px;margin:0 auto;display:grid;gap:26px}
+      .ab .lead{font-family:var(--serif);font-size:clamp(24px,2.6vw,34px);line-height:1.18;letter-spacing:-.01em;color:var(--ink);margin:0;text-wrap:pretty}
+      .ab p{margin:0;font-size:16px;line-height:1.65;color:var(--ink);text-wrap:pretty}
+      .ab-go{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-top:26px;border-top:1px solid var(--line)}
+      .ab-go a{display:inline-block;height:auto;min-height:0;line-height:1.2;padding:10px 18px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-size:13px;font-weight:500}
+      .ab-go a.ghost{background:none;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+    </style>
+    <div class="vh"><span class="label">About</span><h1>Why I made this.</h1></div>
+    <div class="ab">
+      <p class="lead">I'm a master's student in Graphic Design at ArtCenter College of Design. The Plastic Index is part of my thesis.</p>
+      <p>I care deeply about the environment. When my thesis gave me the chance to take it on through design, I knew I wanted to make a tool that pushes towards a circular economy: one where materials are kept in use or returned safely to nature, instead of thrown away.</p>
+      <p>That idea isn't new. Many Indigenous communities have long lived this way, taking only what is needed, using all of it and giving back to the land. Their way of living is what inspired this project.</p>
+      <p>There is a huge amount of research on plastic and its alternatives, but it is scattered across reports, databases and PDFs that few people have time to read. I felt that companies, and the designers who work with them, needed a faster way in. The Plastic Index turns that research into something you can explore in minutes: what is still plastic, who has already switched, what the alternatives cost and how materials can stay in the loop.</p>
+      <p>Every number on the site is sourced and dated, and estimates are marked as estimates.</p>
+      <div class="ab-go"><a href="#still-plastic">See what's still plastic</a><a class="ghost" href="#case-studies">Real World</a><a class="ghost" href="#circular">Circular</a></div>
+    </div>
   </section>
 </main>
 
@@ -2451,7 +2472,7 @@ const REEL=[ /* free Pexels footage, trimmed; credit in each caption */
 
 /* ---------- router ---------- */
 const SHOW_HOME=false; /* video home page put away for now */
-const VIEWS=[...(SHOW_HOME?["home"]:[]),"still-plastic","already-swapped","ideate","materials","case-studies","companies","every-day","circular"];
+const VIEWS=[...(SHOW_HOME?["home"]:[]),"still-plastic","already-swapped","ideate","materials","case-studies","companies","every-day","circular","about"];
 function route(){ const h=(location.hash||"").slice(1); const v=VIEWS.includes(h)?h:(SHOW_HOME?"home":"still-plastic"); document.body.classList.toggle("is-home",v==="home"); window.__reel&&window.__reel(v==="home");
   $$("[data-view]").forEach(s=>s.hidden=!(s.id==="v-"+v||(v==="home"&&s.id==="v-still-plastic")));
   $$("nav a").forEach(a=>a.dataset.v===v?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));
