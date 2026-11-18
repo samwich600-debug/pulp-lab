@@ -819,6 +819,13 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .headline b{font-family:var(--serif);font-weight:400;font-size:clamp(64px,8vw,112px);line-height:.9;letter-spacing:-.04em;color:#B0561E}
 #v-companies .headline span{font-size:16px;line-height:1.3;color:var(--ink)}
 #v-companies .profit.graphic .evidence{border-top:1px solid var(--line);padding-top:12px}
+/* Rankings: the switching graphic leads the panel; the pledge is a smaller note */
+#v-companies .profit.graphic{padding:28px 30px;background:#fff;border:1.5px solid var(--ink);box-shadow:0 14px 40px rgba(0,0,0,.06)}
+#v-companies .headline b{font-size:clamp(84px,10vw,150px)}
+#v-companies .pledge{padding:14px 16px;gap:6px;border-radius:16px}
+#v-companies .pledge-status{font-size:clamp(22px,2vw,30px)}
+#v-companies .pledge-track{height:6px}
+#v-companies .pledge-text{font-size:12px;line-height:1.45}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1610,6 +1617,7 @@ renderCases();
     </div>`;
   };
   const coBody=c=>{ const fm=(CF[c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"")]||[]).map(k=>F[k]).filter(Boolean); return `
+    ${profitGraphic(c)}
     <div><span class="label">${esc(c.hq)}${c.yr?" · "+c.yr+" data":""}</span><h2 id="dTitle" style="font-size:30px">${esc(c.co)}</h2></div>
     ${fm.length?`<div><span class="label">The plastic they put out</span><div class="cofmt" style="--cols:${fm.length%2===0?2:fm.length}">${fm.map(([img,l])=>`<figure><img src="img/${img}.png" alt="${esc(l)}"><figcaption>${esc(l)}</figcaption></figure>`).join("")}</div><p class="src" style="margin:8px 0 0">Unbranded examples of the main single-use formats, not the company's own products.</p></div>`:""}
     <div class="co2col">
@@ -1625,7 +1633,6 @@ renderCases();
         <div class="pledge pledge-${c.status==="on"?"on":c.status==="off"?"off":"mixed"}"><span class="label">Pledge</span><b class="pledge-status">${c.status==="on"?"On track":c.status==="off"?"Off track":"Mixed progress"}</b><span class="pledge-track"><i></i></span><span class="pledge-text">${esc(c.pledge)}</span></div>
       </div>
     </div>
-    ${profitGraphic(c)}
     <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}</p>`; };
   let coOpen=false;
   const coOpenFor=(c,row)=>{
