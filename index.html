@@ -944,6 +944,14 @@ aside.drawer.modal figcaption span{font-size:13px}
 .sf-tip .pctl{color:var(--muted);font-size:12px}
 .sf-tip p{margin:2px 0 0}
 .sf-tip-x{all:unset;cursor:pointer;position:absolute;top:8px;right:10px;font-size:12px;color:var(--muted)}
+
+/* jargon you can tap for an explanation */
+.term{all:unset;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;text-decoration-thickness:1.5px}
+.term:hover,.term:focus-visible{text-decoration-style:solid}
+.term-tip{position:absolute;z-index:60;display:grid;gap:4px;background:#fff;color:var(--ink);border:1px solid var(--ink);border-radius:6px;padding:12px 30px 12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.14);font-size:13.5px;line-height:1.45}
+.term-tip b{font-size:14px}
+.term-tip p{margin:0}
+.term-x{all:unset;cursor:pointer;position:absolute;top:8px;right:10px;font-size:12px;color:var(--muted)}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1904,6 +1912,58 @@ const OLD_PHOTO=[[/shrink/i,"c-shrink.png"],[/blister/i,"p-blister.png"],[/bottl
 const oldPhoto=from=>{ const hit=OLD_PHOTO.find(([re])=>re.test(from||"")); return hit?hit[1]:null; };
 /* tonnes in everyday terms: 1 tonne = 1,000 kg ≈ 83,000 empty plastic water bottles (12 g each, the Plastic page figure) */
 /* plastic saved next to the company's total plastic packaging, as a bar */
+/* packaging jargon: tap a term in a case's "Switch" line for a short explanation (first match wins, longest terms first) */
+const TERMS=[
+ [/cans glued with recyclable adhesive/i,"Glued cans (Snap Pack)","Small dots of a specially made glue hold the cans together as a pack, so no plastic rings or shrink-wrap are needed. You twist a can to snap it off, and the tiny glue spots go through normal can recycling."],
+ [/CanCollar/,"CanCollar","A flat paperboard carrier with holes that slots over the tops of the cans and holds them by their rims. It replaces plastic rings."],
+ [/KeelClip/,"KeelClip","A small paperboard clip that grips the tops of a group of cans by their rims, with finger holes to carry them. It replaces plastic rings and shrink film."],
+ [/cardboard topper/i,"Cardboard topper (Green Grip)","A cardboard clip that sits on the tops of the cans and grips them by the rims, replacing plastic rings and shrink-wrap."],
+ [/vacuum-skin pack/i,"Vacuum-skin pack","A thin film sucked tight around the meat onto a flat base. It still uses plastic, but much less than a deep tray with a lid film, and the food keeps longer."],
+ [/(\d+% )?paper bottle( \(PulPac\))?(, thin liner| with barrier)?/i,"Paper bottle","A bottle shell made of molded paper fibre. Most still have a thin plastic liner or coating inside to hold the liquid, so they cut plastic rather than remove it."],
+ [/seaweed sachets/i,"Seaweed sachets (Notpla)","Sauce packets made from a film of seaweed and plants instead of plastic. They break down naturally in about six weeks."],
+ [/mushroom cushions/i,"Mushroom cushions","Mycelium (the root network of mushrooms) is grown around farm waste inside a mould. In a few days it forms a light, firm cushion that can be composted at home."],
+ [/laser-etched logo/i,"Laser-etched logo","A low-power laser lightly removes colour from the outer skin of the fruit to mark the logo. No sticker, glue or pack is needed, and the fruit inside isn't affected."],
+ [/interlocking paper cushioning|FiberFlute paper cushioning/i,"Paper cushioning","Corrugated paper folded and slotted into shapes that hold the product in place, doing the job foam used to do."],
+ [/wet-molded paper-fiber|moulded fibre|molded recycled-fiber|pulp trays|fiber cushioning|fibre cutlery|fibre lids/i,"Molded fibre","Wet paper pulp pressed into a mould and dried, the same way egg cartons are made. It can be shaped into trays, cushions, lids and tubs."],
+ [/bamboo,? (and )?sugarcane/i,"Bamboo and sugarcane fibre","Fibres from fast-growing bamboo and from sugarcane waste (bagasse), pulped and pressed like paper."],
+ [/cellulose/i,"Cellulose film","A clear film made from wood pulp rather than oil. It looks like plastic but is plant-based, and some types are compostable."],
+ [/\bFSC\b/,"FSC","Forest Stewardship Council. Paper with this label comes from forests managed so they regrow and stay healthy."],
+ [/\bPEFC\b/,"PEFC","Programme for the Endorsement of Forest Certification. Like FSC, it shows the paper comes from responsibly managed forests."],
+ [/shrink[- ]wrap|shrink film/i,"Shrink-wrap","Plastic film wrapped around a group of products and heated so it shrinks tight around them."],
+ [/flow-wraps?/i,"Flow-wrap","The sealed plastic film wrapper around a bar or biscuit pack, sealed at both ends and along the back."],
+ [/blister( pack)?s?/i,"Blister pack","A clear, moulded plastic bubble glued to a card, used to hang products on a hook."],
+ [/clamshells?/i,"Clamshell","A clear plastic box with a hinge that snaps shut, common for berries and small electronics."],
+ [/EPS foam|polystyrene( foam)?|foam cushions/i,"Foam (EPS)","Expanded polystyrene: a white foam made of puffed-up plastic beads. Light and cheap, but rarely recycled and breaks into tiny pieces."],
+ [/\bHDPE\b/,"HDPE","High-density polyethylene, a stiff plastic used for milk jugs, tubs and bottles."],
+ [/\bLDPE\b|\bPE film\b/,"PE / LDPE","Polyethylene film, the soft, stretchy plastic used for bags and wraps."],
+ [/\bpunnet\b/i,"Punnet","A small open box for berries, grapes or tomatoes."],
+ [/(plastic )?window sheets?/i,"Window sheet","The clear plastic panel set into a cardboard box so you can see the toy inside. Replacing it with a printed picture or an open cut-out removes the plastic."],
+ [/polybags?/i,"Polybag","A thin, clear plastic bag used to wrap a product inside its box or in shipping."],
+ [/elastic bands/i,"Elastic bands","Rubber or plastic bands used to hold parts in place inside a box."],
+ [/barrier/i,"Barrier","A very thin coating inside paper packaging that keeps out moisture and air. It's often a small amount of plastic."],
+ [/compostable/i,"Compostable","Breaks down into natural materials in compost. Some need industrial composting; others break down in a home compost bin."]
+];
+function termify(text){
+  const raw=String(text||""), hits=[];
+  TERMS.forEach(([re,label,info],i)=>{ const m=raw.match(re); if(m&&m[0]) hits.push({at:m.index,len:m[0].length,i}); });
+  hits.sort((a,b)=>a.at-b.at||b.len-a.len);
+  let out="", pos=0;
+  for(const h of hits){ if(h.at<pos) continue; out+=esc(raw.slice(pos,h.at))+`<button type="button" class="term" data-term="${h.i}">${esc(raw.substr(h.at,h.len))}</button>`; pos=h.at+h.len; }
+  return out+esc(raw.slice(pos));
+}
+const termTip=(()=>{ const t=document.createElement("div"); t.className="term-tip"; t.hidden=true; t.setAttribute("role","dialog"); t.addEventListener("click",e=>{ e.stopPropagation(); if(e.target.closest(".term-x")) t.hidden=true; }); document.body.append(t); return t; })();
+document.addEventListener("click",e=>{
+  if(e.target.closest&&e.target.closest(".term-tip")) return;
+  const b=e.target.closest&&e.target.closest(".term");
+  if(!b){ termTip.hidden=true; return; }
+  const [,label,info]=TERMS[+b.dataset.term];
+  termTip.innerHTML=`<button type="button" class="term-x" aria-label="Close">✕</button><b>${esc(label)}</b><p>${esc(info)}</p>`;
+  termTip.hidden=false;
+  const r=b.getBoundingClientRect(), w=Math.min(320,innerWidth-24);
+  termTip.style.width=w+"px";
+  termTip.style.left=Math.max(12,Math.min(r.left+r.width/2-w/2,innerWidth-w-12))+scrollX+"px";
+  termTip.style.top=(r.bottom+8+scrollY)+"px";
+},true);
 /* what the switch cost or saved, and whether it paid back */
 function moneyHTML(c){
   const m=(typeof CASE_MONEY!=="undefined")&&CASE_MONEY[c.brand+"|"+c.product];
@@ -1931,11 +1991,11 @@ function tonEq(t){
   const n=t*1e6/12, km=n*0.22/1000, earth=km/40075;
   const nTxt=n>=1e9?fmt(n/1e9,1)+" billion":n>=1e6?fmt(n/1e6,n>=1e8?0:1)+" million":fmt(n);
   const line=earth>=1?`Lined up end to end, they would wrap around the Earth ${earth>=10?fmt(earth):fmt(earth,1)} times.`:`Lined up end to end, they would stretch about ${fmt(km)} km.`;
-  return `<div class="toneq"><img src="img/p-bottle.png" alt="" aria-hidden="true"><div><span class="label">In everyday terms</span><b>≈ ${nTxt} plastic water bottles</b><span class="src">${line} A tonne is 1,000 kg, about the weight of a small car, or about 83,000 empty plastic water bottles (12 g each). Rough arithmetic: bottles about 22 cm tall.</span></div></div>`;
+  return `<div class="toneq"><img src="img/p-bottle.png" alt="" aria-hidden="true"><div><span class="label">In everyday terms</span><b>≈ ${nTxt} plastic water bottles</b><span class="src">${line} A tonne is 1,000 kg, about the weight of a small car, or about 83,000 empty plastic water bottles (12 g each).</span></div></div>`;
 }
 const CASE_AFTER={"Hasbro":"e-blister-box.png","Nestlé Japan":"brand/nestle-japan.png","Mars Wrigley Australia":"brand/mars-wrigley-australia.png"};
 /* photos for the lesson line: what the maker should look at */
-const LESSON_IMG={"Hasbro":[["lesson-window.png","Window sheet: clear plastic in a paper box, easy to swap for paper"],["lesson-twist.png","Plastic twist ties: easy to replace with paper ties"]],"Burger King UK":[["brand/burger-king-books.webp","Burger King's plastic-free books, Sweden and Denmark (brand photo)"]]};
+const LESSON_IMG={"Hasbro":[["lesson-window.png","Window sheet: clear plastic in a paper box, easy to swap for paper"],["lesson-twist.png","Plastic ties and elastic bands: easy to replace with paper ties"]],"Burger King UK":[["brand/burger-king-books.webp","Burger King's plastic-free books, Sweden and Denmark (brand photo)"]]};
 const CASE_BRAND_SRC={"Upfield": "", "Sainsbury's": "https://uk.fsc.org/sites/default/files/2024-03/Sainsbury%27s%20packaging%20image.png", "Walkers": "https://www.packagingstrategies.com/ext/resources/2023/10/31/Walkers-Paper.webp?t=1699398578", "Coca-Cola": "https://i0.wp.com/thedieline.com/wp-content/uploads/2022/08/0c0eba5a-c6be-4e74-ac85-f1f20756906d_Coke_Stacked62f27e06cec63png.webp?w=800&quality=65&ssl=1", "Orkla Salvequick": "https://www.smurfitkappa.com/-/m/images/image-text-teaser-680-x-450/case-studies/orkla-salvequick_680x450_approach.jpg", "Carlsberg": "https://media.madisonpublications.eu/uploads/2018/09/06075942/2C86FC9A-B79F-47A8-932A-81C741192423.jpeg", "Heineken UK": "https://www.grocerygazette.co.uk/wp-content/uploads/2022/10/Heineken-topper-1024x683.jpg", "Nestle": "https://i0.wp.com/thedieline.com/wp-content/uploads/2021/02/8bd5ff2c-5a2d-4f8d-8903-84c938bf5093_smartiespaperpackaging_web.jpg", "Nestle Japan": "https://soranews24.com/wp-content/uploads/sites/3/2019/08/japanese-kit-kats-kitkats-plastic-paper-packaging-new-recycle-environmentally-friendly-packaging-sustainable-chocolates-japan-new-marketing-6-1.jpg", "Nesquik": "https://d2dyh47stel7w4.cloudfront.net/Pictures/1120xAny/9/5/9/155959_nesquikallnatural1_883464_crop.jpg", "Mars Wrigley Australia": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/8/6/5/10865_image21_81815.jpg", "Arla": "https://images.arla.com/recordid/8756524F-7668-47F7-A66DD67069E1E4D6/picture.jpg?width=1200&height=630&mode=max&format=jpg", "Diageo": "https://www.packagingstrategies.com/ext/resources/2020-Postings/New-Packages/JW-Black-for-web.png?height=635&t=1613505211&width=1200", "Absolut": "https://www.circularonline.co.uk/wp-content/uploads/2023/06/2fc0565e-bd59-4c1a-a14f-1dc01cb850bd-1-768x768-1.webp", "Tetra Pak": "https://papermart.in/wp-content/uploads/2019/07/Tetra-Pak-Introduces-Paper-Straws-for-Beverage-Products-in-Europe-799x1024-1.jpg", "Tesco": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/9/6/2/224962_beanswithoutplasticwrap_593232.jpg", "Waitrose": "https://d3fwccq2bzlel7.cloudfront.net/Pictures/1120xAny/2/0/8/49208_2_1213621.jpg", "Lidl GB": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/5/5/0/295550_birchwood_vacpackmince_10_75731_crop.jpeg", "Aldi UK": "https://media.madisonpublications.eu/uploads/2020/02/06075021/Aldi-Chicken-Pesto-Pizza1.jpg", "Iceland": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/8/1/1/125811_Hungry-Heroes-Too-Cool_WEB.jpg", "Woolworths Australia": "https://www.australianmanufacturing.com.au/wp-content/uploads/2021/05/3.-Woolworths-packaging-pulp-tray-for-mini-tomatoes-and-paper-meat-trays.jpg", "Morrisons": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/7/5/7/132757_Morrisons-paper-packaging-web.jpg", "Amazon": "https://imgproxy.divecdn.com/lkF51ux4RQ0kMffqmzCWJ1YIZzqP1A4jijM4WhwkvcE/g:ce/rs:fit:770:435/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9BTVpOX0Fpcl9QaWxsb3dfUmVtb3ZhbF83LmpwZw==.webp", "McDonald's UK & Ireland": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/9/9/6/180996_happymeals_682859.jpg", "McDonald's UK": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/2/1/3/164213_mcflurry_432687.jpg", "Burger King UK": "https://cms.dandad.org/images/f4nPfIUZap-O7gg_c7E_SLywcvk=/32700/width-1600/3000x2400_YwUAuDd.jpg", "Starbucks": "https://www.packagingstrategies.com/ext/resources/2020-Postings/Packager-News/Starbucks-for-web.jpg", "Just Eat": "https://ethicalmarketingnews.com/wp-content/uploads/2019/11/justeat-hellmans.jpg", "IKEA": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/6/6/0/4660_ikeapace020320.jpg", "Samsung": "https://images.samsung.com/is/image/samsung/assets/us/explore/brand/take-charge-of-sustainability-with-galaxy/01042022/Galaxy_S21_packaging.jpg", "LEGO": "https://www.esgtoday.com/wp-content/uploads/2025/11/Lego-paper-bag2.jpg", "Hasbro": "https://www.hasbro.com/common/productimages/en_US/145BAA1FC0404F5CA6C1AEC1CEF13487/235f34beb043f5480f1cb99c6a82bef9cd69de10.jpg", "Ethique": "https://cdn.shopify.com/s/files/1/0025/1717/2339/files/PDP_GENTLE-Shampoo_ETHIQUE_2026_2000x2000-1.jpg?v=1778009760", "Apple": "https://upload.wikimedia.org/wikipedia/commons/8/8c/IPhone_15_Pro_Max_and_the_box%2C_2023%2C_01.jpg", "Dell": "https://cdn.pokde.net/wp-content/uploads/2022/04/dell-sustainable-packaging.jpg", "Google": "https://fdn.gsmarena.com/imgroot/news/23/10/google-pixel-8-unboxing/-1200w5/gsmarena_001.jpg", "HP": "https://www.hp.com/content/dam/sites/garage-press/press/press-releases/2020/molded-fiber-announcement/HP%20MF_HP%20Desktop%20Mini%202.jpg", "Mattel": "https://i0.wp.com/thedieline.com/wp-content/uploads/2020/10/24bb2957-9906-4b59-9b9b-a2f909c498f2_https___hypebeastcom_image_2020_10_mattelunonothinbutpapersustainabilitydesign001.jpg", "Gillette": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1024x536/1/4/6/228146_00000000_glltt_557_proglide_we_razor_1up_v2_tabletop_page_2_843620.jpg", "Logitech": "https://www.logitech.com/blog/wp-content/uploads/2025/04/Copy-of-PR_image_boxes_wiped.png", "Microsoft": "https://i0.wp.com/thedieline.com/wp-content/uploads/2025/04/df51e440-5ba7-4536-9d42-8f449b1c3d2c.jpg", "Lush": "https://lush.co.za/cdn/shop/files/honey_shampoo_bar.jpg?v=1721733777", "Lenor (P&G)": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/9/7/3/2973_lenor-20-07.jpg", "Dove (Unilever)": "https://assets.unileversolutions.com/v1/33161020.jpg", "Garnier": "https://static.thcdn.com/productimg/original/12732545-2085086944127479.jpg", "Sony": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgpZVCdGrCxNu5-eerbvThr-g6If1RcAPIOOlo85pbr0_17VdEtxcDDfN-i8iRRznb6xXAnulwcKJFudkoZ4Xvv-V_qHKKN7fJhQvNI1WQCn6jDMpMIviTuWJLmc3WqpOIQTCd0xn_930xa/s16000/Sony-WF-1000XM4-Packaging.jpg", "La Roche-Posay": "https://prix.formesdeluxe.com/app/uploads/2021/05/la-roche-posay-carton.png", "Native": "https://cdn.shopify.com/s/files/1/1361/9483/products/COCONUT_PlasticTube_Front_01f0203f-3266-4a20-b532-1e8c472c8a60.png?v=1571183541", "H&M Group": "https://fashionunited.uk/news/business/h-m-begin-using-paper-packaging-for-online-orders/2021081257120", "adidas": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhFaCStx8Ja6s3ytO2h5mDv-h5b_loiV4fsBUTagbcmnpuUx2pr2nKowQQxGVCx8gCax4kV4bQlVSdqOM-xElc_6a0pfv1KVYPdI5z3VZTiWWO2X92uiQp23WxDItvdmZBI1-wExCSRUrWo/s1600/adidas+new+policy.jpg", "Vital Proteins": ""};
 /* real branded product photos, shown first on Real World (the unbranded eco version shows on hover); add a file to img/brand/ and a line here */
 const CASE_BRAND={"Upfield": "upfield.png", "Vital Proteins": "vital-proteins.png", "Sainsbury's": "sainsbury-s.png", "Walkers": "walkers.png", "Coca-Cola": "coca-cola.png", "Orkla Salvequick": "orkla-salvequick.png", "Carlsberg": "carlsberg.png", "Heineken UK": "heineken-uk.png", "Nestle": "nestle.png", "Nestle Japan": "nestle-japan.png", "Nesquik": "nesquik.png", "Mars Wrigley Australia": "mars-wrigley-australia.png", "Arla": "arla.png", "Diageo": "diageo.png", "Absolut": "absolut.png", "Tetra Pak": "tetra-pak.png", "Tesco": "tesco.png", "Waitrose": "waitrose.png", "Lidl GB": "lidl-gb.png", "Aldi UK": "aldi-uk.png", "Iceland": "iceland.png", "Woolworths Australia": "woolworths-australia.png", "Morrisons": "morrisons.png", "Amazon": "amazon.png", "McDonald's UK & Ireland": "mcdonald-s-uk-ireland.png", "McDonald's UK": "mcdonald-s-uk.png", "Burger King UK": "burger-king-uk.png", "Starbucks": "starbucks.png", "Just Eat": "just-eat.png", "IKEA": "ikea.png", "Samsung": "samsung.png", "LEGO": "lego.png", "Hasbro": "hasbro.png", "Ethique": "ethique.png", "Apple": "apple.png", "Dell": "dell.png", "Google": "google.png", "HP": "hp.png", "Mattel": "mattel.png", "Gillette": "gillette.png", "Logitech": "logitech.png", "Microsoft": "microsoft.png", "Lush": "lush.png", "Lenor (P&G)": "lenor-p-g.png", "Dove (Unilever)": "dove-unilever.png", "Garnier": "garnier.png", "Sony": "sony.png", "La Roche-Posay": "la-roche-posay.png", "Native": "native.png", "H&M Group": "h-m-group.png", "adidas": "adidas.png"};
@@ -1979,7 +2039,7 @@ function renderCases(){
     const aft=CASE_AFTER[c.brand]||ph;
     const lessonImgs=(LESSON_IMG[c.brand]||[]).map(([f,l])=>`<figure style="margin:0;display:grid;gap:6px;justify-items:center;text-align:center"><img src="img/${f}" alt="${esc(l)}" style="width:100%;max-width:200px;aspect-ratio:1;object-fit:contain;border-radius:12px;background:#fff"><figcaption class="src">${esc(l)}</figcaption></figure>`).join("");
     const caseBody=`
-      ${aft&&bef?`<div class="pair" style="margin-bottom:20px"><figure><img src="img/${bef}" alt="${esc(c.from)}" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption><span class="pill">Before</span>${esc(c.from)}</figcaption></figure><svg class="arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12h56M46 3l12 9-12 9"/></svg><figure class="now"><img src="img/${aft}" alt="${esc(c.to)}" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption><span class="pill g">After</span>${esc(c.to)}</figcaption></figure></div>`:""}
+      ${aft&&bef?`<div class="pair" style="margin-bottom:20px"><figure><img src="img/${bef}" alt="${esc(c.from)}" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption><span class="pill">Before</span>${termify(c.from)}</figcaption></figure><svg class="arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12h56M46 3l12 9-12 9"/></svg><figure class="now"><img src="img/${aft}" alt="${esc(c.to)}" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption><span class="pill g">After</span>${termify(c.to)}</figcaption></figure></div>`:""}
       <div class="mtop">
         ${ph?`<figure style="margin:0;display:grid;gap:8px;justify-items:center;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px"><img src="img/${ph}" alt="${esc(c.to)}" style="width:100%;max-width:260px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption class="src" style="text-align:center">Their solution: ${esc(c.to)}<br><span style="font-size:11px">Unbranded example</span></figcaption></figure>`:""}
         <div class="mstats"><div><span class="label">${esc(c.cat)} · ${c.year}</span><h2 id="dTitle" style="font-size:30px">${esc(c.brand)}</h2><p class="src" style="margin:4px 0 0">${esc(c.product)}</p></div>
@@ -1987,7 +2047,7 @@ function renderCases(){
       ${totalBar(c)}
       ${c.t!=null?tonEq(c.t):""}
       <div class="kv">
-        <div class="wide"><span class="label">Switch</span><span>${esc(c.from)} → <b style="font-family:var(--body);font-size:14px">${esc(c.to)}</b></span></div>
+        <div class="wide"><span class="label">Switch</span><span>${termify(c.from)} → <b style="font-family:var(--body);font-size:14px">${termify(c.to)}</b></span></div>
         <div class="wide"><span class="label">Impact</span><span>${esc(c.benefit)}</span></div>
       </div>
       ${moneyHTML(c)}
