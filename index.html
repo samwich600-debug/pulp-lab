@@ -871,6 +871,15 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 /* Rankings: the eco swap sits behind the clicked item */
 #v-companies .fimg.costack{position:relative}
 #v-companies .facts{grid-column:1/-1}
+/* Rankings left side: every item the company puts out, each with its swap tucked behind */
+#v-companies .fimg.costack{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 10px;align-content:center;justify-items:center;place-items:center}
+#v-companies .fimg.costack.n1{grid-template-columns:minmax(0,1fr)}
+#v-companies .fimg.costack .cs{position:relative;display:grid;place-items:center;width:100%;max-width:260px;aspect-ratio:1}
+#v-companies .fimg.costack .cs img{grid-area:1/1;max-height:none;aspect-ratio:1;object-fit:contain;filter:var(--shadow)}
+#v-companies .fimg.costack .cs img.pl{position:relative;z-index:2;width:70%;transform:translateX(-12%)}
+#v-companies .fimg.costack .cs img.eco{position:relative;z-index:1;width:62%;transform:translate(22%,-10%) rotate(6deg)}
+#v-companies .fimg.costack.n1 .cs{max-width:440px}
+#v-companies .fimg.costack figcaption{grid-column:1/-1;grid-area:auto;margin-top:4px;text-align:center;font-size:13px;color:#2E6B35;font-weight:600}
 #v-companies .fimg.costack{display:grid;place-items:center}
 #v-companies .fimg.costack img.pl,#v-companies .fimg.costack img.eco{grid-area:1/1;max-height:none}
 #v-companies .fimg.costack img.pl{position:relative;z-index:2;width:min(74%,430px);transform:translateX(-10%)}
@@ -1370,6 +1379,15 @@ aside.drawer.modal figcaption span{font-size:13px}
       .ab-go{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-top:26px;border-top:1px solid var(--line)}
       .ab-go a{display:inline-block;height:auto;min-height:0;line-height:1.2;padding:10px 18px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-size:13px;font-weight:500}
       .ab-go a.ghost{background:none;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+      .ab-src{display:grid;gap:12px;padding-top:26px;border-top:1px solid var(--line)}
+      .ab-src h2{font-family:var(--serif);font-weight:400;font-size:clamp(26px,2.6vw,34px);margin:0}
+      .ab-src .note{font-size:14px;color:var(--muted)}
+      .ab-src details{border:1px solid var(--line);border-radius:14px;padding:12px 16px;background:#fff}
+      .ab-src summary{cursor:pointer;font-weight:600;font-size:15px;display:flex;justify-content:space-between;gap:12px}
+      .ab-src summary span{font-weight:400;color:var(--muted)}
+      .ab-src ol{margin:10px 0 2px;padding-left:20px;display:grid;gap:6px;font-size:14px;line-height:1.45}
+      .ab-src ol a{color:var(--ink)}
+      .ab-src ol small{color:var(--muted);margin-left:6px}
     </style>
     <div class="vh"><span class="label">About</span><h1>Why I made this.</h1></div>
     <div class="ab">
@@ -1378,6 +1396,7 @@ aside.drawer.modal figcaption span{font-size:13px}
       <p>That idea isn't new. Many Indigenous communities have long lived this way, taking only what is needed, using all of it and giving back to the land. Their way of living is what inspired this project.</p>
       <p>There is a huge amount of research on plastic and its alternatives, but it is scattered across reports, databases and PDFs that few people have time to read. I felt that companies, and the designers who work with them, needed a faster way in. The Plastic Index turns that research into something you can explore in minutes: what is still plastic, who has already switched, what the alternatives cost and how materials can stay in the loop.</p>
       <p>Every number on the site is sourced and dated, and estimates are marked as estimates.</p>
+      <div class="ab-src" id="abSources"></div>
       <div class="ab-go"><a href="#still-plastic">See what's still plastic</a><a class="ghost" href="#case-studies">Real World</a><a class="ghost" href="#circular">Circular</a></div>
     </div>
   </section>
@@ -2451,8 +2470,9 @@ renderCases();
     const key=c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
     const fm=(CF[key]||[]).map(k=>F[k]).filter(Boolean);
     panel.classList.remove("open","leaving"); panel.hidden=false; coOpen=true;
-    const k0=(CF[key]||[])[0], a0=k0?swapFor(c,k0,0):null;
-    panel.innerHTML=`<figure class="fimg costack">${a0?`<img class="eco" src="img/e-${a0[0]}.png" alt="${esc(a0[1])}">`:""}${fm.length?`<img class="pl" src="img/${fm[0][0]}.png" alt="${esc(fm[0][1])}">`:""}${a0?`<figcaption>Behind it, the swap: ${esc(a0[1])}</figcaption>`:""}</figure><div class="fbody"><button type="button" class="fback" id="cBack">← All companies</button>${coBody(c)}</div>`;
+    const ks=(CF[key]||[]).filter(k=>F[k]);
+    const stack=ks.map((k,i)=>{ const f=F[k], a=swapFor(c,k,i); return `<div class="cs">${a?`<img class="eco" src="img/e-${a[0]}.png" alt="${esc(a[1])}" onerror="this.remove()">`:""}<img class="pl" src="img/${f[0]}.png" alt="${esc(f[1])}"></div>`; }).join("");
+    panel.innerHTML=`<figure class="fimg costack n${Math.min(ks.length,4)}">${stack}<figcaption>Each plastic item, with its swap behind it</figcaption></figure><div class="fbody"><button type="button" class="fback" id="cBack">← All companies</button>${coBody(c)}</div>`;
     sec.classList.add("focusing");
     rows.querySelectorAll(".corow").forEach(r=>r.classList.toggle("cur", r===row));
     rows.insertBefore(panel,row); panel.classList.add("inline");
@@ -2487,6 +2507,41 @@ renderCases();
     b.onclick=()=>open(c,b); rows.append(b);
   });
   COS.filter(c=>c.t==null).forEach(c=>{ const b=document.createElement("button"); b.type="button"; b.textContent=c.co; b.onclick=()=>open(c,b); $("#coND").append(b); });
+})();
+
+/* ---------- About: every source the site uses, gathered from its data so the list grows on its own ---------- */
+(function(){
+  const box=$("#abSources"); if(!box) return;
+  const isUrl=s=>typeof s==="string"&&/^https?:\/\//.test(s);
+  const collect=(v,out,hint)=>{
+    if(v==null) return;
+    if(isUrl(v)){ out.push([hint||"",v]); return; }
+    if(Array.isArray(v)){
+      if(v.length>=2&&typeof v[0]==="string"&&!isUrl(v[0])&&isUrl(v[1])){ out.push([v[0],v[1]]); return; }
+      v.forEach(x=>collect(x,out,hint)); return; }
+    if(typeof v==="object"){
+      const nm=[v.src,v.source,v.name,v.title].find(x=>typeof x==="string"&&!isUrl(x));
+      for(const [k,x] of Object.entries(v)){ if(isUrl(x)) out.push([nm||k,x]); else if(typeof x==="object") collect(x,out,nm||(isNaN(k)?k:hint)); }
+    }
+  };
+  const g=n=>{ try{ return eval(n); }catch(_){ return null; } };
+  const GROUPS=[
+    ["Plastic items, swaps and waste figures",["STILL","WORLD_WASTE","WASTE","ICC","LITTER","ICC_TOP"]],
+    ["Material Lab and packaging fees",["M","SPEC","FEE_SRC"]],
+    ["Real World case studies",["CASES","CASE_TOTAL","CASE_MIX","CASE_MONEY"]],
+    ["Rankings",["COS","EMF","BFFP"]],
+    ["Suppliers and bulk prices",["BUY"]],
+    ["Brand photos (shown for study, not commercial reuse)",["CASE_BRAND_SRC"]]];
+  const seen=new Set(); let total=0;
+  const html=GROUPS.map(([title,names])=>{
+    const out=[]; names.forEach(n=>collect(g(n),out,""));
+    const rows=[]; out.forEach(([label,url])=>{ if(seen.has(url)) return; seen.add(url); let host=""; try{ host=new URL(url).hostname.replace(/^www\./,""); }catch(_){}
+      rows.push([label||host,url,host]); });
+    if(!rows.length) return "";
+    rows.sort((a,b)=>a[0].localeCompare(b[0])); total+=rows.length;
+    return `<details><summary>${esc(title)}<span>${rows.length}</span></summary><ol>${rows.map(([l,u,h])=>`<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(l)}</a><small>${esc(h)}</small></li>`).join("")}</ol></details>`;
+  }).join("");
+  box.innerHTML=`<h2>Sources</h2><p class="note">All ${total} sources the site draws on, grouped by page. This list is built from the site's own data, so it grows whenever a source is added.</p>${html}`;
 })();
 
 /* ---------- home reel: crossfades through short clips ---------- */
