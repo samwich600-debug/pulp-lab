@@ -635,7 +635,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 /* ---- Every day: Earth in the middle of a screen that fills up with bottles ---- */
 .ton-view{position:relative;margin:-40px calc(50% - 50vw) -120px;width:100vw;background:#fff;color:var(--ink);overflow:hidden}
 .ton-stage{position:relative;height:calc(100vh - 64px);height:calc(100dvh - 64px);min-height:560px;overflow:hidden;background:#fff}
-.ton-pile{position:absolute;inset:0;z-index:1;pointer-events:none}
+.ton-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;pointer-events:none}
 .ton-b{position:absolute;width:auto;transform-origin:50% 50%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.14))}
 .ton-earth{position:absolute;left:50%;top:50%;width:min(56vmin,640px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;z-index:2}
 .ton-earth img{position:absolute;width:116%;height:116%;left:-8%;top:-8%;object-fit:cover;display:block}
@@ -768,14 +768,14 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 
   <section id="v-every-day" data-view hidden class="ton-view" aria-label="Every day">
     <div class="ton-stage" id="tonStage">
-      <div class="ton-pile" id="tonPile" aria-hidden="true"></div>
+      <video class="ton-video" src="video/bottles-pile.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
       <div class="ton-earth"><img src="img/earth.png" alt="Planet Earth"></div>
       <div class="ton-copy">
         <span class="label">Every day</span>
         <h1>About 4,700 tonnes of plastic reach the ocean, every day.</h1>
       </div>
       <div class="ton-count" aria-live="off"><b id="tonCount">0</b><span>tonnes so far</span></div>
-      <p class="ton-src">OECD: 1.7 million tonnes reached the ocean in 2019; divided by 365, about 4,700 tonnes a day (a rough average). Each bottle stands for about 5 tonnes.</p>
+      <p class="ton-src">OECD: 1.7 million tonnes reached the ocean in 2019; divided by 365, about 4,700 tonnes a day (a rough average).</p>
     </div>
   </section>
 
@@ -1550,57 +1550,18 @@ show();
 </script>
 
 <script>
-/* Every day: bottles fall from above the screen, land on their sides at random angles and heap up until the screen is full. */
+/* Every day: the tonnes counter climbs as the footage plays */
 (()=>{
-  const stage=document.getElementById("tonStage"), pile=document.getElementById("tonPile"), out=document.getElementById("tonCount");
-  if(!stage) return;
-  const TOTAL=4700, N=900, BATCH=6, EVERY=60;
-  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const fmt=n=>n.toLocaleString("en-US");
-  const probe=new Image(); probe.src="img/p-bottle.png";
+  const stage=document.getElementById("tonStage"), out=document.getElementById("tonCount");
+  if(!stage||!out) return;
   let started=false;
-  function run(){
-    const W=stage.clientWidth, H=stage.clientHeight;
-    const ratio=probe.naturalWidth?probe.naturalHeight/probe.naturalWidth:3;
-    const L=Math.max(96,Math.min(150,W/10));        // bottle length on screen
-    const T=L/ratio;                                // bottle thickness when lying down
-    const colW=L*0.42, cols=Math.max(6,Math.ceil(W/colW));
-    const layer=T*0.55;                             // how far each lying bottle lifts the heap
-    const top=new Array(cols).fill(0);              // how high each column has been built, px from the floor
-    const floor=H-T*0.5;
-    let n=0;
-    function drop(){
-      // land in the lowest of three random columns so the heap spreads and fills
-      const c=[0,1,2].map(()=>Math.floor(Math.random()*cols)).reduce((x,y)=>top[x]<=top[y]?x:y);
-      const x=c*colW+colW/2+(Math.random()-0.5)*colW*0.9;
-      const y=floor-top[c]-T/2;
-      top[c]+=layer*(0.8+Math.random()*0.5);
-      const angle=(Math.random()<0.5?0:180)+(Math.random()*120-60);  // lying, roughly on its side
-      const el=document.createElement("img");
-      el.className="ton-b"; el.src="img/p-bottle.png"; el.alt="";
-      el.style.height=L+"px";
-      el.style.left=(x-(L/ratio)/2)+"px";
-      el.style.top=(-L-Math.random()*H*0.2)+"px";
-      el.style.transform=`rotate(${angle.toFixed(1)}deg)`;
-      pile.appendChild(el);
-      n++;
-      if(reduce){ el.style.top=(y-L/2)+"px"; }
-      else{
-        const fall=0.9+Math.random()*0.5+(y/H)*0.5;
-        el.style.transition=`top ${fall.toFixed(2)}s cubic-bezier(.45,0,.9,.5)`;
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.top=(y-L/2)+"px"; }));
-      }
-      out.textContent=fmt(n>=N?TOTAL:Math.round(n*TOTAL/N));
-    }
-    if(reduce){ for(let k=0;k<N;k++) drop(); return; }
-    let placed=0;
-    const timer=setInterval(()=>{
-      for(let k=0;k<BATCH&&placed<N;k++,placed++) drop();
-      if(placed>=N) clearInterval(timer);
-    },EVERY);
-  }
   const io=new IntersectionObserver(es=>{
-    if(es[0].isIntersecting&&!started){ started=true; io.disconnect(); if(probe.complete) run(); else probe.onload=run; }
+    if(es[0].isIntersecting&&!started){
+      started=true; io.disconnect();
+      const t0=performance.now(), D=12000;
+      const step=now=>{ const k=Math.min(1,(now-t0)/D); out.textContent=Math.round(4700*k).toLocaleString("en-US"); if(k<1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }
   },{threshold:.35});
   io.observe(stage);
 })();
