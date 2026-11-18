@@ -2387,7 +2387,7 @@ renderCases();
   const swapPairs=c=>{
     const rows=(CF[coKey(c)]||[]).map((k,i)=>{ const f=F[k], a=swapFor(c,k,i); if(!f) return "";
       const m=a?byId[ALT_MAT[a[0]]]:null, cost=m&&m.vs?Math.round((mid(m.vs)-1)*100):null;
-      return `<div class="sp"><figure><img src="img/${f[0]}.png" alt=""><figcaption>${esc(f[1])}</figcaption></figure><span class="arr">→</span><figure class="eco">${a?`<img src="img/e-${a[0]}.png" alt="" onerror="this.style.visibility='hidden'"><figcaption>${esc(a[1])}</figcaption>`:`<figcaption>No ready swap yet</figcaption>`}</figure><span class="spc">${a?(cost==null?"Cost: quote only":`${Math.abs(cost)}% ${cost>=0?"more":"less"} than plastic, per unit`):""}</span></div>`; }).join("");
+      return `<div class="sp"><figure><img src="img/${f[0]}.png" alt=""><figcaption>${esc(f[1])}</figcaption></figure><span class="arr">→</span><figure class="eco">${a?`<img src="img/e-${a[0]}.png" alt="" onerror="this.style.visibility='hidden'"><figcaption>${esc(a[1])}</figcaption>`:`<figcaption>No ready swap yet</figcaption>`}</figure><span class="spc">${a?(cost==null?"Cost: quote only":`Costs ${Math.abs(cost)}% ${cost>=0?"more":"less"} than plastic, per unit`):""}</span></div>`; }).join("");
     return rows?`<div class="swaps"><span class="label">What they'd switch, item by item</span>${rows}</div>`:""; };
   const profitGraphic=c=>{
     const pr=PROFIT[c.co];
@@ -2403,9 +2403,9 @@ renderCases();
       <div class="facts">
         <div class="fact hero"><span class="label">Profit that would go to switching</span><b>${shareTxt}%</b><span class="src">of ${pr.y} profit, about ${money(premium)} a year</span></div>
         <div class="fact"><span class="label">Total profit</span><b>${money(pr.p)}</b><span class="src">${pr.y}</span></div>
-        <div class="fact"><span class="label">Price per unit</span><b>${Math.abs(Math.round(extra))}% ${extra>=0?"more":"less"}</b><span class="src">than plastic, for ${esc(m.name)}</span></div>
+        <div class="fact"><span class="label">Cost per unit</span><b>${Math.abs(Math.round(extra))}% ${extra>=0?"more":"less"}</b><span class="src">than plastic, for ${esc(m.name)}</span></div>
       </div>
-      <div class="swapline"><span class="from">${esc(sw[0])}<b>$${plasticC.toFixed(2)}</b></span><span class="arr">→</span><span class="to">${esc(m.name)}<b>$${altC.toFixed(2)}</b></span><span class="more">${Math.abs(Math.round(extra))}% ${extra>=0?"more":"less"} than plastic, per unit</span></div>
+      <div class="swapline"><span class="from">${esc(sw[0])}<b>$${plasticC.toFixed(2)}</b></span><span class="arr">→</span><span class="to">${esc(m.name)}<b>$${altC.toFixed(2)}</b></span><span class="more">Costs ${Math.abs(Math.round(extra))}% ${extra>=0?"more":"less"} than plastic, per unit</span></div>
       <div class="bars">
         <div class="bar-row"><span class="bar-lab">Net profit, ${pr.y}</span><span class="bar-track"><i style="width:100%"></i></span><b>${money(pr.p)}</b></div>
         <div class="bar-row"><span class="bar-lab">Switching cost</span><span class="bar-track cost"><i style="width:${share.toFixed(1)}%"></i></span><b>${money(premium)}</b></div>
