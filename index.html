@@ -1991,7 +1991,7 @@ function tonEq(t){
   const n=t*1e6/12, km=n*0.22/1000, earth=km/40075;
   const nTxt=n>=1e9?fmt(n/1e9,1)+" billion":n>=1e6?fmt(n/1e6,n>=1e8?0:1)+" million":fmt(n);
   const line=earth>=1?`Lined up end to end, they would wrap around the Earth ${earth>=10?fmt(earth):fmt(earth,1)} times.`:`Lined up end to end, they would stretch about ${fmt(km)} km.`;
-  return `<div class="toneq"><img src="img/p-bottle.png" alt="" aria-hidden="true"><div><span class="label">In everyday terms</span><b>≈ ${nTxt} plastic water bottles</b><span class="src">${line} A tonne is 1,000 kg, about the weight of a small car, or about 83,000 empty plastic water bottles (12 g each).</span></div></div>`;
+  return `<div class="toneq"><img src="img/p-bottle.png" alt="" aria-hidden="true"><div><span class="label">In everyday terms</span><b>≈ ${nTxt} plastic water bottles</b><span class="src">${line}</span></div></div>`;
 }
 const CASE_AFTER={"Hasbro":"e-blister-box.png","Nestlé Japan":"brand/nestle-japan.png","Mars Wrigley Australia":"brand/mars-wrigley-australia.png"};
 /* photos for the lesson line: what the maker should look at */
