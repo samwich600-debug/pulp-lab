@@ -36,3 +36,5 @@ const LITTER_CATS={
  strawsUS:{n:67961,total:2798520,name:"straws and stirrers",region:"the US"}
 };
 const LITTER={chips:"wrappers",candy:"wrappers",bottle:"bottles",soda:"bottles",clamshell:"containers",storage:"containers",mealtray:"containers",yogurt:"containers",icecream:"containers",produce:"otherbags",breadbag:"otherbags",binliner:"otherbags",frozen:"otherbags",mailer:"otherbags",bag:"grocery",coldcup:"cups",meattray:"foam",straw:"strawsUS"};
+/* The global top 10 from the same 2024 cleanup, in order; everything else is grouped. Keys match LITTER_CATS where they overlap. */
+const ICC_TOP10=[["wrappers","Food wrappers",1442860],["bottles","Plastic bottles",1284225],["butts","Cigarette butts",1227124],["caps","Bottle caps",979400],["containers","Plastic food containers",523998],["otherbags","Other plastic bags",480371],["grocery","Plastic grocery bags",468394],["papercups","Paper cups and plates",444485],["cups","Plastic cups and plates",436397],["foam","Foam food containers",404636]];

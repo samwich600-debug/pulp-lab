@@ -913,6 +913,27 @@ aside.drawer.modal figcaption span{font-size:13px}
 .money .mrow.ok span:last-child{color:var(--good)}
 .money .mrow.bad span:last-child{color:var(--warn)}
 @media (max-width:600px){.money .mrow{grid-template-columns:1fr;gap:2px}}
+
+/* share graphs: the small grid opens a full, coloured breakdown */
+.wbtn{all:unset;cursor:pointer;display:grid;gap:6px;justify-items:start}
+.wbtn>span:last-child{font-size:12.5px;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.wbtn:hover .waffle{outline:1px solid var(--ink);outline-offset:3px}
+.wbtn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.sharefull{display:grid;gap:12px;border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--sheet)}
+.sf-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sf-close{all:unset;cursor:pointer;font-size:12.5px;color:var(--muted)}
+.sf-body{display:grid;gap:14px}
+.sf-grid{max-width:320px}
+.sf-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.sf-grid i{aspect-ratio:1;border-radius:2px;transition:opacity .15s}
+.sf-grid i.mine{box-shadow:inset 0 0 0 2px var(--ink)}
+.sf-grid i.dim,.sf-legend li.dim{opacity:.18}
+.sf-cap{margin:0 0 10px;font-size:14px;min-height:2.6em}
+.sf-legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:4px 16px;font-size:13px}
+.sf-legend li{display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:center;cursor:default;transition:opacity .15s}
+.sf-legend li i{width:12px;height:12px;border-radius:2px}
+.sf-legend li.mine span{font-weight:600}
+.sf-legend b{font-weight:500;font-variant-numeric:tabular-nums}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1453,7 +1474,7 @@ function shareHTML(it){
   let a;
   if(w&&w.region==="world"&&w.n){
     const t=w.n*g/1e6, p=t/WORLD_WASTE.t*100;
-    a=`<span class="label">Share of the world's plastic waste</span><b class="pct">${pctTxt(p)}</b>${waffle(p)}<span class="src">Estimate: ${bigN(w.n)} a year (${w.year}) × ~${g} g ≈ ${fmt(t>=1e6?t/1e6:t/1e3,1)} ${t>=1e6?"million":"thousand"} tonnes, out of ${WORLD_WASTE.t/1e6} million tonnes of plastic waste a year (${WORLD_WASTE.year}).${w.note?" "+esc(w.note)+".":""} Sources: ${srcA(w.src,w.url)}; ${srcA(WORLD_WASTE.src,WORLD_WASTE.url)}.</span>`;
+    a=`<span class="label">Share of the world's plastic waste</span><b class="pct">${pctTxt(p)}</b><button type="button" class="wbtn" data-kind="waste" data-item="${it.id}" aria-label="See every item in the world's plastic waste">${waffle(p)}<span>See what makes up the rest →</span></button><span class="src">Estimate: ${bigN(w.n)} a year (${w.year}) × ~${g} g ≈ ${fmt(t>=1e6?t/1e6:t/1e3,1)} ${t>=1e6?"million":"thousand"} tonnes, out of ${WORLD_WASTE.t/1e6} million tonnes of plastic waste a year (${WORLD_WASTE.year}).${w.note?" "+esc(w.note)+".":""} Sources: ${srcA(w.src,w.url)}; ${srcA(WORLD_WASTE.src,WORLD_WASTE.url)}.</span>`;
   } else if(w){
     a=`<span class="label">Share of the world's plastic waste</span><span class="src">No worldwide figure published. Measured only in ${esc(w.region)}: ${w.t?fmt(w.t/1000,0)+" thousand tonnes":bigN(w.n)} a year (${w.year}).${w.note?" "+esc(w.note)+".":""} Source: ${srcA(w.src,w.url)}.</span>`;
   } else {
@@ -1463,12 +1484,63 @@ function shareHTML(it){
   let b;
   if(c){
     const p=c.n/(c.total||ICC.total)*100;
-    b=`<span class="label">Share of litter picked up on beaches</span><b class="pct">${pctTxt(p)}</b>${waffle(p)}<span class="src">${fmt(c.n)} ${esc(c.name)} out of ${fmt(c.total||ICC.total)} items collected${c.region?" in "+esc(c.region):" worldwide"} (${ICC.year}). Counted as all ${esc(c.name)}, not only this item. Source: ${srcA(ICC.src,ICC.url)}.</span>`;
+    b=`<span class="label">Share of litter picked up on beaches</span><b class="pct">${pctTxt(p)}</b><button type="button" class="wbtn" data-kind="litter" data-item="${it.id}" aria-label="See every item found on beaches">${waffle(p)}<span>See what else is on beaches →</span></button><span class="src">${fmt(c.n)} ${esc(c.name)} out of ${fmt(c.total||ICC.total)} items collected${c.region?" in "+esc(c.region):" worldwide"} (${ICC.year}). Counted as all ${esc(c.name)}, not only this item. Source: ${srcA(ICC.src,ICC.url)}.</span>`;
   } else {
     b=`<span class="label">Share of litter picked up on beaches</span><span class="src">Not among the most-collected items in the ${ICC.year} International Coastal Cleanup, so not counted separately. Source: ${srcA(ICC.src,ICC.url)}.</span>`;
   }
-  return `<div class="shares"><div>${a}</div><div>${b}</div></div>`;
+  return `<div class="shares"><div>${a}</div><div>${b}</div></div><div class="sharefull" hidden></div>`;
 }
+/* Full breakdown behind each share graph: one 100-square grid, a colour per item, hover to name it */
+const SHARE_COLORS=["#1F6F5C","#C8553D","#2E5AAC","#D9A520","#7A4EAB","#3C8D2F","#D16BA5","#8C6D46","#4BA3C3","#A0A83C"];
+function shareParts(kind){
+  if(kind==="litter"){
+    const parts=ICC_TOP10.map(([k,n,c])=>({k,name:n,p:c/ICC.total*100,note:`${fmt(c)} items`}));
+    const top=parts.reduce((a,x)=>a+x.p,0);
+    parts.push({k:"rest",name:"Everything else",p:100-top,note:`${fmt(ICC.total-ICC_TOP10.reduce((a,x)=>a+x[2],0))} items of many other kinds`,rest:true});
+    return {parts,title:"What volunteers picked up on beaches",src:`Out of ${fmt(ICC.total)} items collected worldwide in ${ICC.year}. Source: <a href="${esc(ICC.url)}" target="_blank" rel="noopener">${esc(ICC.src)}</a>.`};
+  }
+  const NAMES={bottle:"Water and soda bottles",bag:"Grocery bags",sachet:"Sachets",mailer:"Poly mailers",toothpaste:"Toothpaste tubes",hangers:"Hangers",pod:"Coffee pods"};
+  const parts=Object.entries(WASTE).filter(([id,w])=>w.region==="world"&&w.n&&NAMES[id]).map(([id,w])=>{ const g=w.g||(STILL.find(x=>x.id===id)||{}).g||0, t=w.n*g/1e6; return {k:id,name:NAMES[id],p:t/WORLD_WASTE.t*100,note:`~${fmt(t>=1e6?t/1e6:t/1e3,1)} ${t>=1e6?"million":"thousand"} tonnes a year (estimate)`}; }).sort((a,b)=>b.p-a.p);
+  const known=parts.reduce((a,x)=>a+x.p,0);
+  parts.push({k:"pack",name:"All other packaging",p:40-known,note:"Packaging is 40% of the world's plastic waste (OECD)",rest:true,shade:"#B9BDAE"});
+  parts.push({k:"notpack",name:"Not packaging",p:60,note:"Building, cars, textiles, electronics, household goods and more",rest:true});
+  return {parts,title:"What makes up the world's plastic waste",src:`Out of ${WORLD_WASTE.t/1e6} million tonnes a year (${WORLD_WASTE.year}). Items too small to fill a square still get one, so they look bigger than they are. Grocery bags use the top of UNEP's 1 to 5 trillion range. Sources: <a href="${esc(WORLD_WASTE.url)}" target="_blank" rel="noopener">${esc(WORLD_WASTE.src)}</a> and the item sources above.`};
+}
+function shareFullHTML(kind,itemId){
+  const {parts,title,src}=shareParts(kind);
+  const mine=kind==="litter"?LITTER[itemId]:itemId;
+  // squares per part: largest remainder to total 100, every part at least one square
+  let sq=parts.map(x=>Math.max(1,Math.floor(x.p))); let left=100-sq.reduce((a,b)=>a+b,0);
+  const order=parts.map((x,i)=>[x.p-Math.floor(x.p),i]).sort((a,b)=>b[0]-a[0]);
+  for(let j=0;left>0;j=(j+1)%order.length){ sq[order[j][1]]++; left--; }
+  while(left<0){ const i=sq.indexOf(Math.max(...sq)); sq[i]--; left++; }
+  let ci=0; const col=parts.map(x=>x.rest?(x.shade||"var(--line)"):SHARE_COLORS[ci++%SHARE_COLORS.length]);
+  const cells=parts.map((x,i)=>Array.from({length:sq[i]},()=>`<i data-k="${x.k}" style="background:${col[i]}"${x.k===mine?' class="mine"':""}></i>`).join("")).join("");
+  const legend=parts.map((x,i)=>`<li data-k="${x.k}"${x.k===mine?' class="mine"':""}><i style="background:${col[i]}"></i><span>${esc(x.name)}${x.k===mine?" (this item)":""}</span><b>${pctTxt(x.p)}</b></li>`).join("");
+  return `<div class="sf-head"><span class="label">${esc(title)}</span><button type="button" class="sf-close" aria-label="Close breakdown">Close ✕</button></div>
+    <div class="sf-body"><div class="sf-grid" data-kind="${kind}">${cells}</div>
+    <div><p class="sf-cap" aria-live="polite">Hover over a colour to see what it is.</p><ul class="sf-legend">${legend}</ul></div></div>
+    <span class="src">${src}</span>`;
+}
+function sfHighlight(box,k){
+  const parts=shareParts(box.querySelector(".sf-grid").dataset.kind).parts, x=parts.find(p=>p.k===k);
+  box.querySelectorAll(".sf-grid i, .sf-legend li").forEach(el=>el.classList.toggle("dim",!!k&&el.dataset.k!==k));
+  box.querySelector(".sf-cap").innerHTML=x?`<b>${esc(x.name)}</b>: ${pctTxt(x.p)} · ${esc(x.note)}`:"Hover over a colour to see what it is.";
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest&&e.target.closest(".wbtn");
+  if(b){ const box=b.closest(".mstats, .fbody, #stillFocus").querySelector(".sharefull"); if(!box) return;
+    const same=!box.hidden&&box.dataset.kind===b.dataset.kind;
+    if(same){ box.hidden=true; return; }
+    box.dataset.kind=b.dataset.kind; box.innerHTML=shareFullHTML(b.dataset.kind,b.dataset.item); box.hidden=false; box.scrollIntoView({behavior:"smooth",block:"nearest"}); return; }
+  const c=e.target.closest&&e.target.closest(".sf-close"); if(c){ c.closest(".sharefull").hidden=true; return; }
+  const t=e.target.closest&&e.target.closest(".sharefull [data-k]"); if(t) sfHighlight(t.closest(".sharefull"),t.dataset.k);
+});
+document.addEventListener("mouseover",e=>{
+  const t=e.target.closest&&e.target.closest(".sharefull [data-k]");
+  const box=e.target.closest&&e.target.closest(".sharefull");
+  if(t) sfHighlight(box,t.dataset.k); else if(box&&e.target.closest(".sf-body")===null) sfHighlight(box,null);
+});
 /* Plastic page: real companies that already made this item's switch (keys are "brand|product" from data-cases.js) */
 const ITEM_CASES={
  toiletwrap:["Sainsbury's|Toilet and kitchen roll"],
