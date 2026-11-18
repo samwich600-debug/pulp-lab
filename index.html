@@ -1088,7 +1088,6 @@ aside.drawer.modal figcaption span{font-size:13px}
   <section id="v-case-studies" data-view hidden class="focus-host">
     <div class="vh"><h1 id="caseCount">97 brands that cut plastic</h1><p>Plastic saved, as each company reported it. Tap one for the story.</p></div>
     <div class="stat3" id="caseStats" hidden></div>
-    <div class="seg" role="group" aria-label="Category" id="caseSeg"></div>
     <nav class="cats" id="caseBandNav" aria-label="Jump to a category"></nav>
     <div class="focus" id="caseFocus" hidden></div>
     <div class="gallery four" id="g-cases"></div>
@@ -2018,8 +2017,6 @@ let cat="All";
     <div><b>${CASES.length}</b><span>brands that switched</span></div>
     <div><b>${fmt(tot)} t</b><span>plastic saved, from the ${rep.length} that reported tonnes</span></div>
     <div><b>≈ ${fmt(tot/12/1000,1)}B</b><span>plastic water bottles by weight (12 g each)</span></div>`;
-  $("#caseSeg").innerHTML=CATS.map(c=>`<button type="button" aria-pressed="${c===cat}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
-  $$("#caseSeg button").forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; $$("#caseSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderCases(); });
 })();
 /* Real World: grouped by category (A to Z), most plastic saved first within each; the left nav jumps between categories */
 const caseBand=t=>t==null?"No tonnage reported":t>=10000?"10,000+ tonnes":t>=1000?"1,000 to 10,000 tonnes":t>=100?"100 to 1,000 tonnes":"Under 100 tonnes";
