@@ -580,6 +580,11 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 }
 @keyframes caustic{from{transform:translate(0,0)}to{transform:translate(-160px,60px)}}
 
+/* The sources line sits on the caustic water, larger and readable */
+.ocean{display:flex;align-items:center;justify-content:center;padding:0 max(24px,env(safe-area-inset-left,0px))}
+.ocean .foot{position:relative;z-index:1;margin:0 auto;max-width:760px;font-size:clamp(15px,1.3vw,18px);line-height:1.6;color:var(--ink);text-align:center}
+.ocean .foot a{color:var(--ink)}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -615,8 +620,9 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
     </div>
     <div class="seg layoutseg" role="group" aria-label="Layout" id="layoutSeg"><button type="button" aria-pressed="true" data-layout="grid">Grid</button><button type="button" aria-pressed="false" data-layout="index">Index</button></div>
     <div class="gallery four" id="g-still"></div>
-    <p class="foot">Worldwide, only 9% of plastic waste is recycled and 22% is mismanaged: dumped, burned in the open or leaked into nature. About 1.7 million tonnes reached the ocean in 2019 (<a href="https://www.oecd.org/en/publications/global-plastics-outlook_de747aef-en.html" target="_blank" rel="noopener">OECD Global Plastics Outlook</a>). Item recycling rates are US figures from the <a href="https://www.epa.gov/facts-and-figures-about-materials-waste-and-recycling/plastics-material-specific-data" target="_blank" rel="noopener">EPA</a> and <a href="https://www.greenpeace.org/usa/reports/circular-claims-fall-flat-again/" target="_blank" rel="noopener">Greenpeace USA (2022)</a>.</p>
-    <div class="ocean" aria-hidden="true"></div>
+    <div class="ocean">
+      <p class="foot">Worldwide, only 9% of plastic waste is recycled and 22% is mismanaged: dumped, burned in the open or leaked into nature. About 1.7 million tonnes reached the ocean in 2019 (<a href="https://www.oecd.org/en/publications/global-plastics-outlook_de747aef-en.html" target="_blank" rel="noopener">OECD Global Plastics Outlook</a>). Item recycling rates are US figures from the <a href="https://www.epa.gov/facts-and-figures-about-materials-waste-and-recycling/plastics-material-specific-data" target="_blank" rel="noopener">EPA</a> and <a href="https://www.greenpeace.org/usa/reports/circular-claims-fall-flat-again/" target="_blank" rel="noopener">Greenpeace USA (2022)</a>.</p>
+    </div>
   </section>
 
   <section id="v-already-swapped" data-view hidden>
