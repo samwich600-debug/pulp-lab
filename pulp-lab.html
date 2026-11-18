@@ -537,6 +537,14 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
   .tile.hoverswap:hover .nm,.tile.hoverswap:focus-visible .nm{opacity:1}
 }
 
+/* Index layout: camera-focus. The item in view is large and sharp; the rest blur back. */
+.idx-item img{width:min(62vh,92%);filter:var(--shadow) blur(7px);opacity:.3;transform:scale(.94);transition:filter .9s var(--ease),opacity .9s var(--ease),transform .9s var(--ease)}
+.idx-item.on img{filter:var(--shadow);opacity:1;transform:scale(1)}
+.idx-item.on:hover img{transform:scale(1.03)}
+.idx-item h3,.idx-item .idx-n,.idx-item .src{opacity:.25;transition:opacity .9s var(--ease)}
+.idx-item.on h3,.idx-item.on .idx-n,.idx-item.on .src{opacity:1}
+@media (prefers-reduced-motion:reduce){.idx-item img,.idx-item h3,.idx-item .idx-n,.idx-item .src{transition:none}}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -849,9 +857,10 @@ function renderIndex(){
   });
   wrap.append(nav,stage); g.append(wrap);
   const tiles=$$("button",nav);
-  idxIO=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ const i=+e.target.id.slice(2); tiles.forEach((b,j)=>b.setAttribute("aria-current",String(j===i))); } }); },{rootMargin:"-45% 0px -45% 0px"});
+  idxIO=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ const i=+e.target.id.slice(2); tiles.forEach((b,j)=>b.setAttribute("aria-current",String(j===i))); stage.querySelectorAll(".idx-item").forEach(x=>x.classList.toggle("on",x===e.target)); } }); },{rootMargin:"-45% 0px -45% 0px"});
   $$(".idx-item",stage).forEach(el=>idxIO.observe(el));
   if(tiles[0]) tiles[0].setAttribute("aria-current","true");
+  stage.querySelector(".idx-item").classList.add("on");
 }
 function renderStill(){
   const g=$("#g-still"); g.replaceChildren();
