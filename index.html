@@ -1120,7 +1120,19 @@ const STILL=[
  {id:"toiletwrap",name:"Toilet paper wrap",art:"film",resin:"LDPE film",g:4,count:"Billions",scope:"wraps a year worldwide",nr:99,nrSrc:"Estimate: film wraps are rejected by curbside programs",beach:false,swap:"Paper-wrapped toilet paper",brief:"Paper-wrapped toilet paper for a bulk shop"},
  {id:"pods",name:"Laundry pods",art:"pod",resin:"PVA film + PE",g:20,count:"Billions",scope:"pods a year worldwide",nr:99,nrSrc:"Estimate: dissolvable film pouches are not recyclable",beach:false,swap:"Powder in a cardboard box",brief:"Powder laundry detergent for a launderette"},
  {id:"tape",name:"Plastic tape",art:"film",resin:"PP film + acrylic adhesive",g:15,count:"Billions",scope:"rolls a year worldwide",nr:99,nrSrc:"Estimate: tape is rarely accepted curbside",beach:false,swap:"Paper tape",brief:"Paper tape for a packing station"},
- {id:"hangers",name:"Plastic hangers",art:"straw",resin:"PP #5",g:30,count:"Hundreds of millions",scope:"hangers a year worldwide",nr:95,nrSrc:"Estimate: PP #5 is reprocessed under 5%",beach:false,swap:"Wooden hanger",brief:"Wooden hangers for a clothing shop"}
+ {id:"hangers",name:"Plastic hangers",art:"straw",resin:"PP #5",g:30,count:"Hundreds of millions",scope:"hangers a year worldwide",nr:95,nrSrc:"Estimate: PP #5 is reprocessed under 5%",beach:false,swap:"Wooden hanger",brief:"Wooden hangers for a clothing shop"},
+ {id:"meattray",name:"Meat tray and film",art:"clamshell",resin:"PS foam tray + PE film",g:15,count:"Billions",scope:"trays a year worldwide (estimate)",nr:99,nrSrc:"Estimate: foam trays with film wraps are rarely accepted curbside",beach:false,swap:"Molded-pulp tray",brief:"Supermarket meat tray with an absorbent pad and cling film"},
+ {id:"produce",name:"Produce bag",art:"bag",resin:"LDPE #4 film",g:2,count:"Billions",scope:"bags a year worldwide (estimate)",nr:99,nrSrc:"Estimate: thin film bags are rejected by curbside programs",beach:true,swap:"Paper produce bag, or loose produce",brief:"Thin bags for fruit and vegetables in a supermarket"},
+ {id:"frozen",name:"Frozen food bag",art:"chips",resin:"PP / PET laminate",g:5,count:"Hundreds of millions",scope:"bags a year worldwide (estimate)",nr:99,nrSrc:"Estimate: multilayer laminates can't be separated for recycling",beach:false,swap:"Paperboard carton with a paper liner",brief:"Frozen peas in a printed laminated bag"},
+ {id:"mealtray",name:"Ready-meal tray",art:"clamshell",resin:"PP #5 tray + film lid",g:40,count:"Hundreds of millions",scope:"trays a year worldwide (estimate)",nr:95,nrSrc:"Greenpeace USA 2022: #5 plastics reprocessed under 5%",beach:false,swap:"Molded-pulp tray with paper lid",brief:"Ready meal in a compartment tray with a sealed film lid"},
+ {id:"eggs",name:"Egg carton",art:"clamshell",resin:"Clear PET #1 or PS #6",g:40,count:"Billions",scope:"cartons a year worldwide (estimate)",nr:90,nrSrc:"Estimate: clear PET and foam cartons are recycled far less often than bottles",beach:false,swap:"Molded-pulp egg carton",brief:"Clear plastic carton for six eggs"},
+ {id:"icecream",name:"Ice cream tub",art:"yogurt",resin:"PP #5 tub + lid",g:40,count:"Hundreds of millions",scope:"tubs a year worldwide (estimate)",nr:95,nrSrc:"Greenpeace USA 2022: #5 containers reprocessed under 5%",beach:false,swap:"Cardboard tub with a paper lid",brief:"Ice cream tub with a plastic lid"},
+ {id:"sachet",name:"Condiment sachet",art:"chips",resin:"Multilayer film (PE + foil)",g:2,count:"Billions",scope:"sachets a year worldwide (estimate)",nr:99,nrSrc:"Layered films cannot be recycled through curbside programs",beach:false,swap:"Glass jar or refill dispenser",brief:"Single-serve ketchup sachet from a café"},
+ {id:"lipstick",name:"Lipstick",art:"lipstick",resin:"PP / ABS case + metal",g:8,count:"Hundreds of millions",scope:"lipsticks a year worldwide (estimate)",nr:99,nrSrc:"Estimate: mixed plastic and metal, not accepted curbside",beach:false,swap:"Paperboard tube or refillable metal case",brief:"A lipstick in a plastic case"},
+ {id:"cream",name:"Face cream jar",art:"jar",resin:"PP #5 jar + lid",g:50,count:"Hundreds of millions",scope:"jars a year worldwide (estimate)",nr:95,nrSrc:"Greenpeace USA 2022: #5 containers reprocessed under 5%",beach:false,swap:"Glass jar",brief:"Face cream in a white plastic jar"},
+ {id:"sunscreen",name:"Sunscreen tube",art:"tube",resin:"PE tube + PP cap",g:100,count:"Hundreds of millions",scope:"tubes a year worldwide (estimate)",nr:99,nrSrc:"Estimate: multilayer squeeze tubes are not recycled curbside",beach:false,swap:"Solid sunscreen stick in a paper tube",brief:"Sunscreen in a squeeze tube with a flip cap"},
+ {id:"pads",name:"Cotton pads in a bag",art:"bag",resin:"PE bag",g:4,count:"Hundreds of millions",scope:"pouches a year worldwide (estimate)",nr:99,nrSrc:"Estimate: the plastic pouch is not recyclable and pads are often flushed",beach:false,swap:"Cotton rounds in a paper box",brief:"Cotton rounds in a resealable plastic pouch"},
+ {id:"wipes",name:"Facial wipes",art:"bag",resin:"PP / PET nonwoven",g:40,count:"Billions",scope:"wipes a year worldwide (estimate)",nr:99,nrSrc:"Estimate: nonwoven wipes contain plastic and are not recyclable",beach:false,swap:"Reusable cotton cloth",brief:"Facial wipes in a plastic canister"}
 ];
 
 /* ---------- ALREADY SWAPPED ---------- */
@@ -1185,6 +1197,18 @@ const dots=p=>{ const n=Math.round(p/10); return `<div class="dots" aria-hidden=
 function tile(art,name,stat,cls=""){ const b=document.createElement("button"); b.type="button"; b.className="tile "+cls; b.innerHTML=`<span class="art">${art}</span><span class="nm">${esc(name)}</span>${stat?`<span class="stat">${esc(stat)}</span>`:""}`; return b; }
 
 const ALTS={
+ meattray:[["tray-pulp","Molded-pulp tray"]],
+ produce:[["produce-paper","Paper produce bag"]],
+ frozen:[["frozen-carton","Paperboard carton"]],
+ mealtray:[["tray-pulp","Molded-pulp tray"]],
+ eggs:[["egg-pulp","Molded-pulp egg carton"]],
+ icecream:[["tub-carton","Cardboard tub with paper lid"]],
+ sachet:[["storage-glass","Glass jar"]],
+ lipstick:[["lipstick-paper","Paperboard tube"],["lipstick-metal","Refillable metal case"]],
+ cream:[["storage-glass","Glass jar"]],
+ sunscreen:[["sunscreen-stick","Solid sunscreen in paper tube"]],
+ pads:[["pads-cotton","Cotton rounds in a paper box"]],
+ wipes:[["wipes-cloth","Reusable cotton cloth"]],
  bottle:[["bottle-can","Aluminum can"],["bottle-carton","Paper carton"],["paper-bottle","Fiber bottle"],["steel-bottle","Stainless steel bottle"],["glass-refill","Refillable glass bottle"]],
  bag:[["bag-paper","Paper bag"],["bag-tote","Cotton tote"]],
  straw:[["straw-paper","Paper straws"],["straw-bamboo","Bamboo straws"]],
@@ -1255,10 +1279,11 @@ function renderIndex(){
   if(tiles[0]) tiles[0].setAttribute("aria-current","true");
 }
 const ROOM_CATS=[
-  ["Food and drink",["bottle","soda","multipack","coldcup","lid","chips","candy","yogurt","clamshell","pod","straw","cutlery","bag","film","mailer"]],
+  ["Food packaging",["bottle","soda","multipack","coldcup","lid","chips","candy","yogurt","clamshell","pod","straw","cutlery","bag","film","mailer","meattray","produce","frozen","mealtray","eggs","icecream","sachet"]],
   ["Bathroom",["shampoo","handsoap","toothpaste","toothbrush","razor","swab","deodorant","floss","toiletwrap"]],
   ["Home and office",["jug","spray","pods","tape","hangers","blister"]],
-  ["Kitchen",["dishsoap","sponge","storage","binliner","teabag","milk","breadbag"]]
+  ["Kitchen",["dishsoap","sponge","storage","binliner","teabag","milk","breadbag"]],
+  ["Cosmetics",["lipstick","cream","sunscreen","pads","wipes"]]
 ];
 const catSlug=n=>"cat-"+n.toLowerCase().replace(/[^a-z]+/g,"-");
 const catOrder=()=>{
@@ -1308,7 +1333,7 @@ function renderStill(){
 }
 $("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
 /* which library material backs each eco alternative (null = reusable item, not in the library) */
-const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null,"multipack-carton":"paperboard","blister-box":"paperboard","candy-paper":"glassine","spray-aluminum":"aluminum","soap-bar":"paperboard","sponge-cellulose":null,"storage-glass":"glass","liner-compost":"kraft-paper","tea-loose":null,"milk-glass":"glass","bread-paper":"kraft-paper","deo-card":"paperboard","floss-silk":null,"tp-paper":"kraft-paper","pods-powder":"corrugated","tape-paper":"kraft-paper","hanger-wood":null,"paper-bottle":"paper-bottle","steel-bottle":null,"glass-refill":"glass"};
+const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null,"multipack-carton":"paperboard","blister-box":"paperboard","candy-paper":"glassine","spray-aluminum":"aluminum","soap-bar":"paperboard","sponge-cellulose":null,"storage-glass":"glass","liner-compost":"kraft-paper","tea-loose":null,"milk-glass":"glass","bread-paper":"kraft-paper","deo-card":"paperboard","floss-silk":null,"tp-paper":"kraft-paper","pods-powder":"corrugated","tape-paper":"kraft-paper","hanger-wood":null,"paper-bottle":"paper-bottle","steel-bottle":null,"glass-refill":"glass","tray-pulp":"molded-pulp","produce-paper":"kraft-paper","frozen-carton":"paperboard","egg-pulp":"molded-pulp","tub-carton":"paperboard","lipstick-paper":"paperboard","lipstick-metal":"aluminum","sunscreen-stick":"paperboard","pads-cotton":null,"wipes-cloth":null};
 const REUSE={"steel-bottle":"Reusable stainless steel bottle. Washed and refilled for years, it replaces many single-use bottles.","glass-refill":"Reusable glass bottle, refilled from a tap or dispenser. Replaces single-use bottles over many uses.","bag-tote":"Reusable cotton tote. Replaces hundreds of single-use bags over its life; needs ~130 uses to beat a plastic bag on carbon.","film-beeswax":"Reusable cotton coated in beeswax. Lasts about a year of washes, then composts."};
 const buyBox=k=>{ const b=(typeof BUY!=="undefined"&&BUY[k])||[]; const m=byId[ALT_MAT[k]]; const P=(typeof BUY_PRICE!=="undefined")?BUY_PRICE:{};
   return b.length?`<div class="buy"><span class="label">Buy in bulk</span>${m?`<span class="src">Typical unit cost for ${esc(m.name.toLowerCase())}: ${money(m.cost[0])}–${money(m.cost[1])} ${esc(m.unit)}</span>`:""}${b.map(([n,u,note])=>{ const pr=P[u]; return `<a href="${esc(u)}" target="_blank" rel="noopener"><span class="bn">${esc(n)}<em>${esc(note||"")}</em></span><span class="bp">${pr?esc(pr.unit):"price on site"}${pr&&pr.basis?`<em>${esc(pr.basis)}</em>`:""}</span></a>`; }).join("")}<span class="src">Approximate listed prices as of ${DATA_ASOF}, before shipping and tax.</span></div>`:""; };
