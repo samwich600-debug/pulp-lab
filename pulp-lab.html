@@ -2194,9 +2194,9 @@ $$(".foot").forEach(f=>f.insertAdjacentHTML("beforeend",` <span class="foot-asof
 
 /* ---------- case studies (50) ---------- */
 /* before photos for the case studies that have one: what the brand used to ship */
-const CASE_BEFORE={"Hasbro":"case-before-blister.png"};
+const CASE_BEFORE={"Hasbro":"case-before-blister.png","Samsung":"p-blister.png","Apple":"p-blister.png","Philips":"p-blister.png","Playmobil":"p-blister.png","Bacardi":"p-blister.png"};
 /* a photo of the old product for any case, from what the brand used to ship */
-const OLD_PHOTO=[[/shrink/i,"c-shrink.png"],[/blister/i,"p-blister.png"],[/bottle/i,"p-bottle.png"],[/straw/i,"p-straw.png"],[/mailer/i,"p-mailer.png"],[/clamshell|punnet|tray/i,"p-clamshell.png"],[/tub/i,"p-yogurt.png"],[/lid/i,"p-lid.png"],[/tube|stick/i,"c-toothpaste.png"],[/foam|air pillow|eps/i,"c-bubble.png"],[/film|wrap/i,"p-film.png"],[/pouch|sachet|flow/i,"c-sachet.png"],[/bag/i,"p-bag.png"]];
+const OLD_PHOTO=[[/shrink/i,"c-shrink.png"],[/blister/i,"p-blister.png"],[/bottle/i,"p-bottle.png"],[/straw/i,"p-straw.png"],[/mailer/i,"p-mailer.png"],[/clamshell|punnet/i,"p-clamshell.png"],[/tray/i,"k-blacktray.png"],[/tub/i,"p-yogurt.png"],[/lid/i,"p-lid.png"],[/tube|stick/i,"c-toothpaste.png"],[/foam|air pillow|eps/i,"c-bubble.png"],[/film|wrap/i,"p-film.png"],[/pouch|sachet|flow/i,"c-sachet.png"],[/bag/i,"p-bag.png"]];
 const oldPhoto=from=>{ const hit=OLD_PHOTO.find(([re])=>re.test(from||"")); return hit?hit[1]:null; };
 /* tonnes in everyday terms: 1 tonne = 1,000 kg ≈ 83,000 empty plastic water bottles (12 g each, the Plastic page figure) */
 /* plastic saved next to the company's total plastic packaging, as a bar */
