@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
 <meta charset="utf-8">
-<title>Pulp Lab</title>
+<title>The Plastic Index</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Instrument+Serif&family=Doto:wght@800;900&display=swap">
@@ -541,7 +541,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 </style>
 
 <header class="top"><div class="wrap">
-  <a class="brand" href="#still-plastic" aria-label="Pulp Lab home">PULP LAB</a>
+  <a class="brand" href="#still-plastic" aria-label="The Plastic Index home">The Plastic Index</a>
   <nav aria-label="Pages">
     <a href="#still-plastic" data-v="still-plastic">Plastic</a>
     <a href="#already-swapped" data-v="already-swapped">Swaps</a>
@@ -553,7 +553,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 </div></header>
 
 <main class="wrap">
-  <section id="v-home" data-view hidden class="home" aria-label="Pulp Lab">
+  <section id="v-home" data-view hidden class="home" aria-label="The Plastic Index">
     <div class="reel" id="reel" aria-hidden="true"></div>
     <div class="reel-shade" aria-hidden="true"></div>
     <div class="home-copy">
@@ -737,7 +737,11 @@ const STILL=[
  {id:"swab",name:"Cotton swab",art:"swab",resin:"PP #5 stick",g:0.3,count:"Billions",scope:"a year worldwide",nr:99,nrSrc:"Too small for sorting; often flushed",beach:true,swap:"Paper-stick swab in a cardboard box",brief:"Cotton swabs and their box"},
  {id:"soda",name:"Soda bottle",art:"bottle",resin:"PET #1",g:20,count:"600+ billion",scope:"single-use bottles a year worldwide (one industry-cited estimate)",nr:67,nrSrc:"Industry report (Bevi, 2023): 33% of PET bottles recycled",beach:false,swap:"Aluminum can",brief:"Sparkling drinks in cans for a café menu"},
  {id:"toothpaste",name:"Toothpaste tube",art:"toothbrush",resin:"PE + aluminum laminate",g:20,count:"~400 million",scope:"tubes discarded a year in the US (industry-cited estimate)",nr:83,nrSrc:"UK trial: only 16.7% recovered when paste was left in the tube",beach:false,swap:"Toothpaste tablets in a glass jar",brief:"Toothpaste tablets for a zero-waste bathroom shop"},
- {id:"coldcup",name:"Cold cup",art:"lid",resin:"PET or PP",g:10,count:"Billions",scope:"used a year in the US (rough estimate; no national figure found)",nr:99,nrSrc:"EPA, as cited in 2022 press: under 1% of cups and plates recycled",beach:false,swap:"Paperboard cup",brief:"Cold drink cups for an iced-coffee bar"}
+ {id:"coldcup",name:"Cold cup",art:"lid",resin:"PET or PP",g:10,count:"Billions",scope:"used a year in the US (rough estimate; no national figure found)",nr:99,nrSrc:"EPA, as cited in 2022 press: under 1% of cups and plates recycled",beach:false,swap:"Paperboard cup",brief:"Cold drink cups for an iced-coffee bar"},
+ {id:"multipack",name:"Drink multipack",art:"bottle",resin:"PET #1 film wrap",g:12,count:"Billions",scope:"multipacks a year worldwide (rough estimate)",nr:95,nrSrc:"Estimate: the film wrap is not accepted in most curbside programs",beach:false,swap:"Cardboard carton multipack",brief:"Multipacks of drinks for a grocery shelf"},
+ {id:"blister",name:"Blister pack",art:"toothbrush",resin:"PET or PVC blister",g:8,count:"Billions",scope:"packs a year worldwide (rough estimate)",nr:99,nrSrc:"Plastic and card glued together; not accepted curbside",beach:false,swap:"Folded paperboard box",brief:"Retail boxes for small products"},
+ {id:"candy",name:"Candy wrapper",art:"chips",resin:"Plastic film",g:2,count:"Billions",scope:"wrappers a year worldwide (rough estimate)",nr:99,nrSrc:"Small multilayer films; not accepted curbside",beach:false,swap:"Paper candy wrapper",brief:"Wrapped chocolate bars for a café counter"},
+ {id:"spray",name:"Spray bottle",art:"bottle",resin:"HDPE #2 + PP trigger",g:50,count:"Hundreds of millions",scope:"a year in the US (rough estimate)",nr:71,nrSrc:"EPA 2018: about 29% of HDPE bottles recycled; triggers are often lost",beach:false,swap:"Refillable aluminum spray bottle",brief:"Refillable cleaning spray for a home shop"}
 ];
 
 /* ---------- ALREADY SWAPPED ---------- */
@@ -813,7 +817,11 @@ const ALTS={
  swab:[["swab-paper","Paper-stick swabs"]],
  soda:[["bottle-can","Aluminum can"]],
  toothpaste:[["toothpaste-tabs","Toothpaste tablets"]],
- coldcup:[["yogurt-paper","Paperboard cup"]]
+ coldcup:[["yogurt-paper","Paperboard cup"]],
+ multipack:[["multipack-carton","Cardboard carton multipack"]],
+ blister:[["blister-box","Folded paperboard box"]],
+ candy:[["candy-paper","Paper candy wrapper"]],
+ spray:[["spray-aluminum","Refillable aluminum spray bottle"]]
 };
 /* plain-English cost difference vs the plastic version */
 const costDiff=p=>!isFinite(p)?"—":p>0?`${Math.round(p)}% more`:p<0?`${Math.round(-p)}% less`:"Same price";
@@ -866,7 +874,7 @@ function renderStill(){
 $("#layoutSeg").onclick=e=>{ const b=e.target.closest("button[data-layout]"); if(!b) return; layout=b.dataset.layout; $$("#layoutSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderStill(); };
 $("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
 /* which library material backs each eco alternative (null = reusable item, not in the library) */
-const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null};
+const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null,"multipack-carton":"paperboard","blister-box":"paperboard","candy-paper":"glassine","spray-aluminum":"aluminum"};
 const REUSE={"bag-tote":"Reusable cotton tote. Replaces hundreds of single-use bags over its life; needs ~130 uses to beat a plastic bag on carbon.","film-beeswax":"Reusable cotton coated in beeswax. Lasts about a year of washes, then composts."};
 const buyBox=k=>{ const b=(typeof BUY!=="undefined"&&BUY[k])||[]; const m=byId[ALT_MAT[k]]; const P=(typeof BUY_PRICE!=="undefined")?BUY_PRICE:{};
   return b.length?`<div class="buy"><span class="label">Buy in bulk</span>${m?`<span class="src">Typical unit cost for ${esc(m.name.toLowerCase())}: ${money(m.cost[0])}–${money(m.cost[1])} ${esc(m.unit)}</span>`:""}${b.map(([n,u,note])=>{ const pr=P[u]; return `<a href="${esc(u)}" target="_blank" rel="noopener"><span class="bn">${esc(n)}<em>${esc(note||"")}</em></span><span class="bp">${pr?esc(pr.unit):"price on site"}${pr&&pr.basis?`<em>${esc(pr.basis)}</em>`:""}</span></a>`; }).join("")}<span class="src">Approximate listed prices as of ${DATA_ASOF}, before shipping and tax.</span></div>`:""; };
@@ -1218,7 +1226,7 @@ function card(c,qty){
       <div class="wide"><span class="label">Environment</span><span>${esc(c.co2_note||"")}</span><span class="src">After use: ${esc(c.end_of_life||"")}</span></div>
       ${m?`<div class="wide"><span class="label">Watch</span><span>${esc(m.watch)}</span></div>`:""}
     </div>
-    ${specHTML(c.material_id)}${CLAIM}<p class="src">${c._src==="claude"?"Estimated by Claude for your brief":"From the Pulp Lab material library"}, ${DATA_ASOF}. Get supplier quotes before you commit.</p>`, true);
+    ${specHTML(c.material_id)}${CLAIM}<p class="src">${c._src==="claude"?"Estimated by Claude for your brief":"From the Plastic Index material library"}, ${DATA_ASOF}. Get supplier quotes before you commit.</p>`, true);
   return el;
 }
 const stack=$("#ideas"), st=$("#ideaStatus");
@@ -1241,12 +1249,12 @@ function briefText(){ const L=[`# Packaging brief: ${RUN.brief}`,`${fmt(RUN.qty)
   RUN.concepts.forEach((c,k)=>{ const m=byId[c.material_id], x=SPEC[c.material_id]||[], uc=c.unit_cost_usd||{}, lt=c.lead_time_weeks||{};
     L.push(`## ${k+1}. ${c.name}${m?` (${m.name})`:""}`, c.why||"", `- Unit cost: $${uc.low}–$${uc.high} (plastic ≈ $${c.plastic_unit_cost_usd}); ${costDiff(c.cost_vs_plastic_pct)} than plastic per unit`, `- Lead time: ${lt.low}–${lt.high} weeks`, `- Plastic avoided: ${c.plastic_avoided_g_per_unit} g per unit`, `- After use: ${c.end_of_life||""}`, `- Sourcing: ${c.sourcing||""}`);
     if(x.length) L.push(`- Moisture/oxygen/grease barrier: ${RATE[x[0]]}/${RATE[x[1]]}/${RATE[x[2]]}; food contact: ${x[4]}; lines: ${x[5]}; UK EPR £${UK_EPR[x[10]]}/t`);
-    L.push(`- Source: ${c._src==="claude"?"Claude estimate":"Pulp Lab library"}`,""); });
+    L.push(`- Source: ${c._src==="claude"?"Claude estimate":"Plastic Index library"}`,""); });
   L.push("Planning estimates only, not supplier quotes or an LCA. Check claims against the FTC Green Guides / EU green-claims rules.");
   return L.join("\n"); }
 $("#copyBrief").onclick=async()=>{ const t=briefText(); try{ await navigator.clipboard.writeText(t); st.textContent="Brief copied"; }catch(_){ const a=document.createElement("textarea"); a.value=t; document.body.append(a); a.select(); st.textContent="Press ⌘C to copy"; setTimeout(()=>a.remove(),8000); } };
 (async()=>{ const dl=await (window.claude?.use?window.claude.use("downloads"):Promise.resolve(null)).catch(()=>null); if(!dl) return; const b=$("#dlBrief"); b.hidden=false;
-  b.onclick=async()=>{ try{ await dl.save({filename:`pulp-lab-brief-${RUN.date}.md`,data:briefText()}); st.textContent="Brief saved"; }catch(e){ if(e?.code==="unavailable") b.hidden=true; } }; })();
+  b.onclick=async()=>{ try{ await dl.save({filename:`plastic-index-brief-${RUN.date}.md`,data:briefText()}); st.textContent="Brief saved"; }catch(e){ if(e?.code==="unavailable") b.hidden=true; } }; })();
 const SKEY="pl-briefs"; const loadSaved=()=>{ try{ return JSON.parse(localStorage.getItem(SKEY)||"[]"); }catch(_){ return []; } };
 function fillSaved(){ const sel=$("#savedBriefs"), list=loadSaved(); sel.innerHTML=`<option value="">Saved briefs (${list.length})</option>`+list.map((r,k)=>`<option value="${k}">${esc(r.brief.slice(0,40))} · ${r.date}</option>`).join(""); }
 $("#saveBrief").onclick=()=>{ if(!RUN.concepts.length) return; const list=loadSaved(); list.unshift(JSON.parse(JSON.stringify(RUN))); try{ localStorage.setItem(SKEY,JSON.stringify(list.slice(0,12))); st.textContent="Saved in this browser"; }catch(_){ st.textContent="Couldn't save in this browser"; } fillSaved(); };
@@ -1299,7 +1307,7 @@ function svg(lines,w,{cell=10,r=.46,ghost=false,vary=false,h=30}={}){
       x0+=w+1; });
     maxW=Math.max(maxW,x0-1); y0+=rows+1.4; });
   const W=maxW*cell, H=(y0-1.4)*cell;
-  return `<svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" style="height:${h}px;width:auto;display:block" role="img" aria-label="Pulp Lab">${dots.join("")}</svg>`;
+  return `<svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" style="height:${h}px;width:auto;display:block" role="img" aria-label="The Plastic Index">${dots.join("")}</svg>`;
 }
 const LOGOS=[
   ["Chunky",()=>svg(["PULP LAB"],3,{cell:10,r:.47,h:26})],
@@ -1309,7 +1317,7 @@ const LOGOS=[
 ];
 const i=2; /* chosen: LED grid */
 const brand=document.querySelector(".brand");
-function show(){ brand.innerHTML=LOGOS[i][1](); }
+function show(){ brand.textContent="The Plastic Index"; }
 show();
 })();
 })();

@@ -1,6 +1,6 @@
-# Pulp Lab
+# The Plastic Index
 
-Plastic-free packaging research and ideation site; thesis prototype for helping graphic designers adopt eco-friendly practices.
+Plastic-free packaging research and ideation site (named The Plastic Index); thesis prototype for helping graphic designers adopt eco-friendly practices.
 
 ## Where it lives
 - Repo: https://github.com/samwich600-debug/pulp-lab (public)

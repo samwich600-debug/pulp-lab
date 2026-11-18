@@ -1,4 +1,4 @@
-# Pulp Lab
+# The Plastic Index
 
 A research and ideation site about plastic-free packaging, built as a thesis prototype on helping graphic designers adopt more eco-friendly practices.
 
