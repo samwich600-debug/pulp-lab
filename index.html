@@ -863,6 +863,9 @@ aside.drawer.modal figcaption span{font-size:13px}
 #g-still .tile:hover .art.eco-fan.wb .pk{left:var(--x);width:16%;opacity:1;transform:scale(1);transition-delay:calc(var(--k) * 60ms)}
 #g-still .tile:hover .art.eco-fan.wb .pk:first-child{opacity:1;transform:scale(1)}
 
+
+/* Swaps: category timeline on the left, same as Plastic */
+@media (min-width:900px){#v-already-swapped{padding-left:150px}}
 </style>
 
 <header class="top"><div class="wrap">
@@ -906,6 +909,7 @@ aside.drawer.modal figcaption span{font-size:13px}
   </section>
 
   <section id="v-already-swapped" data-view hidden class="focus-host">
+    <nav class="cats" id="swapCatNav" aria-label="Swap categories"></nav>
     <div class="vh"><h1>Already on shelves, plastic-free.</h1><p>Everyday products that made the switch. Tap one to see how.</p></div>
     <div class="focus" id="swapFocus" hidden></div>
     <div class="gallery four" id="g-swap"></div>
@@ -1507,7 +1511,25 @@ document.addEventListener("click",e=>{
   if(e.target.closest&&e.target.closest("#g-swap .tile")) return;
   closeSwap();
 });
-SWAP.forEach(it=>{
+/* Swaps grouped like the Plastic page: each swap sits under the category of the plastic item it replaces */
+const SWAP_CAT_FIX={"Canned water":"bottle","Boxed water":"bottle","Toothpaste tablets":"toothpaste","Paper-wrapped toilet roll":"toiletwrap","Collagen canister":"yogurt","Paper deodorant":"deodorant","Cleaning tablets":"spray","Glass milk bottle":"milk","Pulp egg carton":"eggs","Paper can carrier":"multipack","Mushroom inserts":"blister","Laundry sheets":"jug","Wax food wrap":"film","Compostable coffee pod":"pod","Shampoo bar":"shampoo","Bamboo toothbrush":"toothbrush"};
+const swapSrcId=it=>SWAP_CAT_FIX[it.name]||((SWAP_WAS[it.name]||"").startsWith("p-")?SWAP_WAS[it.name].slice(2):null);
+function swapGroups(){
+  const rank={}; ROOM_CATS.forEach(([n,ids],ci)=>ids.forEach((id,ii)=>{ rank[id]=[ci,ii]; }));
+  const groups=ROOM_CATS.map(([n])=>({name:n,items:[]})), other={name:"Other",items:[]};
+  SWAP.map((it,i)=>({it,i,r:rank[swapSrcId(it)]})).sort((a,b)=>a.r&&b.r?(a.r[0]-b.r[0]||a.r[1]-b.r[1]||a.i-b.i):a.r?-1:b.r?1:a.i-b.i)
+    .forEach(({it,r})=>(r?groups[r[0]]:other).items.push(it));
+  return [...groups,other].filter(g=>g.items.length);
+}
+const swapSlug=n=>"swapcat-"+n.toLowerCase().replace(/[^a-z]+/g,"-");
+(function(){
+  const nav=$("#swapCatNav"), gs=swapGroups();
+  nav.innerHTML=gs.map(g=>`<button type="button" data-cat="${swapSlug(g.name)}"><i aria-hidden="true"></i><span>${esc(g.name)}</span></button>`).join("");
+  nav.onclick=e=>{ const b=e.target.closest("button[data-cat]"); if(!b) return; const m=document.getElementById(b.dataset.cat); m&&m.scrollIntoView({behavior:"smooth",block:"start"}); };
+  window.__swapOrder=[]; gs.forEach(g=>{ window.__swapOrder.push({mark:g.name}); g.items.forEach(it=>window.__swapOrder.push(it)); });
+})();
+__swapOrder.forEach(it=>{
+  if(it.mark){ const m=document.createElement("div"); m.className="cat-mark"; m.id=swapSlug(it.mark); m.setAttribute("aria-hidden","true"); $("#g-swap").append(m); return; }
   const t=document.createElement("button"); t.type="button"; t.className="tile swap hoverswap"; t.setAttribute("aria-label",it.name);
   const wasKey=SWAP_WAS[it.name];
   const wasPk=wasKey?`<span class="pk" style="--k:0;--px:44%;--py:-30%;--pr:7deg"><img src="img/${wasKey}.png" alt=""></span>`:"";
@@ -1530,6 +1552,9 @@ SWAP.forEach(it=>{
     <button class="btn" id="goIdeate">Use this idea for my product</button>`);
   $("#g-swap").append(t);
 });
+(function(){ const io=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ const id=e.target.id; $$("#swapCatNav button").forEach(b=>b.setAttribute("aria-current",String(b.dataset.cat===id))); } }); },{rootMargin:"-35% 0px -55% 0px"});
+  $$("#g-swap .cat-mark").forEach(m=>io.observe(m));
+  const first=$("#swapCatNav button"); first&&first.setAttribute("aria-current","true"); })();
 
 const MAT_REPL={
 "molded-pulp":[["p-clamshell","Berry clamshells","Fruit punnets"],["p-lid","Hot cup lids","Fiber sip lids"],["p-pod","Coffee pods","Compostable pulp pods"],["c-bubble","Foam and bubble padding","Protective inserts"],["c-saucecup","Sauce cups","Fiber portion cups"]],
