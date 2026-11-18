@@ -717,6 +717,10 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 /* Eco versions on the home grid: the alternatives are the same size as the plastic photos, with no names under them */
 #g-still .tile.swap .nm{display:none}
 #g-still .art.eco-fan .pk img{width:100%;height:auto}
+/* Ideate: three starter ideas under the brief bar */
+.suggest{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 18px}
+.suggest button{font:inherit;font-size:13px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:border-color .2s ease}
+.suggest button:hover,.suggest button:focus-visible{border-color:var(--ink);outline:none}
 </style>
 
 <header class="top"><div class="wrap">
@@ -775,6 +779,11 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
           <button class="btn ghost" type="button" id="ideaStop" hidden>Stop</button>
           <button class="btn" type="submit" id="ideaBtn">Generate materials</button>
         </form>
+      <div class="suggest" role="group" aria-label="Ideas to start from">
+        <button type="button" data-s="A snack bag made from plant starch">A snack bag made from plant starch</button>
+        <button type="button" data-s="A shampoo bar wrapped in paper">A shampoo bar wrapped in paper</button>
+        <button type="button" data-s="A takeout box made from molded pulp">A takeout box made from molded pulp</button>
+      </div>
       <div class="board" id="board">
         <div class="surface" id="surface">
           <canvas id="pad" width="1200" height="900" aria-label="Drawing board. Draw your idea or drop an image."></canvas>
@@ -1724,4 +1733,11 @@ show();
   },{threshold:.35});
   io.observe(stage);
 })();
+</script>
+<script>
+/* Ideate: a suggested idea fills the brief and puts the cursor in it */
+document.querySelectorAll(".suggest button[data-s]").forEach(b=>b.addEventListener("click",()=>{
+  const i=document.getElementById("brief"); if(!i) return;
+  i.value=b.dataset.s; i.focus();
+}));
 </script>
