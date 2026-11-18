@@ -827,6 +827,15 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .pledge-status{font-size:clamp(22px,2vw,30px)}
 #v-companies .pledge-track{height:6px}
 #v-companies .pledge-text{font-size:12px;line-height:1.45}
+/* Rankings: the three facts sit in one row at the top of the graphic */
+#v-companies .profit.graphic{border:1px solid var(--line);box-shadow:none;padding:18px 20px}
+#v-companies .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#v-companies .fact{background:#F4F3EE;border-radius:16px;padding:14px 16px;display:grid;gap:4px;align-content:start}
+#v-companies .fact .label{font-size:10.5px;line-height:1.3}
+#v-companies .fact b{font-family:var(--serif);font-weight:400;font-size:clamp(28px,2.8vw,40px);line-height:1;letter-spacing:-.02em}
+#v-companies .fact .src{font-size:12px;line-height:1.35}
+#v-companies .fact:nth-child(2) b{color:#B0561E}
+#v-companies .swapline .more{font-size:clamp(20px,2vw,28px)}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1596,7 +1605,11 @@ renderCases();
     const share=Math.min(100,premium/pr.p*100);
     const shareTxt=share<1?share.toFixed(1):Math.round(share);
     return `<div class="profit graphic">
-      <div class="headline"><b>${shareTxt}%</b><span>of ${money(pr.p)} profit would go on switching</span></div>
+      <div class="facts">
+        <div class="fact"><span class="label">Total profit</span><b>${money(pr.p)}</b><span class="src">${pr.y}</span></div>
+        <div class="fact"><span class="label">Profit that would go to switching</span><b>${shareTxt}%</b><span class="src">about ${money(premium)} a year</span></div>
+        <div class="fact"><span class="label">Price per unit</span><b>+${Math.round(extra)}%</b><span class="src">for ${esc(m.name)}</span></div>
+      </div>
       <div class="swapline"><span class="from">${esc(sw[0])}<b>$${plasticC.toFixed(2)}</b></span><span class="arr">→</span><span class="to">${esc(m.name)}<b>$${altC.toFixed(2)}</b></span><span class="more">${extra>=0?"+":""}${Math.round(extra)}% more</span></div>
       <div class="bars">
         <div class="bar-row"><span class="bar-lab">Net profit, ${pr.y}</span><span class="bar-track"><i style="width:100%"></i></span><b>${money(pr.p)}</b></div>
