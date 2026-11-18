@@ -2252,11 +2252,11 @@ let cat="All";
     <div><b>${fmt(tot)} t</b><span>plastic saved, from the ${rep.length} that reported tonnes</span></div>
     <div><b>≈ ${fmt(tot/12/1000,1)}B</b><span>plastic water bottles by weight (12 g each)</span></div>`;
 })();
-/* Real World: grouped by category (Food, Household, Retail, Toys first; Electronics last), most plastic saved first within each; the left nav jumps between categories */
+/* Real World: grouped by category (Food, Beverage, Retail, Household, Toys first; Electronics last), most plastic saved first within each; the left nav jumps between categories */
 const caseBand=t=>t==null?"No tonnage reported":t>=10000?"10,000+ tonnes":t>=1000?"1,000 to 10,000 tonnes":t>=100?"100 to 1,000 tonnes":"Under 100 tonnes";
 const caseBandSlug=b=>"caseband-"+b.toLowerCase().replace(/[^a-z0-9]+/g,"-");
 /* category order: these first, Electronics last, the rest A to Z in between */
-const CASE_CAT_FIRST=["Food","Household","Retail","Toys"], CASE_CAT_LAST=["Electronics"];
+const CASE_CAT_FIRST=["Food","Beverage","Retail","Household","Toys"], CASE_CAT_LAST=["Electronics"];
 const caseCatRank=c=>CASE_CAT_FIRST.includes(c)?CASE_CAT_FIRST.indexOf(c):CASE_CAT_LAST.includes(c)?100+CASE_CAT_LAST.indexOf(c):50;
 function renderCases(){
   const g=$("#g-cases"); g.replaceChildren();
