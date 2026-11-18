@@ -1527,7 +1527,7 @@ renderCases();
     <div class="co2col">
       <div class="mstats">
         <div class="big">${c.t!=null?`<b>${fmt(c.t)} t</b><span>plastic packaging a year</span><span class="src">≈ ${fmt(c.t/12/1000,1)} billion plastic water bottles by weight</span>`:`<b style="font-size:28px">Not published</b><span>${esc(c.trend||"")}</span>`}</div>
-        ${c.virgin!=null?`<div class="big"><b>${c.virgin}%</b><span>virgin plastic (${c.rec}% recycled content)</span>${dots(c.virgin)}</div>`:c.rec!=null?`<div class="big"><b>${c.rec}%</b><span>recycled content</span></div>`:""}
+        ${c.virgin!=null?`<div class="big"><b>${c.virgin}%</b><span>virgin plastic (${c.rec}% recycled content)</span></div>`:c.rec!=null?`<div class="big"><b>${c.rec}%</b><span>recycled content</span></div>`:""}
       </div>
       <div class="kv">
         ${c.t!=null&&c.trend?`<div class="wide"><span class="label">Trend</span><span>${esc(c.trend)}</span></div>`:""}
