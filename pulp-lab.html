@@ -651,6 +651,18 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #g-still .art.fan .pk i{display:none}
 .hoverswap.lit .art.fan .pk{opacity:0}
 .hoverswap.lit .art.fan .orig{transform:none}
+/* Categories beside the Plastic grid: grey names, the one in view is black */
+.cat-mark{grid-column:1/-1;height:0;margin:0;scroll-margin-top:120px}
+.cats{display:none}
+@media (min-width:900px){
+  #v-still-plastic{padding-left:150px}
+  .cats{display:grid;position:fixed;left:26px;top:50%;transform:translateY(-50%);gap:16px;z-index:6;width:112px}
+  .cats button{all:unset;cursor:pointer;font-size:13px;line-height:1.3;color:#9A9A94;transition:color .25s ease}
+  .cats button:hover{color:var(--ink)}
+  .cats button[aria-current="true"]{color:var(--ink)}
+  .cats button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -681,6 +693,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
     <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
   </section>
   <section id="v-still-plastic" data-view>
+    <nav class="cats" id="catNav" aria-label="Categories"></nav>
     <div class="focus" id="stillFocus" hidden></div>
     <div class="vhrow">
       <div class="vh"><h1 id="stillTitle">Easy to make plastic-free. Still plastic.</h1><p id="stillSub">Tap an item to see what it leaves behind.</p></div>
@@ -1012,13 +1025,46 @@ function renderIndex(){
   $$(".idx-item",stage).forEach(el=>idxIO.observe(el));
   if(tiles[0]) tiles[0].setAttribute("aria-current","true");
 }
+const ROOM_CATS=[
+  ["Kitchen",["dishsoap","sponge","storage","binliner","teabag","milk","breadbag"]],
+  ["Food and drink",["bottle","soda","multipack","coldcup","lid","chips","candy","yogurt","clamshell","pod","straw","cutlery","bag","film","mailer"]],
+  ["Bathroom",["shampoo","handsoap","toothpaste","toothbrush","razor","swab","deodorant","floss","toiletwrap"]],
+  ["Home and office",["jug","spray","pods","tape","hangers","blister"]]
+];
+const catSlug=n=>"cat-"+n.toLowerCase().replace(/[^a-z]+/g,"-");
+const catOrder=()=>{
+  const byId=Object.fromEntries(STILL.map(it=>[it.id,it]));
+  const used=new Set(); const out=[];
+  ROOM_CATS.forEach(([name,ids])=>{ const items=ids.map(id=>byId[id]).filter(Boolean); items.forEach(it=>used.add(it.id)); if(items.length) out.push({name,items}); });
+  const rest=STILL.filter(it=>!used.has(it.id));
+  if(rest.length) out.push({name:"Other",items:rest});
+  return out;
+};
+function buildCatNav(){
+  const nav=$("#catNav");
+  nav.innerHTML=catOrder().map(c=>`<button type="button" data-cat="${catSlug(c.name)}">${esc(c.name)}</button>`).join("");
+  nav.onclick=e=>{ const b=e.target.closest("button[data-cat]"); if(!b) return; const m=document.getElementById(b.dataset.cat); m&&m.scrollIntoView({behavior:"smooth",block:"start"}); };
+}
+let catIO=null;
+function watchCats(){
+  if(catIO){ catIO.disconnect(); catIO=null; }
+  const marks=$$(".cat-mark");
+  if(!marks.length) return;
+  catIO=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ const id=e.target.id; $$("#catNav button").forEach(b=>b.setAttribute("aria-current",String(b.dataset.cat===id))); } }); },{rootMargin:"-35% 0px -55% 0px"});
+  marks.forEach(m=>catIO.observe(m));
+}
 function renderStill(){
   const g=$("#g-still"); [...g.children].filter(c=>c.id!=="stillFocus").forEach(c=>c.remove());
+  $("#catNav").hidden = layout==="index";
   $("#stillTitle").textContent = eco ? "The same things, without the plastic." : "Easy to make plastic-free. Still plastic.";
   $("#stillSub").textContent = eco ? "Every one of these swaps is on the market today." : "Tap an item to see what it leaves behind.";
   g.classList.toggle("plain", layout==="index");
   if(layout==="index"){ renderIndex(); return; }
-  STILL.forEach(it=>{
+  if(!$("#catNav").children.length) buildCatNav();
+  const flat=[]; catOrder().forEach(c=>{ const m=document.createElement("div"); m.className="cat-mark"; m.id=catSlug(c.name); m.setAttribute("aria-hidden","true"); flat.push(m); c.items.forEach(it=>flat.push(it)); });
+  flat.forEach(item=>{
+    if(item instanceof HTMLElement){ g.append(item); return; }
+    const it=item;
     const alts=ALTS[it.id]||[];
     const art = eco
       ? `<span class="art ph"><span class="multi" style="--n:${alts.length}">${alts.map(([k,l])=>`<img src="${eimg(k)}" alt="${esc(l)}" loading="lazy">`).join("")}</span><span class="eco-badge">${alts.length>1?alts.length+" swaps":"Swap"}</span></span>`
@@ -1029,6 +1075,7 @@ function renderStill(){
     b.onclick=()=>openStill(it);
     g.append(b);
   });
+  watchCats();
 }
 $("#layoutSeg").onclick=e=>{ const b=e.target.closest("button[data-layout]"); if(!b) return; layout=b.dataset.layout; $$("#layoutSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderStill(); };
 $("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
