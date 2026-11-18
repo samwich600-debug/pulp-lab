@@ -973,6 +973,7 @@ aside.drawer.modal figcaption span{font-size:13px}
     <a href="#companies" data-v="companies">Rankings</a>
     <a href="#already-swapped" data-v="already-swapped">Swaps</a>
     <a href="#materials" data-v="materials">Material Lab</a>
+    <a href="#circular" data-v="circular">Circular</a>
     <a href="#every-day" data-v="every-day">Every day</a>
   </nav>
 </div></header>
@@ -1125,6 +1126,190 @@ aside.drawer.modal figcaption span{font-size:13px}
     <div class="corows" id="coRows"></div>
     <div style="margin-top:36px"><span class="label">No total published</span><div class="nd" id="coND"></div></div>
     <p class="foot">Company figures as disclosed to the <a href="https://content.ellenmacarthurfoundation.org/m/21c4a4ffd7e2e9b4/original/Global-Commitment-2025-Report-M-10-25.pdf" target="_blank" rel="noopener">Ellen MacArthur Foundation (2025 report, 2024 data)</a> or in company reports. Brand audit ranks from <a href="https://www.breakfreefromplastic.org/2024/02/07/bffp-movement-unveils-2023-global-brand-audit-results/" target="_blank" rel="noopener">Break Free From Plastic</a>, counting branded litter collected by volunteers. Plastic packaging waste worldwide was about 142 million tonnes in 2019, roughly 40% of all plastic waste (<a href="https://ourworldindata.org/data-insights/packaging-is-the-source-of-40-of-the-planets-plastic-waste" target="_blank" rel="noopener">OECD via Our World in Data</a>).</p>
+  </section>
+  <!-- ===== Circular: redrawn Ellen MacArthur Foundation systems diagram ===== -->
+  <section id="v-circular" data-view hidden aria-label="Circular">
+    <style>
+      #v-circular{--bio:#5D7F45;--bio-soft:#EEF2E7;--tech:#3C6A92;--tech-soft:#E9EFF5;--leak:#9C9A90}
+      #v-circular .vh{margin-bottom:36px}
+      #v-circular .vh p{max-width:620px;margin-inline:auto}
+      .cx-key{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 28px;margin:0 0 28px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+      .cx-key span{display:inline-flex;align-items:center;gap:8px}
+      .cx-key i{width:9px;height:9px;border-radius:50%;display:inline-block}
+      .cx-frame{position:relative;border-top:1px solid var(--line);padding:18px 0 6px}
+      .cx-svg{display:block;width:100%;height:auto;max-width:1040px;max-height:calc(100svh - 200px);min-height:560px;margin:0 auto;overflow:visible}
+      .cx-svg text{paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round;font-family:var(--body);font-size:12px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;fill:var(--ink)}
+      .cx-svg text.cx-serif{font-family:var(--serif);font-size:24px;font-weight:400;letter-spacing:-.01em;text-transform:none;stroke:none}
+      .cx-svg text.cx-mute{fill:var(--muted);font-size:11px}
+      .cx-svg .ln{fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:opacity .3s,stroke-width .3s}
+      .cx-svg .ln.g{stroke:var(--bio)} .cx-svg .ln.b{stroke:var(--tech)} .cx-svg .ln.k{stroke:var(--leak)}
+      .cx-svg .nd{cursor:pointer;outline:none;transition:opacity .3s}
+      .cx-svg .nd circle.ring{fill:#fff;stroke-width:1.6;transition:fill .25s}
+      .cx-svg .nd.g circle.ring{stroke:var(--bio)} .cx-svg .nd.b circle.ring{stroke:var(--tech)}
+      .cx-svg .nd.g circle.core{fill:var(--bio)} .cx-svg .nd.b circle.core{fill:var(--tech)}
+      .cx-svg .nd.big.g circle.ring{fill:var(--bio-soft)} .cx-svg .nd.big.b circle.ring{fill:var(--tech-soft)}
+      .cx-svg .nd.pill rect{fill:#fff;stroke:var(--ink);stroke-width:1}
+      .cx-svg .nd:hover circle.ring,.cx-svg .nd:focus-visible circle.ring,.cx-svg .nd.on circle.ring{fill:var(--sheet)}
+      .cx-svg .nd.g:hover circle.ring,.cx-svg .nd.g.on circle.ring,.cx-svg .nd.g:focus-visible circle.ring{fill:var(--bio-soft)}
+      .cx-svg .nd.b:hover circle.ring,.cx-svg .nd.b.on circle.ring,.cx-svg .nd.b:focus-visible circle.ring{fill:var(--tech-soft)}
+      .cx-svg .nd.pill:hover rect,.cx-svg .nd.pill.on rect,.cx-svg .nd.pill:focus-visible rect{fill:var(--sheet)}
+      .cx-svg .nd:focus-visible{outline:none}
+      .cx-svg .nd:focus-visible .ring,.cx-svg .nd:focus-visible rect{stroke-width:2.4}
+      .cx-svg.focus .ln:not(.on),.cx-svg.focus .nd:not(.on){opacity:.28}
+      .cx-svg.focus .ln.on{stroke-width:2.4}
+      .cx-svg .dot{pointer-events:none}
+      .cx-tip{position:sticky;bottom:0;z-index:2;background:var(--paper);padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));min-height:3.2em;max-width:760px;margin:12px auto 0;text-align:center;font-family:var(--serif);font-size:clamp(20px,2vw,26px);line-height:1.2;letter-spacing:-.01em;color:var(--ink);text-wrap:balance}
+      .cx-tip b{display:block;font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+      .cx-swipe{display:none;text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+      .cx-notes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px 48px;margin-top:56px;padding-top:24px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.6;color:var(--muted)}
+      .cx-notes p{margin:0}
+      @media (max-width:760px){
+        .cx-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-inline:-16px}
+        .cx-scroll::-webkit-scrollbar{display:none}
+        .cx-svg{width:860px;max-width:none;max-height:none;min-height:0;padding-inline:16px;box-sizing:content-box}
+        .cx-swipe{display:block}
+        .cx-notes{grid-template-columns:minmax(0,1fr)}
+      }
+      /* eight nav tabs: tighten spacing on phones so they stay on two rows */
+      @media (max-width:480px){header.top nav a{margin-left:0;margin-right:14px;letter-spacing:.1em}.cx-tip{font-size:18px}}
+    </style>
+    <div class="vh"><h1>Keep materials in the loop.</h1><p>The circular economy in one diagram. Green materials can safely go back to nature; blue ones should stay in use. The tighter the loop, the more value it keeps. Tap any step.</p></div>
+    <div class="cx-key" aria-hidden="true"><span><i style="background:var(--bio)"></i>Biological cycle</span><span><i style="background:var(--tech)"></i>Technical cycle</span><span><i style="background:var(--leak)"></i>Leakage</span></div>
+    <div class="cx-frame">
+      <p class="cx-swipe">Swipe sideways to see both cycles</p>
+      <div class="cx-scroll" id="cxScroll">
+        <svg class="cx-svg" id="cxSvg" viewBox="-40 0 1100 890" role="img" aria-labelledby="cxTitle">
+          <title id="cxTitle">Circular economy systems diagram: a biological cycle on the left and a technical cycle on the right, both feeding a central chain of parts manufacturer, product manufacturer and service provider.</title>
+          <defs>
+            <marker id="cxAg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--bio)"/></marker>
+            <marker id="cxAb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--tech)"/></marker>
+            <marker id="cxAk" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--leak)"/></marker>
+          </defs>
+          <g id="cxLines"></g>
+          <path d="M215,885 A285,135 0 0 1 785,885" fill="none" stroke="var(--leak)" stroke-width="1" stroke-dasharray="2 5"/>
+          <g id="cxDots"></g>
+          <g id="cxNodes"></g>
+          <text x="500" y="826" text-anchor="middle">Minimise systematic leakage</text>
+          <text x="500" y="846" text-anchor="middle">and negative externalities</text>
+          <text x="40" y="128" class="cx-mute">Renewables flow management</text>
+          <text x="960" y="128" text-anchor="end" class="cx-mute">Stock management</text>
+        </svg>
+      </div>
+      <div class="cx-tip" id="cxTip" aria-live="polite"><b>How it works</b>Materials move from the top down to people, then loop back. Hover or tap a step for a one-line explanation.</div>
+    </div>
+    <div class="cx-notes">
+      <p>¹ Hunting and fishing.<br>² Can take both post-harvest and post-consumer waste as an input.</p>
+      <p>Source: Ellen MacArthur Foundation, <a href="https://www.ellenmacarthurfoundation.org/circular-economy-diagram" target="_blank" rel="noopener"><i>Circular economy systems diagram</i></a> (February 2019), www.ellenmacarthurfoundation.org. Drawing based on Braungart &amp; McDonough, <i>Cradle to Cradle</i> (C2C). Redrawn and animated for this site; the moving dots illustrate the idea and are not to scale.</p>
+    </div>
+    <script>
+    (function(){
+      const NS="http://www.w3.org/2000/svg", svg=document.getElementById("cxSvg"), sec=document.getElementById("v-circular");
+      const gL=document.getElementById("cxLines"), gD=document.getElementById("cxDots"), gN=document.getElementById("cxNodes"), tip=document.getElementById("cxTip");
+      const el=(t,a,p)=>{ const e=document.createElementNS(NS,t); for(const k in a) e.setAttribute(k,a[k]); p&&p.append(e); return e; };
+      /* lines: id, kind (g bio / b tech / k leak), d, particle speed px/s, spawn every s, arrow, group (node it belongs to) */
+      const L=[
+        ["inG","g","M440,84 V144",40,1.6,1,"ren"],
+        ["inB","b","M560,84 V144",40,1.6,1,"fin"],
+        ["g1","g","M440,190 V230",40,1.6,1,"parts"],
+        ["b1","b","M560,190 V230",40,1.6,1,"parts"],
+        ["g2","g","M440,276 V316",40,1.6,1,"product"],
+        ["b2","b","M560,276 V316",40,1.6,1,"product"],
+        ["g3","g","M440,362 V398 H400 V431",40,1.6,1,"service"],
+        ["b3","b","M560,362 V398 H600 V431",40,1.6,1,"service"],
+        ["regen","g","M222,310 C232,272 246,248 258,229",34,2.2,1,"regen"],
+        ["farm","g","M302,198 C350,168 396,150 432,146",40,1.8,1,"farm"],
+        ["feed","g","M322,656 C262,600 246,452 282,350 C312,268 372,206 432,152",46,2.0,1,"feed"],
+        ["toExt","g","M394,580 C388,612 384,636 374,656",30,2.2,1,"ext"],
+        ["c1","g","M394,590 C320,606 290,540 351,500",56,1.6,1,"cascade"],
+        ["c2","g","M394,586 C336,594 322,552 356,516",62,1.3,1,"cascade"],
+        ["c3","g","M394,582 C356,584 348,562 364,530",68,1.0,1,"cascade"],
+        ["toAD","g","M322,690 C300,700 280,692 268,676",28,2.4,1,"ad"],
+        ["toBio","g","M236,642 C222,580 210,500 204,442",30,2.4,1,"bio"],
+        ["toGas","g","M226,654 C190,652 160,640 138,622",22,3.2,1,"biogas"],
+        ["share","b","M612,580 C650,592 696,590 698,556 C700,522 678,500 652,494",92,0.55,1,"share"],
+        ["maint","b","M614,584 C690,612 756,578 758,516 C760,456 700,432 640,450",84,0.75,1,"maint"],
+        ["reuse","b","M616,588 C730,634 820,560 820,458 C820,350 700,300 568,298",72,1.15,1,"reuse"],
+        ["refurb","b","M618,592 C770,654 884,540 884,400 C884,270 722,212 568,212",62,1.7,1,"refurb"],
+        ["recyc","b","M620,596 C820,672 952,520 952,330 C952,166 744,120 568,124",52,2.5,1,"recycle"],
+        ["leakG","k","M400,594 V778",22,3.6,1,"leak"],
+        ["leakB","k","M600,594 V778",22,3.6,1,"leak"]
+      ];
+      /* nodes: id, kind, x, y, r, label lines, label x, y, anchor, explanation */
+      const N=[
+        ["ren","g",440,62,18,["Renewables"],412,66,"end","Renewables","Materials and energy that grow back or don't run out, like plants, wood and sunlight."],
+        ["fin","b",560,62,18,["Finite materials"],588,66,"start","Finite materials","Oil, gas, metals and minerals: once used up, they're gone. Plastic is made from oil and gas."],
+        ["farm","g",276,206,24,["Farming /","collection¹"],276,158,"middle","Farming / collection","Growing crops, forestry, hunting and fishing: where plant and animal materials enter the economy."],
+        ["bio","g",200,374,66,[],0,0,"","Biosphere","Nature itself. Clean biological materials return to the soil and grow back."],
+        ["regen","g",0,0,0,["Regeneration"],122,378,"end","Regeneration","Putting nutrients back into the soil so the land can grow the next crop."],
+        ["feed","g",0,0,0,["Biochemical","feedstock"],312,300,"start","Biochemical feedstock","Plant-based materials made into new things, from paper fibre to bio-based chemicals."],
+        ["ext","g",348,680,24,["Extraction of","biochemical","feedstock²"],348,728,"middle","Extraction of biochemical feedstock","Pulling useful chemicals and fibres out of food and plant waste before it breaks down."],
+        ["ad","g",244,662,22,["Anaerobic","digestion"],244,706,"middle","Anaerobic digestion","Microbes break down food and plant waste without air, making biogas and fertiliser."],
+        ["biogas","g",116,606,20,["Biogas"],116,644,"middle","Biogas","Gas captured from digestion for heat and power: a last bit of value before nutrients go back to soil."],
+        ["cascade","g",0,0,0,["Cascades"],342,472,"end","Cascades","Using a material again for a lower-grade job each time, like cotton shirt, then insulation, then paper."],
+        ["consumer","g",400,485,50,[],0,0,"","Consumer","Someone who uses a product up, like food or a paper bag, so it can go back to nature."],
+        ["user","b",600,485,50,[],0,0,"","User","Someone who uses a product without using it up, like a phone, a jar or a refill bottle."],
+        ["share","b",698,556,13,["Share"],718,572,"start","Share","More people use the same thing, like a library, a tool hire shop or shared crates."],
+        ["maint","b",758,516,16,["Maintain /","prolong"],782,524,"start","Maintain / prolong","Repair and look after it so it lasts longer. The tightest loop keeps the most value."],
+        ["reuse","b",820,458,19,["Reuse /","redistribute"],846,464,"start","Reuse / redistribute","Pass it on as it is: second-hand sales, returnable bottles, refillable packs."],
+        ["refurb","b",884,400,21,["Refurbish /","remanufacture"],912,406,"start","Refurbish / remanufacture","Rebuild it to as-new with fresh parts, then sell it again."],
+        ["recycle","b",952,330,23,["Recycle"],982,335,"start","Recycle","Break it down to raw material and start again. The widest loop: most of the value and energy is lost."],
+        ["parts","p",500,168,0,["Parts manufacturer"],0,0,"","Parts manufacturer","Turns raw materials into components and packaging materials."],
+        ["product","p",500,254,0,["Product manufacturer"],0,0,"","Product manufacturer","Puts parts together into a finished product and its packaging. Most design decisions land here."],
+        ["service","p",500,340,0,["Service provider"],0,0,"","Service provider","Sells, rents or delivers the product to people."],
+        ["leak","k",0,0,0,[],0,0,"","Leakage","Whatever escapes the loops: litter, landfill and pollution. The aim is to shrink it towards zero."]
+      ];
+      const P={};
+      L.forEach(([id,k,d,sp,ev,ar,grp])=>{ const p=el("path",{d,class:"ln "+k,"data-g":grp},gL); if(ar) p.setAttribute("marker-end","url(#cxA"+k+")"); P[id]={el:p,k,sp,ev,grp,len:0,next:Math.random()*ev}; });
+      const label=(g,lines,x,y,anchor,cls)=>{ const t=el("text",{x,y,"text-anchor":anchor||"start"},g); if(cls) t.setAttribute("class",cls); lines.forEach((s,i)=>{ const ts=el("tspan",{x,dy:i?15:0},t); ts.textContent=s; }); return t; };
+      const nodes={}, bare=[];
+      N.forEach(([id,k,x,y,r,lines,lx,ly,anc,name,txt])=>{
+        const g=el("g",{class:"nd "+k+(r>=40?" big":"")+(k==="p"?" pill":""),tabindex:"0",role:"button","aria-label":name+": "+txt,"data-id":id},gN);
+        if(k==="p"){ el("rect",{x:380,y:y-21,width:240,height:42,rx:21},g); label(g,lines,500,y+4.5,"middle"); }
+        else if(id==="leak"){ /* hit area over the leakage text */ el("rect",{x:300,y:800,width:400,height:60,fill:"transparent"},g); }
+        else if(r){ el("circle",{class:"ring",cx:x,cy:y,r},g); if(r<40) el("circle",{class:"core",cx:x,cy:y,r:Math.max(3,r*.22)},g);
+          else label(g,[name],x,y+8,"middle","cx-serif"); }
+        if(k!=="p"&&lines.length){ label(g,lines,lx,ly,anc); if(!r) bare.push(g); }
+        nodes[id]={g,name,txt};
+      });
+      el("text",{x:400,y:566,"text-anchor":"middle",class:"cx-mute"},gN).textContent="Collection";
+      el("text",{x:600,y:566,"text-anchor":"middle",class:"cx-mute"},gN).textContent="Collection";
+      const DEF=tip.innerHTML;
+      function focus(id){ svg.classList.toggle("focus",!!id);
+        Object.entries(nodes).forEach(([k,n])=>n.g.classList.toggle("on",k===id));
+        Object.values(P).forEach(p=>p.el.classList.toggle("on",p.grp===id));
+        if(id){ const n=nodes[id]; tip.innerHTML="<b></b>"; tip.firstChild.textContent=n.name; tip.append(n.txt); } else tip.innerHTML=DEF; }
+      let pinned=null;
+      Object.entries(nodes).forEach(([id,n])=>{
+        n.g.addEventListener("pointerenter",e=>{ if(e.pointerType==="mouse") focus(id); });
+        n.g.addEventListener("pointerleave",e=>{ if(e.pointerType==="mouse") focus(pinned); });
+        n.g.addEventListener("click",()=>{ pinned=pinned===id?null:id; focus(pinned); });
+        n.g.addEventListener("focus",()=>focus(id)); n.g.addEventListener("blur",()=>focus(pinned));
+        n.g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); n.g.dispatchEvent(new Event("click")); } });
+      });
+      svg.addEventListener("click",e=>{ if(!e.target.closest(".nd")){ pinned=null; focus(null); } });
+
+      /* particles: inner technical loops are shorter and spawn more often, so they turn over faster */
+      const reduce=matchMedia("(prefers-reduced-motion: reduce)");
+      const COL={g:"var(--bio)",b:"var(--tech)",k:"var(--leak)"};
+      let dots=[], raf=0, last=0;
+      function spawn(p,t0){ const c=el("circle",{r:p.k==="k"?2.4:3.4,class:"dot",fill:COL[p.k]},gD); dots.push({p,c,s:t0||0}); }
+      function frame(t){ const dt=Math.min(.05,(t-(last||t))/1000); last=t;
+        Object.values(P).forEach(p=>{ p.next-=dt; if(p.next<=0){ spawn(p); p.next+=p.ev*(0.8+Math.random()*.4); } });
+        dots=dots.filter(o=>{ o.s+=o.p.sp*dt; if(o.s>=o.p.len){ o.c.remove(); return false; }
+          const pt=o.p.el.getPointAtLength(o.s), f=Math.min(1,o.s/14,(o.p.len-o.s)/14);
+          o.c.setAttribute("cx",pt.x.toFixed(1)); o.c.setAttribute("cy",pt.y.toFixed(1)); o.c.setAttribute("opacity",(f*(svg.classList.contains("focus")&&!o.p.el.classList.contains("on")?.25:1)).toFixed(2)); return true; });
+        raf=requestAnimationFrame(frame); }
+      function prime(){ /* start with the loops already flowing */ Object.values(P).forEach(p=>{ for(let s=p.sp*p.ev*Math.random(); s<p.len; s+=p.sp*p.ev) spawn(p,s); }); }
+      function run(on){ if(on&&!raf&&!reduce.matches){ Object.values(P).forEach(p=>{ if(!p.len) p.len=p.el.getTotalLength(); }); if(!dots.length) prime(); last=0; raf=requestAnimationFrame(frame); }
+        if(!on&&raf){ cancelAnimationFrame(raf); raf=0; } }
+      function hits(){ /* label-only steps get a tap area once the page is visible (getBBox needs layout) */ bare.splice(0).forEach(g=>{ const bb=g.getBBox(); el("rect",{x:bb.x-8,y:bb.y-8,width:bb.width+16,height:bb.height+16,fill:"transparent"},g); }); }
+      function sync(){ const vis=!sec.hidden&&!document.hidden; if(!sec.hidden) hits(); run(vis);
+        if(vis&&!sync.done){ const sc=document.getElementById("cxScroll"); if(sc.scrollWidth>sc.clientWidth){ sc.scrollLeft=(sc.scrollWidth-sc.clientWidth)/2; sync.done=true; } } }
+      addEventListener("hashchange",()=>setTimeout(sync,0)); document.addEventListener("visibilitychange",sync);
+      reduce.addEventListener&&reduce.addEventListener("change",()=>{ run(false); gD.textContent=""; dots=[]; sync(); });
+      setTimeout(sync,0);
+    })();
+    </script>
   </section>
 </main>
 
@@ -2251,7 +2436,7 @@ const REEL=[ /* free Pexels footage, trimmed; credit in each caption */
 
 /* ---------- router ---------- */
 const SHOW_HOME=false; /* video home page put away for now */
-const VIEWS=[...(SHOW_HOME?["home"]:[]),"still-plastic","already-swapped","ideate","materials","case-studies","companies","every-day"];
+const VIEWS=[...(SHOW_HOME?["home"]:[]),"still-plastic","already-swapped","ideate","materials","case-studies","companies","every-day","circular"];
 function route(){ const h=(location.hash||"").slice(1); const v=VIEWS.includes(h)?h:(SHOW_HOME?"home":"still-plastic"); document.body.classList.toggle("is-home",v==="home"); window.__reel&&window.__reel(v==="home");
   $$("[data-view]").forEach(s=>s.hidden=!(s.id==="v-"+v||(v==="home"&&s.id==="v-still-plastic")));
   $$("nav a").forEach(a=>a.dataset.v===v?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));
