@@ -700,6 +700,9 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .ocean .foot .foot-asof{margin-top:4px}
 .ocean .foot .ocean-sub{display:block;margin-top:14px;font-family:var(--serif);font-size:clamp(19px,1.9vw,27px);line-height:1.22;letter-spacing:-.01em;color:var(--muted);text-wrap:pretty}
 
+/* Plastic page, eco mode: the swap photos sit almost touching, separated by a few pixels */
+#g-still .art.ph .multi{gap:0;grid-template-columns:repeat(var(--n,1),minmax(0,1fr))}
+#g-still .art.ph .multi img{width:112%;max-width:none;height:100%;object-fit:contain;margin:0 -6%}
 </style>
 
 <header class="top"><div class="wrap">
