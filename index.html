@@ -800,6 +800,21 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .profit-card b{font-family:var(--serif);font-weight:400;font-size:clamp(34px,3.6vw,54px);line-height:1;letter-spacing:-.02em}
 #v-companies .profit-card.pct b{color:#B0561E}
 #v-companies .profit-card .src{font-size:12px;line-height:1.5}
+/* Rankings: the switching cost against profit, as a simple graphic */
+#v-companies .profit.graphic{grid-column:1/-1;display:grid;gap:14px;padding:22px 24px;border-radius:22px;background:#F4F3EE;border:1px solid var(--line)}
+#v-companies .swapline{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;font-size:14px}
+#v-companies .swapline .from,#v-companies .swapline .to{display:grid;gap:2px;font-family:var(--serif);font-size:clamp(18px,1.6vw,22px);line-height:1.15}
+#v-companies .swapline b{font-family:var(--body);font-weight:600;font-size:14px;color:var(--ink)}
+#v-companies .swapline .arr{color:var(--muted);font-size:20px}
+#v-companies .swapline .more{margin-left:auto;font-family:var(--serif);font-size:clamp(30px,3vw,44px);line-height:1;color:#B0561E}
+#v-companies .bars{display:grid;gap:10px}
+#v-companies .bar-row{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;align-items:center;font-size:13px}
+#v-companies .bar-lab{color:var(--muted)}
+#v-companies .bar-row b{font-family:var(--serif);font-weight:400;font-size:20px;white-space:nowrap}
+#v-companies .bar-track{display:block;height:14px;border-radius:99px;background:rgba(12,12,11,.08);overflow:hidden}
+#v-companies .bar-track i{display:block;height:100%;border-radius:99px;background:var(--ink)}
+#v-companies .bar-track.cost i{background:#B0561E}
+#v-companies .profit.graphic .src{font-size:12px;line-height:1.5}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1556,6 +1571,26 @@ renderCases();
   const CF={"Coca-Cola":["soda","water","shrink"],"PepsiCo":["soda","chips","water"],"Nestle":["water","wrapper","pod","sachet"],"Procter & Gamble":["jug","shampoo","sachet","wipes"],"Danone":["water","yogurt"],"Unilever":["sachet","shampoo","jug"],"Henkel":["jug","spray"],"Colgate-Palmolive":["toothpaste","shampoo","jug"],"Keurig Dr Pepper":["soda","pod"],"Mars":["wrapper","petfood"],"Mondelez":["wrapper","chips"],"Reckitt":["spray","jug"],"L'Oreal":["cosmetic","shampoo"],"Amazon":["mailer","bubble"],"Walmart":["bag","film","clamshell"],"Kraft Heinz":["squeeze","film"],"Kimberly-Clark":["wipes","film"],"Ferrero":["wrapper","mints"],"Kenvue":["cosmetic","blister"],"Starbucks":["coldcup","straw","lid"],"McDonald's":["lid","straw","cutlery","sauce"],"Philip Morris Intl.":["cig","film"]};
   const PROFIT={"Coca-Cola":{p:10.6,y:"2024"},"PepsiCo":{p:9.58,y:"2024"},"Nestl\u00e9":{p:12.0,y:"2024",n:"CHF 10.9bn"},"Procter & Gamble":{p:16.1,y:"FY2025"},"Danone":{p:2.12,y:"2024",n:"\u20ac2.02bn"},"Unilever":{p:6.72,y:"2024",n:"\u20ac6.4bn"},"Henkel":{p:2.13,y:"2024",n:"\u20ac2.03bn"},"Colgate-Palmolive":{p:2.89,y:"2024"},"Keurig Dr Pepper":{p:1.4,y:"2024"},"Mondel\u0113z":{p:4.61,y:"2024"},"Reckitt":{p:1.79,y:"2024",n:"\u00a31.43bn"},"L'Or\u00e9al":{p:6.73,y:"2024",n:"\u20ac6.41bn"},"Amazon":{p:59.2,y:"2024"}};
   /* Switching cost, worst case: the eco alternative at 1.5x plastic, resin at US$1,200 a tonne, paid on every tonne. */
+  /* which plastic each company puts out, and the eco swap to price against it (library materials) */
+  const SWAPFOR={"Coca-Cola":["Plastic soda bottle","bottle-can"],"PepsiCo":["Chip bag","chips-paper"],"Nestlé":["Water bottle","bottle-carton"],"Procter & Gamble":["Detergent jug","jug-powder"],"Danone":["Yogurt cup","yogurt-paper"],"Unilever":["Shampoo bottle","shampoo-bar"],"Henkel":["Detergent jug","jug-sheets"],"Keurig Dr Pepper":["Plastic bottle","bottle-can"],"Mondelēz":["Chip bag","chips-paper"],"Reckitt":["Detergent jug","jug-powder"],"L'Oréal":["Shampoo bottle","shampoo-bar"],"Amazon":["Poly mailer","mailer-paper"]};
+  const profitGraphic=c=>{
+    const pr=PROFIT[c.co];
+    if(!pr) return `<div class="profit"><div class="profit-card"><span class="label">Net profit</span><b>Not published</b><span class="src">Privately owned, so no profit is reported.</span></div></div>`;
+    const money=bn=>bn>=1?`$${bn.toFixed(1)}bn`:`$${Math.round(bn*1000)}m`;
+    const sw=SWAPFOR[c.co], m=sw?byId[ALT_MAT[sw[1]]]:null;
+    if(!m||c.t==null) return `<div class="profit graphic"><div class="bars"><div class="bar-row"><span class="bar-lab">Net profit, ${pr.y}</span><span class="bar-track"><i style="width:100%"></i></span><b>${money(pr.p)}</b></div></div><p class="src">No cost data for a swap from this company's plastic.</p></div>`;
+    const altC=mid(m.cost), plasticC=altC/mid(m.vs), extra=(mid(m.vs)-1)*100;
+    const premium=c.t*1200*(mid(m.vs)-1)/1e9;
+    const share=Math.min(100,premium/pr.p*100);
+    return `<div class="profit graphic">
+      <div class="swapline"><span class="from">${esc(sw[0])}<b>$${plasticC.toFixed(2)}</b></span><span class="arr">→</span><span class="to">${esc(m.name)}<b>$${altC.toFixed(2)}</b></span><span class="more">${extra>=0?"+":""}${Math.round(extra)}% more</span></div>
+      <div class="bars">
+        <div class="bar-row"><span class="bar-lab">Net profit, ${pr.y}</span><span class="bar-track"><i style="width:100%"></i></span><b>${money(pr.p)}</b></div>
+        <div class="bar-row"><span class="bar-lab">Switching cost</span><span class="bar-track cost"><i style="width:${share.toFixed(1)}%"></i></span><b>${money(premium)}</b></div>
+      </div>
+      <p class="src">Switching all ${fmt(c.t)} tonnes would cost about ${money(premium)} a year, ${Math.round(share)}% of profit. Resin at US$1,200 a tonne; rough estimate.</p>
+    </div>`;
+  };
   const profitHTML=c=>{
     const pr=PROFIT[c.co];
     if(!pr) return `<div class="profit"><div class="profit-card"><span class="label">Net profit</span><b>Not published</b><span class="src">Privately owned, so no profit is reported.</span></div></div>`;
@@ -1583,7 +1618,7 @@ renderCases();
         <div class="pledge pledge-${c.status==="on"?"on":c.status==="off"?"off":"mixed"}"><span class="label">Pledge</span><b class="pledge-status">${c.status==="on"?"On track":c.status==="off"?"Off track":"Mixed progress"}</b><span class="pledge-track"><i></i></span><span class="pledge-text">${esc(c.pledge)}</span></div>
       </div>
     </div>
-    ${profitHTML(c)}
+    ${profitGraphic(c)}
     <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}</p>`; };
   let coOpen=false;
   const coOpenFor=(c,row)=>{
