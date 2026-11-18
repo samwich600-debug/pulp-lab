@@ -793,6 +793,12 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .kv .wide:nth-child(3)>.label::before{background:#2E5F23}
 #v-companies .kv .wide:nth-child(4)>.label::before{background:#7A7A72}
 
+/* Rankings: net profit and the worst-case switching cost, side by side */
+#v-companies .profit{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#v-companies .profit-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;display:grid;gap:6px;align-content:start}
+#v-companies .profit-card b{font-family:var(--serif);font-weight:400;font-size:clamp(34px,3.6vw,54px);line-height:1;letter-spacing:-.02em}
+#v-companies .profit-card.pct b{color:#B0561E}
+#v-companies .profit-card .src{font-size:12px;line-height:1.5}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1547,6 +1553,19 @@ renderCases();
   const statusPill=s=>s==="on"?`<span class="pill g">On track</span>`:s==="off"?`<span class="pill r">Off track</span>`:`<span class="pill">Mixed progress</span>`;
   const F={soda:["c-soda","PET soda bottles"],water:["p-bottle","PET water bottles"],shrink:["c-shrink","Shrink-wrapped multipacks"],chips:["p-chips","Multilayer snack bags"],wrapper:["c-wrapper","Candy wrappers"],pod:["p-pod","Coffee capsules"],sachet:["c-sachet","Single-use sachets"],jug:["p-jug","Detergent jugs"],shampoo:["p-shampoo","Shampoo and soap bottles"],wipes:["c-wipes","Wipes and diaper packs"],yogurt:["p-yogurt","Yogurt cups"],spray:["c-spray","Trigger spray bottles"],toothpaste:["c-toothpaste","Toothpaste tubes"],petfood:["c-petfood","Pet-food pouches"],cosmetic:["c-cosmetic","Cosmetic bottles and jars"],mailer:["p-mailer","Poly mailers"],bubble:["c-bubble","Bubble wrap"],bag:["p-bag","Plastic bags"],film:["p-film","Plastic film"],clamshell:["p-clamshell","Clamshells"],squeeze:["c-squeeze","Squeeze bottles"],mints:["c-mints","Plastic candy boxes"],blister:["c-blister","Blister packs"],coldcup:["c-coldcup","Cold cups and lids"],straw:["p-straw","Straws"],lid:["p-lid","Hot cup lids"],cutlery:["p-cutlery","Cutlery"],sauce:["c-saucecup","Sauce cups"],cig:["c-cigbutt","Plastic cigarette filters"]};
   const CF={"Coca-Cola":["soda","water","shrink"],"PepsiCo":["soda","chips","water"],"Nestle":["water","wrapper","pod","sachet"],"Procter & Gamble":["jug","shampoo","sachet","wipes"],"Danone":["water","yogurt"],"Unilever":["sachet","shampoo","jug"],"Henkel":["jug","spray"],"Colgate-Palmolive":["toothpaste","shampoo","jug"],"Keurig Dr Pepper":["soda","pod"],"Mars":["wrapper","petfood"],"Mondelez":["wrapper","chips"],"Reckitt":["spray","jug"],"L'Oreal":["cosmetic","shampoo"],"Amazon":["mailer","bubble"],"Walmart":["bag","film","clamshell"],"Kraft Heinz":["squeeze","film"],"Kimberly-Clark":["wipes","film"],"Ferrero":["wrapper","mints"],"Kenvue":["cosmetic","blister"],"Starbucks":["coldcup","straw","lid"],"McDonald's":["lid","straw","cutlery","sauce"],"Philip Morris Intl.":["cig","film"]};
+  const PROFIT={"Coca-Cola":{p:10.6,y:"2024"},"PepsiCo":{p:9.58,y:"2024"},"Nestl\u00e9":{p:12.0,y:"2024",n:"CHF 10.9bn"},"Procter & Gamble":{p:16.1,y:"FY2025"},"Danone":{p:2.12,y:"2024",n:"\u20ac2.02bn"},"Unilever":{p:6.72,y:"2024",n:"\u20ac6.4bn"},"Henkel":{p:2.13,y:"2024",n:"\u20ac2.03bn"},"Colgate-Palmolive":{p:2.89,y:"2024"},"Keurig Dr Pepper":{p:1.4,y:"2024"},"Mondel\u0113z":{p:4.61,y:"2024"},"Reckitt":{p:1.79,y:"2024",n:"\u00a31.43bn"},"L'Or\u00e9al":{p:6.73,y:"2024",n:"\u20ac6.41bn"},"Amazon":{p:59.2,y:"2024"}};
+  /* Switching cost, worst case: the eco alternative at 1.5x plastic, resin at US$1,200 a tonne, paid on every tonne. */
+  const profitHTML=c=>{
+    const pr=PROFIT[c.co];
+    if(!pr) return `<div class="profit"><div class="profit-card"><span class="label">Net profit</span><b>Not published</b><span class="src">Privately owned, so no profit is reported.</span></div></div>`;
+    const money=bn=>bn>=1?`$${bn.toFixed(1)}bn`:`$${Math.round(bn*1000)}m`;
+    const worst=c.t!=null?c.t*1200*0.5/1e9:null;
+    const pct=worst!=null?worst/pr.p*100:null;
+    return `<div class="profit">
+      <div class="profit-card"><span class="label">Net profit, ${pr.y}</span><b>${money(pr.p)}</b><span class="src">${pr.n?esc(pr.n)+" at today's rate":"Latest reported year"}</span></div>
+      <div class="profit-card pct"><span class="label">Switching cost, worst case</span>${pct!=null?`<b>${pct<1?pct.toFixed(1):Math.round(pct)}%</b><span class="src">of profit, about ${money(worst)} a year</span>`:`<b>n/a</b><span class="src">No plastic tonnage published</span>`}</div>
+    </div>`;
+  };
   const coBody=c=>{ const fm=(CF[c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"")]||[]).map(k=>F[k]).filter(Boolean); return `
     <div><span class="label">${esc(c.hq)}${c.yr?" · "+c.yr+" data":""}</span><h2 id="dTitle" style="font-size:30px">${esc(c.co)}</h2></div>
     ${fm.length?`<div><span class="label">The plastic they put out</span><div class="cofmt" style="--cols:${fm.length%2===0?2:fm.length}">${fm.map(([img,l])=>`<figure><img src="img/${img}.png" alt="${esc(l)}"><figcaption>${esc(l)}</figcaption></figure>`).join("")}</div><p class="src" style="margin:8px 0 0">Unbranded examples of the main single-use formats, not the company's own products.</p></div>`:""}
@@ -1563,6 +1582,7 @@ renderCases();
         <div class="pledge pledge-${c.status==="on"?"on":c.status==="off"?"off":"mixed"}"><span class="label">Pledge</span><b class="pledge-status">${c.status==="on"?"On track":c.status==="off"?"Off track":"Mixed progress"}</b><span class="pledge-track"><i></i></span><span class="pledge-text">${esc(c.pledge)}</span></div>
       </div>
     </div>
+    ${profitHTML(c)}
     <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}</p>`; };
   let coOpen=false;
   const coOpenFor=(c,row)=>{
