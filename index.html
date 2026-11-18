@@ -648,6 +648,10 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .ton-src{position:absolute;right:24px;top:18px;z-index:3;max-width:300px;margin:0;text-align:right;font-size:12px;line-height:1.55;color:var(--muted);background:rgba(255,255,255,.7);padding:4px 8px;border-radius:6px}
 @media (max-width:760px){.ton-src{display:none}.ton-copy h1{font-size:24px}}
 
+/* Home grid: no names on the alternatives; only the item under the cursor responds */
+#g-still .art.fan .pk i{display:none}
+.hoverswap.lit .art.fan .pk{opacity:0}
+.hoverswap.lit .art.fan .orig{transform:none}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1540,7 +1544,7 @@ show();
       if(t.matches(":hover")) b=0;
       t.style.filter=b>0.05?`blur(${b.toFixed(2)}px)`:"";
     });
-    if(best && bestD<0.2) best.classList.add("lit");
+
   }
   const queue=()=>{ if(!queued){ queued=true; requestAnimationFrame(focusRows); } };
   addEventListener("scroll",queue,{passive:true});
