@@ -652,18 +652,35 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #g-still .art.fan .pk i{display:none}
 .hoverswap.lit .art.fan .pk{opacity:0}
 .hoverswap.lit .art.fan .orig{transform:none}
+/* Pages as a vertical timeline on the left: one dot per page, the name appears on hover */
+@media (min-width:900px){
+  header.top .wrap{justify-content:flex-start}
+  header.top nav{position:fixed;left:34px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-start;gap:4px;z-index:6;margin:0}
+  header.top nav::before{content:"";position:absolute;left:5px;top:10px;bottom:10px;width:1px;background:var(--line)}
+  header.top nav a{position:relative;display:flex;align-items:center;gap:16px;margin:0;padding:6px 0;border-radius:0;background:none!important;box-shadow:none!important;font-size:0;letter-spacing:0;text-transform:none;color:var(--ink);opacity:1}
+  header.top nav a::before{content:"";flex:none;position:relative;z-index:1;width:11px;height:11px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 1px var(--ink);transition:background .25s ease,transform .25s ease}
+  header.top nav a span{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;color:var(--ink);opacity:0;transform:translateX(-6px);transition:opacity .25s ease,transform .25s ease;pointer-events:none}
+  header.top nav a:hover span,header.top nav a:focus-visible span{opacity:1;transform:none}
+  header.top nav a:hover::before,header.top nav a:focus-visible::before{transform:scale(1.25)}
+  header.top nav a[aria-current="page"]::before{background:var(--ink);transform:scale(1.25)}
+  header.top nav a[aria-current="page"] span{opacity:1;transform:none}
+  header.top nav a:focus-visible{outline:none}
+  header.top nav a:focus-visible::before{box-shadow:0 0 0 1px var(--ink),0 0 0 4px rgba(12,12,11,.15)}
+  main.wrap{padding-left:96px}
+}
+
 </style>
 
 <header class="top"><div class="wrap">
   <a class="brand" href="#still-plastic" aria-label="The Plastic Index home">The Plastic Index</a>
   <nav aria-label="Pages">
-    <a href="#still-plastic" data-v="still-plastic">Plastic</a>
-    <a href="#already-swapped" data-v="already-swapped">Swaps</a>
-    <a href="#ideate" data-v="ideate">Ideate</a>
-    <a href="#materials" data-v="materials">Material Lab</a>
-    <a href="#case-studies" data-v="case-studies">Real World</a>
-    <a href="#companies" data-v="companies">Rankings</a>
-    <a href="#every-day" data-v="every-day">Every day</a>
+    <a href="#still-plastic" data-v="still-plastic"><span>Plastic</span></a>
+    <a href="#already-swapped" data-v="already-swapped"><span>Swaps</span></a>
+    <a href="#ideate" data-v="ideate"><span>Ideate</span></a>
+    <a href="#materials" data-v="materials"><span>Material Lab</span></a>
+    <a href="#case-studies" data-v="case-studies"><span>Real World</span></a>
+    <a href="#companies" data-v="companies"><span>Rankings</span></a>
+    <a href="#every-day" data-v="every-day"><span>Every day</span></a>
   </nav>
 </div></header>
 
