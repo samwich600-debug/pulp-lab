@@ -737,6 +737,13 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .focus-host .focus .fimg .art.fan{width:min(100%,440px);margin:0}
 #v-still-plastic.focusing{padding-left:12px}
 .focus-host .focus .fbody{padding-left:24px}
+/* Ideate materials: a row you scroll through with arrows */
+.carousel{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
+.carousel .stack{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:6px 2px}
+.carousel .stack::-webkit-scrollbar{display:none}
+.carousel .stack>*{flex:0 0 min(300px,80%);scroll-snap-align:start}
+.car{all:unset;cursor:pointer;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:22px;line-height:1;color:var(--ink);background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.car:hover,.car:focus-visible{box-shadow:inset 0 0 0 1px var(--ink)}
 </style>
 
 <header class="top"><div class="wrap">
@@ -831,7 +838,11 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
           <div class="rail-head"><span class="label">Materials</span><span class="status" id="ideaStatus" role="status"></span></div>
           <div class="railtools"><button type="button" class="chipbtn" id="copyBrief">Copy brief</button><button type="button" class="chipbtn" id="dlBrief" hidden>Download</button><button type="button" class="chipbtn" id="saveBrief">Save</button><select id="savedBriefs" aria-label="Saved briefs"><option value="">Saved briefs</option></select></div>
           <p class="read" id="sketchRead" hidden></p>
-          <div class="stack" id="ideas"></div>
+          <div class="carousel">
+            <button type="button" class="car prev" aria-label="Previous material">‹</button>
+            <div class="stack" id="ideas"></div>
+            <button type="button" class="car next" aria-label="Next material">›</button>
+          </div>
         </aside>
     </div>
     </section>
@@ -1618,7 +1629,11 @@ function card(c,qty){
 const stack=$("#ideas"), st=$("#ideaStatus");
 function ghosts(n){ RUN.concepts=[]; stack.replaceChildren(...Array.from({length:n},()=>{ const d=document.createElement("div"); d.className="ghost"; return d; })); }
 let RUN={brief:"Example: soy candle in a jar",qty:5000,region:"United States",date:new Date().toISOString().slice(0,10),concepts:[]};
-function pushCard(c,qty){ RUN.concepts.push(c); const g=stack.querySelector(".ghost"); const el=card(c,qty); g?g.replaceWith(el):stack.append(el); }
+/* materials run from the least expensive to switch to the most expensive */
+function sortCards(){ const cards=[...stack.querySelectorAll(".mcard")].sort((a,b)=>(+a.dataset.pct)-(+b.dataset.pct)); cards.forEach(c=>stack.append(c)); }
+function pushCard(c,qty){ RUN.concepts.push(c); const g=stack.querySelector(".ghost"); const el=card(c,qty); el.dataset.pct=Number(c.cost_vs_plastic_pct)||0; g?g.replaceWith(el):stack.append(el); sortCards(); }
+$(".car.prev").onclick=()=>stack.scrollBy({left:-(stack.firstElementChild?.offsetWidth||260)-12,behavior:"smooth"});
+$(".car.next").onclick=()=>stack.scrollBy({left:(stack.firstElementChild?.offsetWidth||260)+12,behavior:"smooth"});
 async function playLocal(list,qty){ ghosts(list.length); for(const c of list){ c._src=c._src||"library"; await new Promise(r=>setTimeout(r,260)); pushCard(c,qty); } stack.querySelectorAll(".ghost").forEach(g=>g.remove()); }
 
 const LIB=M.map(m=>`${m.id} | ${m.name} | ${m.kind==="dev"?"IN DEVELOPMENT":"available"} | ${m.made} | from ${m.origin} | ${m.suppliers} | $${m.cost[0]}-${m.cost[1]} ${m.unit} | ${m.vs[0]}-${m.vs[1]}x plastic (${m.replaces}) | ${m.lead[0]}-${m.lead[1]} wk | ${m.eol} | ${m.co2}`).join("\n");
