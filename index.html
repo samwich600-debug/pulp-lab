@@ -767,6 +767,20 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .cofmt figure{padding:10px 6px;border-radius:14px;min-width:0}
 #v-companies .cofmt img{max-width:100px}
 #v-companies .cofmt figcaption{font-size:12px;line-height:1.3}
+/* Rankings: the pledge is the feature of the company panel: a large status, a progress track, the pledge in words */
+#v-companies .pledge{grid-column:1/-1;display:grid;gap:10px;padding:26px 28px;border-radius:22px;background:#EFEDE4}
+#v-companies .pledge-on{background:linear-gradient(135deg,#E4F0DC,#D2E8C2)}
+#v-companies .pledge-off{background:linear-gradient(135deg,#F7E4D6,#F0CFB6)}
+#v-companies .pledge-status{font-family:var(--serif);font-weight:400;font-size:clamp(40px,4.4vw,64px);line-height:.95;letter-spacing:-.025em}
+#v-companies .pledge-track{display:block;height:12px;border-radius:99px;background:rgba(12,12,11,.08);overflow:hidden}
+#v-companies .pledge-track i{display:block;height:100%;width:0;border-radius:99px;background:#7A7A72;transition:width 1.2s var(--ease) .3s}
+#v-companies .pledge-on .pledge-track i{background:#2E5F23}
+#v-companies .pledge-off .pledge-track i{background:#B0561E}
+#v-companies .focus.open .pledge-on .pledge-track i{width:85%}
+#v-companies .focus.open .pledge-mixed .pledge-track i{width:50%}
+#v-companies .focus.open .pledge-off .pledge-track i{width:20%}
+#v-companies .pledge-text{font-size:14px;line-height:1.55;max-width:58ch}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -1534,7 +1548,7 @@ renderCases();
         <div class="wide"><span class="label">Main single-use plastic</span><span>${esc(c.use)}</span></div>
         ${c.audit?`<div class="wide"><span class="label">Found as litter</span><span>${esc(c.audit)}</span></div>`:""}
         <div class="wide"><span class="label">Data type</span><span>${c.co==="Amazon"?"Self-reported by Amazon; third-party estimates (Oceana) are higher and disputed":"Self-reported by the company"}${c.yr?", "+c.yr:""}</span></div>
-        <div class="wide"><span class="label">Pledge</span>${statusPill(c.status)}<span style="margin-top:6px">${esc(c.pledge)}</span></div>
+        <div class="pledge pledge-${c.status==="on"?"on":c.status==="off"?"off":"mixed"}"><span class="label">Pledge</span><b class="pledge-status">${c.status==="on"?"On track":c.status==="off"?"Off track":"Mixed progress"}</b><span class="pledge-track"><i></i></span><span class="pledge-text">${esc(c.pledge)}</span></div>
       </div>
     </div>
     <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}</p>`; };
