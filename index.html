@@ -560,7 +560,8 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #g-still.gallery{gap:clamp(22px,2.6vw,36px) clamp(10px,1.6vw,22px)}
 @media (min-width:1100px){
   header.top .wrap,main.wrap{max-width:1360px}
-  #g-still.four{grid-template-columns:repeat(5,minmax(0,1fr))}
+  #g-still.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #g-still.gallery{gap:clamp(40px,4.4vw,72px) clamp(24px,3vw,56px)}
 }
 
 /* Plastic grid: the item in the middle of the screen fans out its alternatives, as on hover */
@@ -568,6 +569,16 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .hoverswap.lit .art.fan .pk{opacity:1;transition-delay:calc(var(--k) * 70ms);transform:translate(var(--px),var(--py)) rotate(var(--pr)) scale(1)}
 .hoverswap.lit .art.fan .orig{transform:translateY(10px) scale(1.04)}
 @media (prefers-reduced-motion:reduce){.hoverswap.lit .art.fan .pk,.hoverswap.lit .art.fan .orig{transition:none}}
+
+/* Near the bottom of the Plastic page: a quiet band of light moving over water (caustics). Faint, no outlines. */
+.ocean{position:relative;height:min(42vh,340px);margin:88px calc(50% - 50vw) 0;width:100vw;overflow:hidden;background:linear-gradient(180deg,#F4F7F6 0%,#DCE9E8 55%,#CFE2E0 100%);-webkit-mask-image:linear-gradient(180deg,transparent,#000 28%,#000 72%,transparent);mask-image:linear-gradient(180deg,transparent,#000 28%,#000 72%,transparent)}
+.ocean::before{content:"";position:absolute;inset:-10% -10%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='420'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.017 0.023' numOctaves='2' seed='11' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a'%3E%3CfeFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='640' height='420' filter='url%28%23c%29' fill='%23ffffff'/%3E%3C/svg%3E");background-size:640px 420px;opacity:.6;mix-blend-mode:normal}
+.ocean::after{content:"";position:absolute;inset:-10% -10%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='420'%3E%3Cfilter id='c' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.017 0.023' numOctaves='2' seed='11' result='n'/%3E%3CfeColorMatrix in='n' type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0' result='a'/%3E%3CfeComponentTransfer in='a'%3E%3CfeFuncA type='table' tableValues='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='640' height='420' filter='url%28%23c%29' fill='%23ffffff'/%3E%3C/svg%3E");background-size:900px 600px;background-position:200px 120px;opacity:.45;mix-blend-mode:normal}
+@media (prefers-reduced-motion:no-preference){
+  .ocean::before{animation:caustic 34s linear infinite}
+  .ocean::after{animation:caustic 52s linear infinite reverse}
+}
+@keyframes caustic{from{transform:translate(0,0)}to{transform:translate(-160px,60px)}}
 
 </style>
 
@@ -605,6 +616,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
     <div class="seg layoutseg" role="group" aria-label="Layout" id="layoutSeg"><button type="button" aria-pressed="true" data-layout="grid">Grid</button><button type="button" aria-pressed="false" data-layout="index">Index</button></div>
     <div class="gallery four" id="g-still"></div>
     <p class="foot">Worldwide, only 9% of plastic waste is recycled and 22% is mismanaged: dumped, burned in the open or leaked into nature. About 1.7 million tonnes reached the ocean in 2019 (<a href="https://www.oecd.org/en/publications/global-plastics-outlook_de747aef-en.html" target="_blank" rel="noopener">OECD Global Plastics Outlook</a>). Item recycling rates are US figures from the <a href="https://www.epa.gov/facts-and-figures-about-materials-waste-and-recycling/plastics-material-specific-data" target="_blank" rel="noopener">EPA</a> and <a href="https://www.greenpeace.org/usa/reports/circular-claims-fall-flat-again/" target="_blank" rel="noopener">Greenpeace USA (2022)</a>.</p>
+    <div class="ocean" aria-hidden="true"></div>
   </section>
 
   <section id="v-already-swapped" data-view hidden>
