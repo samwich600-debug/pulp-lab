@@ -2544,7 +2544,7 @@ renderCases();
     rows.sort((a,b)=>a[0].localeCompare(b[0])); total+=rows.length;
     return `<details><summary>${esc(title)}<span>${rows.length}</span></summary><ol>${rows.map(([l,u,h])=>`<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(l)}</a><small>${esc(h)}</small></li>`).join("")}</ol></details>`;
   }).join("");
-  box.innerHTML=`<h2>Sources</h2><p class="note">All ${total} sources the site draws on, grouped by page. This list is built from the site's own data, so it grows whenever a source is added.</p>${html}`;
+  box.innerHTML=`<h2>Citations</h2><p class="note">All ${total} sources the site draws on, grouped by page. This list is built from the site's own data, so it grows whenever a source is added.</p>${html}`;
 })();
 
 /* ---------- home reel: crossfades through short clips ---------- */
