@@ -863,9 +863,12 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .fact.hero .src{font-size:15px;color:var(--ink)}
 /* Rankings: the eco swap sits behind the clicked item */
 #v-companies .fimg.costack{position:relative}
-#v-companies .fimg.costack img.pl{position:relative;z-index:2;width:min(76%,440px)}
-#v-companies .fimg.costack img.eco{position:absolute;z-index:1;width:min(48%,280px);right:0;top:8%;transform:rotate(7deg);filter:var(--shadow)}
-#v-companies .fimg.costack figcaption{position:absolute;right:0;bottom:4%;max-width:60%;text-align:right;font-size:12.5px;color:var(--moss);font-weight:600}
+#v-companies .facts{grid-column:1/-1}
+#v-companies .fimg.costack{display:grid;place-items:center}
+#v-companies .fimg.costack img.pl,#v-companies .fimg.costack img.eco{grid-area:1/1;max-height:none}
+#v-companies .fimg.costack img.pl{position:relative;z-index:2;width:min(74%,430px);transform:translateX(-14%)}
+#v-companies .fimg.costack img.eco{position:relative;z-index:1;width:min(70%,410px);transform:translate(24%,-8%) rotate(6deg);opacity:.96;filter:var(--shadow)}
+#v-companies .fimg.costack figcaption{grid-area:2/1;margin-top:10px;text-align:center;font-size:13px;color:var(--moss);font-weight:600}
 /* Rankings: every item the company would switch, with its swap */
 #v-companies .swaps{grid-column:1/-1;display:grid;gap:10px}
 #v-companies .swaps .sp{display:grid;grid-template-columns:92px 22px 92px minmax(0,1fr);align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:16px;background:#fff}
