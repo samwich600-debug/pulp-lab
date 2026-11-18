@@ -757,6 +757,10 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .mats-car .stack{display:flex;gap:clamp(14px,2vw,24px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:8px 2px 18px}
 .mats-car .stack::-webkit-scrollbar{display:none}
 .mats-car .stack>*{flex:0 0 min(240px,60%);scroll-snap-align:start}
+/* Rankings: a company opens in place, with the same motion as the Plastic items */
+#v-companies.focusing .corows .corow:not(.cur){opacity:.35;transition:opacity .4s ease}
+#v-companies .focus.inline{grid-column:1/-1;margin:8px 0 40px}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -910,8 +914,9 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
     </div>
   </section>
 
-  <section id="v-companies" data-view hidden>
+  <section id="v-companies" data-view hidden class="focus-host">
     <div class="vh"><h1>Who puts the most plastic out there</h1><p>Plastic packaging each company sells into the world in a year. Tap one for details.</p></div>
+    <div class="focus" id="coFocus" hidden></div>
     <div class="stat3" id="coStats"></div>
     <div class="cohead"><span><i style="background:var(--plastic-ink)"></i>Virgin plastic</span><span><i style="background:var(--plastic)"></i>Recycled content</span><span>Tonnes a year, latest reported</span></div>
     <div class="corows" id="coRows"></div>
@@ -1510,7 +1515,7 @@ renderCases();
   const statusPill=s=>s==="on"?`<span class="pill g">On track</span>`:s==="off"?`<span class="pill r">Off track</span>`:`<span class="pill">Mixed progress</span>`;
   const F={soda:["c-soda","PET soda bottles"],water:["p-bottle","PET water bottles"],shrink:["c-shrink","Shrink-wrapped multipacks"],chips:["p-chips","Multilayer snack bags"],wrapper:["c-wrapper","Candy wrappers"],pod:["p-pod","Coffee capsules"],sachet:["c-sachet","Single-use sachets"],jug:["p-jug","Detergent jugs"],shampoo:["p-shampoo","Shampoo and soap bottles"],wipes:["c-wipes","Wipes and diaper packs"],yogurt:["p-yogurt","Yogurt cups"],spray:["c-spray","Trigger spray bottles"],toothpaste:["c-toothpaste","Toothpaste tubes"],petfood:["c-petfood","Pet-food pouches"],cosmetic:["c-cosmetic","Cosmetic bottles and jars"],mailer:["p-mailer","Poly mailers"],bubble:["c-bubble","Bubble wrap"],bag:["p-bag","Plastic bags"],film:["p-film","Plastic film"],clamshell:["p-clamshell","Clamshells"],squeeze:["c-squeeze","Squeeze bottles"],mints:["c-mints","Plastic candy boxes"],blister:["c-blister","Blister packs"],coldcup:["c-coldcup","Cold cups and lids"],straw:["p-straw","Straws"],lid:["p-lid","Hot cup lids"],cutlery:["p-cutlery","Cutlery"],sauce:["c-saucecup","Sauce cups"],cig:["c-cigbutt","Plastic cigarette filters"]};
   const CF={"Coca-Cola":["soda","water","shrink"],"PepsiCo":["soda","chips","water"],"Nestle":["water","wrapper","pod","sachet"],"Procter & Gamble":["jug","shampoo","sachet","wipes"],"Danone":["water","yogurt"],"Unilever":["sachet","shampoo","jug"],"Henkel":["jug","spray"],"Colgate-Palmolive":["toothpaste","shampoo","jug"],"Keurig Dr Pepper":["soda","pod"],"Mars":["wrapper","petfood"],"Mondelez":["wrapper","chips"],"Reckitt":["spray","jug"],"L'Oreal":["cosmetic","shampoo"],"Amazon":["mailer","bubble"],"Walmart":["bag","film","clamshell"],"Kraft Heinz":["squeeze","film"],"Kimberly-Clark":["wipes","film"],"Ferrero":["wrapper","mints"],"Kenvue":["cosmetic","blister"],"Starbucks":["coldcup","straw","lid"],"McDonald's":["lid","straw","cutlery","sauce"],"Philip Morris Intl.":["cig","film"]};
-  const open=c=>{ const fm=(CF[c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"")]||[]).map(k=>F[k]).filter(Boolean); openDrawer(`
+  const coBody=c=>{ const fm=(CF[c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"")]||[]).map(k=>F[k]).filter(Boolean); return `
     <div><span class="label">${esc(c.hq)}${c.yr?" · "+c.yr+" data":""}</span><h2 id="dTitle" style="font-size:30px">${esc(c.co)}</h2></div>
     ${fm.length?`<div><span class="label">The plastic they put out</span><div class="cofmt">${fm.map(([img,l])=>`<figure><img src="img/${img}.png" alt="${esc(l)}"><figcaption>${esc(l)}</figcaption></figure>`).join("")}</div><p class="src" style="margin:8px 0 0">Unbranded examples of the main single-use formats, not the company's own products.</p></div>`:""}
     <div class="co2col">
@@ -1526,7 +1531,38 @@ renderCases();
         <div class="wide"><span class="label">Pledge</span>${statusPill(c.status)}<span style="margin-top:6px">${esc(c.pledge)}</span></div>
       </div>
     </div>
-    <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}</p>`, true); };
+    <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}</p>`; };
+  let coOpen=false;
+  const coOpenFor=(c,row)=>{
+    const panel=$("#coFocus"), sec=$("#v-companies"), rows=$("#coRows");
+    const key=c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    const fm=(CF[key]||[]).map(k=>F[k]).filter(Boolean);
+    panel.classList.remove("open","leaving"); panel.hidden=false; coOpen=true;
+    panel.innerHTML=`<figure class="fimg">${fm.length?`<img src="img/${fm[0][0]}.png" alt="${esc(fm[0][1])}">`:""}</figure><div class="fbody"><button type="button" class="fback" id="cBack">← All companies</button>${coBody(c)}</div>`;
+    sec.classList.add("focusing");
+    rows.querySelectorAll(".corow").forEach(r=>r.classList.toggle("cur", r===row));
+    rows.insertBefore(panel,row); panel.classList.add("inline");
+    $("#cBack").onclick=coClose;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>panel.classList.add("open")));
+    window.scrollTo({top:panel.getBoundingClientRect().top+scrollY-120,behavior:"smooth"});
+  };
+  const coClose=()=>{
+    const panel=$("#coFocus"), sec=$("#v-companies");
+    coOpen=false;
+    panel.classList.remove("open"); panel.classList.add("leaving");
+    sec.classList.remove("focusing");
+    $("#coRows").querySelectorAll(".corow.cur").forEach(r=>r.classList.remove("cur"));
+    setTimeout(()=>{ if(!coOpen){ panel.hidden=true; panel.innerHTML=""; panel.classList.remove("leaving","inline"); sec.prepend(panel); } },520);
+  };
+  addEventListener("keydown",e=>{ if(e.key==="Escape"&&coOpen) coClose(); });
+  document.addEventListener("click",e=>{
+    if(!coOpen) return;
+    const panel=$("#coFocus");
+    if(panel&&panel.contains(e.target)) return;
+    if(e.target.closest&&e.target.closest("#coRows .corow")) return;
+    coClose();
+  });
+  const open=(c,row)=>coOpenFor(c,row);
   const rows=$("#coRows");
   withT.forEach(c=>{
     const b=document.createElement("button"); b.type="button"; b.className="corow";
@@ -1534,9 +1570,9 @@ renderCases();
     b.innerHTML=`<span class="nm">${esc(c.co)}${c.rank?` <span class="pill r" style="margin-left:4px">#${c.rank} litter</span>`:""}</span>
       <span><span class="bar ${c.virgin!=null?"v":""}" style="display:block;width:${w}%;${c.virgin!=null?`--v:${c.virgin}%`:""}"></span></span>
       <span class="val">${c.t>=1e6?fmt(c.t/1e6,2)+"M":fmt(c.t/1000)+"k"} t</span>`;
-    b.onclick=()=>open(c); rows.append(b);
+    b.onclick=()=>open(c,b); rows.append(b);
   });
-  COS.filter(c=>c.t==null).forEach(c=>{ const b=document.createElement("button"); b.type="button"; b.textContent=c.co; b.onclick=()=>open(c); $("#coND").append(b); });
+  COS.filter(c=>c.t==null).forEach(c=>{ const b=document.createElement("button"); b.type="button"; b.textContent=c.co; b.onclick=()=>open(c,b); $("#coND").append(b); });
 })();
 
 /* ---------- home reel: crossfades through short clips ---------- */
