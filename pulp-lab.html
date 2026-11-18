@@ -1604,15 +1604,15 @@ renderCases();
     const share=Math.min(100,premium/pr.p*100);
     const shareTxt=share<1?share.toFixed(1):Math.round(share);
     return `<div class="profit graphic">
-      <div class="facts">
-        <div class="fact"><span class="label">Total profit</span><b>${money(pr.p)}</b><span class="src">${pr.y}</span></div>
-        <div class="fact"><span class="label">Profit that would go to switching</span><b>${shareTxt}%</b><span class="src">about ${money(premium)} a year</span></div>
-        <div class="fact"><span class="label">Price per unit</span><b>+${Math.round(extra)}%</b><span class="src">for ${esc(m.name)}</span></div>
-      </div>
       <div class="swapline"><span class="from">${esc(sw[0])}<b>$${plasticC.toFixed(2)}</b></span><span class="arr">→</span><span class="to">${esc(m.name)}<b>$${altC.toFixed(2)}</b></span><span class="more">${extra>=0?"+":""}${Math.round(extra)}% more</span></div>
       <div class="bars">
         <div class="bar-row"><span class="bar-lab">Net profit, ${pr.y}</span><span class="bar-track"><i style="width:100%"></i></span><b>${money(pr.p)}</b></div>
         <div class="bar-row"><span class="bar-lab">Switching cost</span><span class="bar-track cost"><i style="width:${share.toFixed(1)}%"></i></span><b>${money(premium)}</b></div>
+      </div>
+      <div class="facts">
+        <div class="fact"><span class="label">Total profit</span><b>${money(pr.p)}</b><span class="src">${pr.y}</span></div>
+        <div class="fact"><span class="label">Profit that would go to switching</span><b>${shareTxt}%</b><span class="src">about ${money(premium)} a year</span></div>
+        <div class="fact"><span class="label">Price per unit</span><b>+${Math.round(extra)}%</b><span class="src">for ${esc(m.name)}</span></div>
       </div>
       <p class="src">Switching all ${fmt(c.t)} tonnes would cost about ${money(premium)} a year. Resin at US$1,200 a tonne; rough estimate.</p>
       <p class="src evidence"><b>Does it pay back?</b> Products with sustainability claims on their packs grew faster in US sales, 2018–22 (McKinsey and NielsenIQ). Unilever's sustainable brands outgrew the rest of its business through 2018. Mostly company and industry data, so it doesn't prove a packaging-only effect.</p>
