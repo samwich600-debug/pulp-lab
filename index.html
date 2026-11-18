@@ -852,6 +852,30 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .swapline .more{margin-left:0}
 #v-companies .swapline .arr{display:none}
 #v-companies .profit.graphic{gap:16px;padding:18px}
+/* Rankings: the three key numbers lead; the share of profit that switching would take is the hero */
+#v-companies .facts{grid-template-columns:1fr 1fr;gap:12px}
+#v-companies .fact{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;gap:6px}
+#v-companies .fact b{font-size:clamp(34px,3.4vw,48px);white-space:nowrap}
+#v-companies .fact .label{font-size:11.5px;letter-spacing:.12em}
+#v-companies .fact .src{font-size:13px;line-height:1.4}
+#v-companies .fact:nth-child(2) b{color:var(--ink)}
+#v-companies .fact.hero{grid-column:1/-1;background:#FBEFE6;border-color:#E9C9B3;padding:22px 24px}
+#v-companies .fact.hero b{font-size:clamp(68px,7.4vw,112px);color:#B0561E}
+#v-companies .fact.hero .src{font-size:15px;color:var(--ink)}
+/* Rankings: the eco swap sits behind the clicked item */
+#v-companies .fimg.costack{position:relative}
+#v-companies .fimg.costack img.pl{position:relative;z-index:2;width:min(76%,440px)}
+#v-companies .fimg.costack img.eco{position:absolute;z-index:1;width:min(48%,280px);right:0;top:8%;transform:rotate(7deg);filter:var(--shadow)}
+#v-companies .fimg.costack figcaption{position:absolute;right:0;bottom:4%;max-width:60%;text-align:right;font-size:12.5px;color:var(--moss);font-weight:600}
+/* Rankings: every item the company would switch, with its swap */
+#v-companies .swaps{grid-column:1/-1;display:grid;gap:10px}
+#v-companies .swaps .sp{display:grid;grid-template-columns:92px 22px 92px minmax(0,1fr);align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:16px;background:#fff}
+#v-companies .swaps figure{margin:0;display:grid;justify-items:center;gap:4px;text-align:center}
+#v-companies .swaps img{width:68px;height:68px;object-fit:contain;filter:var(--shadow)}
+#v-companies .swaps figcaption{font-size:11.5px;line-height:1.25}
+#v-companies .swaps figure.eco figcaption{color:var(--moss);font-weight:600}
+#v-companies .swaps .arr{color:var(--moss);font-size:18px;text-align:center}
+#v-companies .swaps .spc{font-size:13px;color:var(--muted);line-height:1.4}
 /* Real world: larger type under each brand, and readable captions in the case panels */
 #g-cases .tile .nm,#g-cases .tile .nm[style]{font-size:17px!important;line-height:1.35}
 #g-cases .tile .cnum{font-size:clamp(26px,2.6vw,34px)}
@@ -2347,6 +2371,15 @@ renderCases();
   /* Switching cost, worst case: the eco alternative at 1.5x plastic, resin at US$1,200 a tonne, paid on every tonne. */
   /* which plastic each company puts out, and the eco swap to price against it (library materials) */
   const SWAPFOR={"Coca-Cola":["Plastic soda bottle","bottle-can"],"PepsiCo":["Chip bag","chips-paper"],"Nestlé":["Water bottle","bottle-carton"],"Procter & Gamble":["Detergent jug","jug-powder"],"Danone":["Yogurt cup","yogurt-paper"],"Unilever":["Shampoo bottle","shampoo-bar"],"Henkel":["Detergent jug","jug-sheets"],"Keurig Dr Pepper":["Plastic bottle","bottle-can"],"Mondelēz":["Chip bag","chips-paper"],"Reckitt":["Detergent jug","jug-powder"],"L'Oréal":["Shampoo bottle","shampoo-bar"],"Amazon":["Poly mailer","mailer-paper"]};
+  /* each plastic format a company puts out -> its item in ALTS -> the swap to show (the first format uses SWAPFOR's pick) */
+  const FID={soda:"soda",water:"bottle",shrink:"multipack",chips:"chips",wrapper:"candy",pod:"pod",sachet:"sachet",jug:"jug",shampoo:"shampoo",wipes:"wipes",yogurt:"yogurt",spray:"spray",toothpaste:"toothpaste",mailer:"mailer",bag:"bag",film:"film",clamshell:"clamshell",straw:"straw",lid:"lid",cutlery:"cutlery",coldcup:"coldcup",blister:"blister"};
+  const coKey=c=>c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const swapFor=(c,k,i)=>{ const sw=SWAPFOR[c.co], list=(typeof ALTS!=="undefined"&&ALTS[FID[k]])||[]; if(i===0&&sw){ const hit=list.find(a=>a[0]===sw[1]); if(hit) return hit; } return list[0]||null; };
+  const swapPairs=c=>{
+    const rows=(CF[coKey(c)]||[]).map((k,i)=>{ const f=F[k], a=swapFor(c,k,i); if(!f) return "";
+      const m=a?byId[ALT_MAT[a[0]]]:null, cost=m&&m.vs?Math.round((mid(m.vs)-1)*100):null;
+      return `<div class="sp"><figure><img src="img/${f[0]}.png" alt=""><figcaption>${esc(f[1])}</figcaption></figure><span class="arr">→</span><figure class="eco">${a?`<img src="img/e-${a[0]}.png" alt="" onerror="this.style.visibility='hidden'"><figcaption>${esc(a[1])}</figcaption>`:`<figcaption>No ready swap yet</figcaption>`}</figure><span class="spc">${a?(cost==null?"Cost: quote only":`${Math.abs(cost)}% ${cost>=0?"more":"less"} than plastic, per unit`):""}</span></div>`; }).join("");
+    return rows?`<div class="swaps"><span class="label">What they'd switch, item by item</span>${rows}</div>`:""; };
   const profitGraphic=c=>{
     const pr=PROFIT[c.co];
     if(!pr) return `<div class="profit"><div class="profit-card"><span class="label">Net profit</span><b>Not published</b><span class="src">Privately owned, so no profit is reported.</span></div></div>`;
@@ -2358,15 +2391,15 @@ renderCases();
     const share=Math.min(100,premium/pr.p*100);
     const shareTxt=share<1?share.toFixed(1):Math.round(share);
     return `<div class="profit graphic">
-      <div class="swapline"><span class="from">${esc(sw[0])}<b>$${plasticC.toFixed(2)}</b></span><span class="arr">→</span><span class="to">${esc(m.name)}<b>$${altC.toFixed(2)}</b></span><span class="more">${extra>=0?"+":""}${Math.round(extra)}% more</span></div>
+      <div class="facts">
+        <div class="fact hero"><span class="label">Profit that would go to switching</span><b>${shareTxt}%</b><span class="src">of ${pr.y} profit, about ${money(premium)} a year</span></div>
+        <div class="fact"><span class="label">Total profit</span><b>${money(pr.p)}</b><span class="src">${pr.y}</span></div>
+        <div class="fact"><span class="label">Price per unit</span><b>${Math.abs(Math.round(extra))}% ${extra>=0?"more":"less"}</b><span class="src">than plastic, for ${esc(m.name)}</span></div>
+      </div>
+      <div class="swapline"><span class="from">${esc(sw[0])}<b>$${plasticC.toFixed(2)}</b></span><span class="arr">→</span><span class="to">${esc(m.name)}<b>$${altC.toFixed(2)}</b></span><span class="more">${Math.abs(Math.round(extra))}% ${extra>=0?"more":"less"} than plastic, per unit</span></div>
       <div class="bars">
         <div class="bar-row"><span class="bar-lab">Net profit, ${pr.y}</span><span class="bar-track"><i style="width:100%"></i></span><b>${money(pr.p)}</b></div>
         <div class="bar-row"><span class="bar-lab">Switching cost</span><span class="bar-track cost"><i style="width:${share.toFixed(1)}%"></i></span><b>${money(premium)}</b></div>
-      </div>
-      <div class="facts">
-        <div class="fact"><span class="label">Total profit</span><b>${money(pr.p)}</b><span class="src">${pr.y}</span></div>
-        <div class="fact"><span class="label">Profit that would go to switching</span><b>${shareTxt}%</b><span class="src">about ${money(premium)} a year</span></div>
-        <div class="fact"><span class="label">Price per unit</span><b>+${Math.round(extra)}%</b><span class="src">for ${esc(m.name)}</span></div>
       </div>
       <p class="src">Switching all ${fmt(c.t)} tonnes would cost about ${money(premium)} a year. Resin at US$1,200 a tonne; rough estimate.</p>
       <p class="src evidence"><b>Does it pay back?</b> Products with sustainability claims on their packs grew faster in US sales, 2018–22 (McKinsey and NielsenIQ). Unilever's sustainable brands outgrew the rest of its business through 2018. Mostly company and industry data, so it doesn't prove a packaging-only effect.</p>
@@ -2385,6 +2418,7 @@ renderCases();
   };
   const coBody=c=>{ const fm=(CF[c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"")]||[]).map(k=>F[k]).filter(Boolean); return `
     ${profitGraphic(c)}
+    ${swapPairs(c)}
     <div><span class="label">${esc(c.hq)}${c.yr?" · "+c.yr+" data":""}</span><h2 id="dTitle" style="font-size:30px">${esc(c.co)}</h2></div>
     ${fm.length?`<div><span class="label">The plastic they put out</span><div class="cofmt" style="--cols:${fm.length%2===0?2:fm.length}">${fm.map(([img,l])=>`<figure><img src="img/${img}.png" alt="${esc(l)}"><figcaption>${esc(l)}</figcaption></figure>`).join("")}</div><p class="src" style="margin:8px 0 0">Unbranded examples of the main single-use formats, not the company's own products.</p></div>`:""}
     <div class="co2col">
@@ -2408,7 +2442,8 @@ renderCases();
     const key=c.co.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
     const fm=(CF[key]||[]).map(k=>F[k]).filter(Boolean);
     panel.classList.remove("open","leaving"); panel.hidden=false; coOpen=true;
-    panel.innerHTML=`<figure class="fimg">${fm.length?`<img src="img/${fm[0][0]}.png" alt="${esc(fm[0][1])}">`:""}</figure><div class="fbody"><button type="button" class="fback" id="cBack">← All companies</button>${coBody(c)}</div>`;
+    const k0=(CF[key]||[])[0], a0=k0?swapFor(c,k0,0):null;
+    panel.innerHTML=`<figure class="fimg costack">${a0?`<img class="eco" src="img/e-${a0[0]}.png" alt="${esc(a0[1])}">`:""}${fm.length?`<img class="pl" src="img/${fm[0][0]}.png" alt="${esc(fm[0][1])}">`:""}${a0?`<figcaption>Behind it, the swap: ${esc(a0[1])}</figcaption>`:""}</figure><div class="fbody"><button type="button" class="fback" id="cBack">← All companies</button>${coBody(c)}</div>`;
     sec.classList.add("focusing");
     rows.querySelectorAll(".corow").forEach(r=>r.classList.toggle("cur", r===row));
     rows.insertBefore(panel,row); panel.classList.add("inline");
