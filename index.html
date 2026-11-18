@@ -936,6 +936,14 @@ aside.drawer.modal figcaption span{font-size:13px}
 .sf-legend li i{width:12px;height:12px;border-radius:2px}
 .sf-legend li.mine span{font-weight:600}
 .sf-legend b{font-weight:500;font-variant-numeric:tabular-nums}
+
+.sharefull{position:relative}
+.sf-grid i,.sf-legend li{cursor:pointer}
+.sf-tip{position:absolute;z-index:5;display:grid;gap:4px;background:var(--paper,#fff);border:1px solid var(--ink);border-radius:6px;padding:12px 30px 12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.12);font-size:13px;line-height:1.45}
+.sf-tip b{font-size:14px}
+.sf-tip .pctl{color:var(--muted);font-size:12px}
+.sf-tip p{margin:2px 0 0}
+.sf-tip-x{all:unset;cursor:pointer;position:absolute;top:8px;right:10px;font-size:12px;color:var(--muted)}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1070,10 +1078,10 @@ aside.drawer.modal figcaption span{font-size:13px}
   </section>
 
   <section id="v-case-studies" data-view hidden class="focus-host">
-    <div class="vh"><h1>50 brands that cut plastic</h1><p>Plastic saved, as each company reported it. Tap one for the story.</p></div>
+    <div class="vh"><h1 id="caseCount">97 brands that cut plastic</h1><p>Plastic saved, as each company reported it. Tap one for the story.</p></div>
     <div class="stat3" id="caseStats" hidden></div>
     <div class="seg" role="group" aria-label="Category" id="caseSeg"></div>
-    <nav class="cats" id="caseBandNav" aria-label="Jump by plastic saved"></nav>
+    <nav class="cats" id="caseBandNav" aria-label="Jump to a category"></nav>
     <div class="focus" id="caseFocus" hidden></div>
     <div class="gallery four" id="g-cases"></div>
     <p class="foot">Company-reported estimates, not independent audits. Most brands don't publish what a switch cost them.</p>
@@ -1521,14 +1529,55 @@ function shareFullHTML(kind,itemId){
   const legend=parts.map((x,i)=>`<li data-k="${x.k}"${x.k===mine?' class="mine"':""}><i style="background:${col[i]}"></i><span>${esc(x.name)}${x.k===mine?" (this item)":""}</span><b>${pctTxt(x.p)}</b></li>`).join("");
   return `<div class="sf-head"><span class="label">${esc(title)}</span><button type="button" class="sf-close" aria-label="Close breakdown">Close ✕</button></div>
     <div class="sf-body"><div class="sf-grid" data-kind="${kind}">${cells}</div>
-    <div><p class="sf-cap" aria-live="polite">Hover over a colour to see what it is.</p><ul class="sf-legend">${legend}</ul></div></div>
+    <div><p class="sf-cap" aria-live="polite">Hover over a colour to see what it is. Click it to learn more.</p><ul class="sf-legend">${legend}</ul></div></div>
     <span class="src">${src}</span>`;
 }
 function sfHighlight(box,k){
   const parts=shareParts(box.querySelector(".sf-grid").dataset.kind).parts, x=parts.find(p=>p.k===k);
   box.querySelectorAll(".sf-grid i, .sf-legend li").forEach(el=>el.classList.toggle("dim",!!k&&el.dataset.k!==k));
-  box.querySelector(".sf-cap").innerHTML=x?`<b>${esc(x.name)}</b>: ${pctTxt(x.p)} · ${esc(x.note)}`:"Hover over a colour to see what it is.";
+  box.querySelector(".sf-cap").innerHTML=x?`<b>${esc(x.name)}</b>: ${pctTxt(x.p)} · ${esc(x.note)}`:"Hover over a colour to see what it is. Click it to learn more.";
 }
+/* what each colour in a breakdown actually covers (shown in a small box on click) */
+const SF_INFO={
+ wrappers:"Wrappers from candy, chips and other snacks. The cleanup's data card counts them together as \"food wrappers (candy, chips, etc.)\", mostly thin layered plastic film.",
+ bottles:"Plastic drink bottles: water, soda, juice and sports drinks, nearly all PET.",
+ butts:"Cigarette filters. They look like cotton but are made of cellulose acetate, a plastic, and break into tiny fibres.",
+ caps:"Screw caps and lids from bottles, counted separately from the bottles themselves.",
+ containers:"Rigid plastic food tubs and boxes: takeout containers, deli tubs, yoghurt and spread pots.",
+ otherbags:"Every plastic bag that isn't a grocery bag: bread bags, produce bags, bin bags, zip bags and similar.",
+ grocery:"Carry-out shopping bags from supermarkets and shops.",
+ papercups:"Paper cups and plates. Many have a thin plastic lining inside to hold liquid.",
+ cups:"Plastic cups and plates: party cups, cold-drink cups and disposable plates.",
+ foam:"Expanded polystyrene (foam) takeout boxes, clamshells and cups. Foam crumbles into small beads that are hard to clean up.",
+ rest:"Dozens of other kinds counted in smaller numbers, such as straws, lids, cutlery, fishing line, rope, balloons and pieces of plastic too broken to identify.",
+ bottle:"Single-use plastic drink bottles, water and soda together.",
+ bag:"Single-use plastic shopping bags. This uses the top of UNEP's estimate of 1 to 5 trillion a year, so the true share may be lower.",
+ sachet:"Small single-serve packets for sauces, shampoo, detergent, coffee and more. Common where people buy in small amounts.",
+ mailer:"Plastic envelopes used to post online orders.",
+ toothpaste:"Squeeze tubes for toothpaste, usually layered plastic that is hard to recycle.",
+ hangers:"Plastic clothes hangers, many given away with new clothes.",
+ pod:"Single-serve coffee capsules made of plastic.",
+ pack:"All other plastic packaging: films, trays, tubs, bottles for other products, caps and wraps. Packaging is 40% of all plastic waste (OECD).",
+ notpack:"Plastic waste that isn't packaging: building materials, car parts, clothing and textiles, electronics and household goods."
+};
+function sfTip(box,el){
+  const k=el.dataset.k, parts=shareParts(box.querySelector(".sf-grid").dataset.kind).parts, x=parts.find(p=>p.k===k);
+  let tip=box.querySelector(".sf-tip"); if(!tip){ tip=document.createElement("div"); tip.className="sf-tip"; tip.setAttribute("role","status"); box.append(tip); }
+  if(!x){ tip.hidden=true; return; }
+  tip.innerHTML=`<button type="button" class="sf-tip-x" aria-label="Close">✕</button><b>${esc(x.name)}</b><span class="pctl">${pctTxt(x.p)} · ${esc(x.note)}</span><p>${esc(SF_INFO[k]||"")}</p>`;
+  tip.hidden=false;
+  const br=box.getBoundingClientRect(), r=el.getBoundingClientRect();
+  const w=Math.min(300,br.width-24); tip.style.width=w+"px";
+  let left=r.left-br.left+r.width/2-w/2; left=Math.max(12,Math.min(left,br.width-w-12));
+  tip.style.left=left+"px"; tip.style.top=(r.bottom-br.top+8)+"px";
+}
+document.addEventListener("click",e=>{
+  if(!(e.target.closest&&e.target.closest(".sharefull"))) return;
+  if(e.target.closest(".sf-tip-x")){ e.target.closest(".sf-tip").hidden=true; return; }
+  if(e.target.closest(".sf-tip")) return;
+  const t=e.target.closest("[data-k]"), box=e.target.closest(".sharefull");
+  if(t) sfTip(box,t); else { const tip=box.querySelector(".sf-tip"); if(tip) tip.hidden=true; }
+});
 document.addEventListener("click",e=>{
   const b=e.target.closest&&e.target.closest(".wbtn");
   if(b){ const box=b.closest(".mstats, .fbody, #stillFocus").querySelector(".sharefull"); if(!box) return;
@@ -1546,33 +1595,40 @@ document.addEventListener("mouseover",e=>{
 /* Plastic page: real companies that already made this item's switch (keys are "brand|product" from data-cases.js) */
 const ITEM_CASES={
  toiletwrap:["Sainsbury's|Toilet and kitchen roll"],
- multipack:["Coca-Cola|Can multipacks","Carlsberg|Snap Pack can multipacks","Heineken UK|Green Grip multipacks","Walkers|Crisp multipacks","Tesco|Tinned food multipacks"],
- chips:["Walkers|Crisp multipacks"],
- candy:["Nestlé|Smarties","Mars Wrigley Australia|Mars, Snickers, Milky Way bars","Nestlé Japan|KitKat minis bags"],
- yogurt:["Arla|Skyr and quark buckets"],
+ multipack:["Coca-Cola|Can multipacks","Carlsberg|Snap Pack can multipacks","Heineken UK|Green Grip multipacks","Walkers|Crisp multipacks","Tesco|Tinned food multipacks","Heinz|Canned multipacks (Beanz, soups, pasta)","Budweiser Brewing Group UK|Can multipacks (UK range)","Guinness (Diageo)|Beer can multipacks"],
+ chips:["Walkers|Crisp multipacks","Pringles|Crisp tube","Cadbury (Mondelēz)|Biscuit multipacks"],
+ candy:["Nestlé|Smarties","Mars Wrigley Australia|Mars, Snickers, Milky Way bars","Nestlé Japan|KitKat minis bags","Quality Street (Nestlé UK)|Sweet wrappers"],
+ yogurt:["Arla|Skyr and quark buckets","Quaker (PepsiCo UK)|Porridge pots"],
  icecream:["Upfield|Flora plant butter and spread tubs","Vital Proteins|Collagen Peptides canister"],
  straw:["Tetra Pak|Carton straws","Starbucks|Cold drink lids"],
- lid:["Starbucks|Cold drink lids","McDonald's UK|McFlurry"],
+ lid:["Starbucks|Cold drink lids","McDonald's UK|McFlurry","Dunkin'|Hot drink cups"],
  clamshell:["Waitrose|Organic grapes","Woolworths Australia|Fresh produce"],
- meattray:["Lidl GB|Beef mince","Woolworths Australia|Fresh produce"],
+ meattray:["Lidl GB|Beef mince","Woolworths Australia|Fresh produce","Asda|Steak range"],
  mealtray:["Iceland|Frozen ready meals"],
- produce:["Morrisons|Loose fruit and veg","Woolworths Australia|Fresh produce"],
- mailer:["H&M Group|Online order bags","Amazon|Delivery void fill (N. America)"],
- blister:["Gillette|Razor packs","Logitech|Mouse packaging","Hasbro|Toy and game packaging","Orkla Salvequick|Plaster packs"],
+ produce:["Morrisons|Loose fruit and veg","Woolworths Australia|Fresh produce","REWE Group|Organic avocados and sweet potatoes"],
+ mailer:["H&M Group|Online order bags","Amazon|Delivery void fill (N. America)","Walmart|E-commerce mailers (US)","Nike|Online order packaging","Decathlon|Polybags and logistics packaging"],
+ blister:["Gillette|Razor packs","Logitech|Mouse packaging","Hasbro|Toy and game packaging","Orkla Salvequick|Plaster packs","Colgate-Palmolive|Premium manual toothbrushes","Wilkinson Sword (Edgewell)|Hydro razor range","Dr.BEST (GSK)|GreenClean toothbrush","Marks & Spencer|Men's socks, pyjamas and underwear"],
  film:["Mattel|UNO decks"],
  sachet:["Just Eat × Hellmann's|Sauce sachets (Notpla)"],
- shampoo:["Ethique|Shampoo and conditioner bars","Garnier|Shampoo bars","Lush|'Naked' solid cosmetics"],
- jug:["Lenor (P&G)|Paper bottle pilot"],
+ shampoo:["Ethique|Shampoo and conditioner bars","Garnier|Shampoo bars","Lush|'Naked' solid cosmetics","Pantene and Head & Shoulders (P&G)|Shampoo refill system (Europe)","L'Occitane|Eco-refill pouches"],
+ jug:["Lenor (P&G)|Paper bottle pilot","Seventh Generation|EasyDose laundry detergent"],
  deodorant:["Native|Plastic-free deodorant","Dove (Unilever)|Refillable deodorant"],
  sunscreen:["La Roche-Posay|Anthelios sunscreen tube"],
- bag:["adidas|Shopping bags"]
+ bag:["adidas|Shopping bags","Aldi Australia|Checkout bags","Zara (Inditex)|Shopping bags","Uniqlo (Fast Retailing)|Shopping bags and product wraps","Subway Australia|Takeaway bags and wraps"],
+ cutlery:["Kinder Joy (Ferrero)|Egg spoon","Tim Hortons|Cutlery and bowl lids (Canada)"],
+ toothbrush:["Colgate-Palmolive|Premium manual toothbrushes","Dr.BEST (GSK)|GreenClean toothbrush"],
+ razor:["Wilkinson Sword (Edgewell)|Hydro razor range"],
+ spray:["Cif (Unilever)|Ecorefill spray cleaner"],
+ pods:["Finish (Reckitt)|Dishwasher tablet pouch"],
+ eggs:["Ocado|Own-range refresh (530+ products)"],
+ coldcup:["Dunkin'|Hot drink cups"]
 };
 const caseKey=c=>c.brand+"|"+c.product;
 function itemCasesHTML(it){
   const keys=ITEM_CASES[it.id]||[]; if(!keys.length||typeof CASES==="undefined") return "";
   const cs=keys.map(k=>CASES.find(c=>caseKey(c)===k)).filter(Boolean); if(!cs.length) return "";
   return `<div class="itemcases"><span class="label">Companies that already made this change</span><div class="ic-row">${cs.map(c=>{
-    const nb=c.brand.normalize("NFD").replace(/[̀-ͯ]/g,""), br=pick(CASE_BRAND,/^Nesquik/.test(c.product)?"Nesquik":nb);
+    const nb=caseNb(c), br=caseBrandImg(c);
     return `<button type="button" class="ic" data-case="${esc(caseKey(c))}">${br?`<img src="img/brand/${br}" alt="" loading="lazy">`:""}<b>${esc(c.brand)}</b><span>${esc(c.product)}</span><span class="src">${c.t!=null?fmt(c.t,c.t<10?1:0)+" t of plastic saved":esc(c.to)}</span></button>`; }).join("")}</div><span class="src">Tap one to read the full story on Real World.</span></div>`;
 }
 /* jump to Real World and open that company's story */
@@ -1884,6 +1940,12 @@ const CASE_BRAND_SRC={"Upfield": "", "Sainsbury's": "https://uk.fsc.org/sites/de
 /* real branded product photos, shown first on Real World (the unbranded eco version shows on hover); add a file to img/brand/ and a line here */
 const CASE_BRAND={"Upfield": "upfield.png", "Vital Proteins": "vital-proteins.png", "Sainsbury's": "sainsbury-s.png", "Walkers": "walkers.png", "Coca-Cola": "coca-cola.png", "Orkla Salvequick": "orkla-salvequick.png", "Carlsberg": "carlsberg.png", "Heineken UK": "heineken-uk.png", "Nestle": "nestle.png", "Nestle Japan": "nestle-japan.png", "Nesquik": "nesquik.png", "Mars Wrigley Australia": "mars-wrigley-australia.png", "Arla": "arla.png", "Diageo": "diageo.png", "Absolut": "absolut.png", "Tetra Pak": "tetra-pak.png", "Tesco": "tesco.png", "Waitrose": "waitrose.png", "Lidl GB": "lidl-gb.png", "Aldi UK": "aldi-uk.png", "Iceland": "iceland.png", "Woolworths Australia": "woolworths-australia.png", "Morrisons": "morrisons.png", "Amazon": "amazon.png", "McDonald's UK & Ireland": "mcdonald-s-uk-ireland.png", "McDonald's UK": "mcdonald-s-uk.png", "Burger King UK": "burger-king-uk.png", "Starbucks": "starbucks.png", "Just Eat": "just-eat.png", "IKEA": "ikea.png", "Samsung": "samsung.png", "LEGO": "lego.png", "Hasbro": "hasbro.png", "Ethique": "ethique.png", "Apple": "apple.png", "Dell": "dell.png", "Google": "google.png", "HP": "hp.png", "Mattel": "mattel.png", "Gillette": "gillette.png", "Logitech": "logitech.png", "Microsoft": "microsoft.png", "Lush": "lush.png", "Lenor (P&G)": "lenor-p-g.png", "Dove (Unilever)": "dove-unilever.png", "Garnier": "garnier.png", "Sony": "sony.png", "La Roche-Posay": "la-roche-posay.png", "Native": "native.png", "H&M Group": "h-m-group.png", "adidas": "adidas.png"};
 const pick=(map,nb)=>map[nb]||(Object.entries(map).find(([k])=>nb.startsWith(k))||[])[1];
+/* hover images and brand photos chosen per product, ahead of the per-brand maps (null = no brand photo) */
+const CASE_IMG_P={"Heinz|Canned multipacks (Beanz, soups, pasta)":"e-multipack-carton.png","Barilla|Blue Box pasta":"e-frozen-carton.png","Pringles|Crisp tube":"k-candy-tube.png","Quaker (PepsiCo UK)|Porridge pots":"e-yogurt-paper.png","Mondelēz|Cookie trays (UK and Europe)":"e-tray-pulp.png","Cadbury (Mondelēz)|Biscuit multipacks":"e-chips-paper.png","Kinder Joy (Ferrero)|Egg spoon":"e-cutlery-wood.png","Quality Street (Nestlé UK)|Sweet wrappers":"e-candy-paper.png","Kellogg's|Corn Flakes cereal liner (trial)":"k-paper-pouch.png","Actimel (Danone)|Yoghurt drink bottle":"k-actimel.png","Budweiser Brewing Group UK|Can multipacks (UK range)":"s-collar.png","Guinness (Diageo)|Beer can multipacks":"e-multipack-carton.png","Bacardi|Holiday gift packs":"k-giftbox.png","Aldi Australia|Checkout bags":"e-bag-paper.png","Asda|Steak range":"k-tray.png","Walmart|E-commerce mailers (US)":"e-mailer-paper.png","Sainsbury's|Dip pots (and earlier yoghurt and cream)":"k-dip.png","Ocado|Own-range refresh (530+ products)":"e-egg-pulp.png","REWE Group|Organic avocados and sweet potatoes":"k-avocado.png","Cif (Unilever)|Ecorefill spray cleaner":"k-cif.png","Finish (Reckitt)|Dishwasher tablet pouch":"k-paper-pouch.png","Seventh Generation|EasyDose laundry detergent":"k-easydose.png","Lenovo|ThinkPad laptop packaging":"k-electronics.png","Huawei|Phone, tablet and PC packaging":"k-phone.png","Nokia|5G radio module transit packaging":"e-mailer-box.png","Fairphone|Fairphone 5 box":"k-phone.png","Philips|i9000 electric shaver":"k-electronics.png","Ravensburger|Jigsaw puzzles and games":"k-game.png","Zapf Creation|BABY born and Baby Annabell doll boxes":"k-dollbox.png","Sambro|Peppa Pig Create Your Own Character toy":"k-game.png","Disney|Classic princess dolls":"k-dollbox.png","Playmobil|Junior Advent calendar":"e-tray-pulp.png","Colgate-Palmolive|Premium manual toothbrushes":"e-blister-box.png","L'Occitane|Eco-refill pouches":"k-refillpouch.png","Wilkinson Sword (Edgewell)|Hydro razor range":"e-razor-safety.png","Dr.BEST (GSK)|GreenClean toothbrush":"e-blister-box.png","Pantene and Head & Shoulders (P&G)|Shampoo refill system (Europe)":"e-shampoo-aluminum.png","Dunkin'|Hot drink cups":"e-lid-fiber.png","Tim Hortons|Cutlery and bowl lids (Canada)":"e-cutlery-wood.png","Domino's Australia|Pizza box (trial)":"k-pizza.png","Subway Australia|Takeaway bags and wraps":"e-bag-paper.png","Nike|Online order packaging":"e-mailer-box.png","Uniqlo (Fast Retailing)|Shopping bags and product wraps":"e-bag-paper.png","Zara (Inditex)|Shopping bags":"e-bag-paper.png","Decathlon|Polybags and logistics packaging":"e-mailer-paper.png","Marks & Spencer|Men's socks, pyjamas and underwear":"e-blister-box.png"};
+const CASE_BRAND_P={"Sainsbury's|Dip pots (and earlier yoghurt and cream)":null};
+const caseNb=c=>c.brand.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const caseHoverImg=c=>CASE_IMG_P[c.brand+"|"+c.product]||(/^Nesquik/.test(c.product)?"k-paper-pouch.png":CASE_IMG[caseNb(c)]||(Object.entries(CASE_IMG).find(([k])=>caseNb(c).startsWith(k))||[])[1]);
+const caseBrandImg=c=>{ const k=c.brand+"|"+c.product; return k in CASE_BRAND_P?CASE_BRAND_P[k]:pick(CASE_BRAND,/^Nesquik/.test(c.product)?"Nesquik":caseNb(c)); };
 
 const CASE_IMG={"Upfield":"k-tub-paper.png","Vital Proteins":"s-canister.png","Sainsbury's":"s-tp.png","Walkers":"e-chips-paper.png","Coca-Cola":"s-collar.png","Orkla Salvequick":"k-plasters.png","Carlsberg":"e-bottle-can.png","Heineken UK":"s-collar.png","Nestle":"k-candy-tube.png","Nestle Japan":"c-wrapper.png","Mars Wrigley Australia":"c-wrapper.png","Arla":"e-yogurt-paper.png","Diageo":"k-paperbottle.png","Absolut":"k-paperbottle.png","Tetra Pak":"e-straw-paper.png","Tesco":"k-tins.png","Waitrose":"e-clamshell-pulp.png","Lidl GB":"k-mince.png","Aldi UK":"k-pizza.png","Iceland":"k-tray.png","Woolworths Australia":"e-bag-paper.png","Morrisons":"e-bag-paper.png","Amazon":"e-mailer-paper.png","McDonald's UK & Ireland":"k-toy.png","McDonald's UK":"e-yogurt-paper.png","Burger King UK":"k-toy.png","Starbucks":"c-coldcup.png","Just Eat":"k-seaweed.png","IKEA":"e-mailer-box.png","Samsung":"k-phone.png","LEGO":"k-bricks.png","Hasbro":"k-game.png","Ethique":"e-shampoo-bar.png","Apple":"k-phone.png","Dell":"s-mushroom.png","Google":"k-phone.png","HP":"k-electronics.png","Mattel":"k-game.png","Gillette":"e-razor-safety.png","Logitech":"k-electronics.png","Microsoft":"k-electronics.png","Lush":"k-shampoo-round.png","Lenor (P&G)":"k-paperbottle.png","Dove (Unilever)":"s-deo.png","Garnier":"e-shampoo-bar.png","Sony":"k-electronics.png","La Roche-Posay":"k-tube.png","Native":"s-deo.png","H&M Group":"e-mailer-paper.png","adidas":"e-bag-paper.png"};
 
@@ -1899,18 +1961,18 @@ let cat="All";
   $("#caseSeg").innerHTML=CATS.map(c=>`<button type="button" aria-pressed="${c===cat}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
   $$("#caseSeg button").forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; $$("#caseSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderCases(); });
 })();
-/* Real World: sorted by plastic saved, most first; the left nav jumps between size bands */
+/* Real World: grouped by category (A to Z), most plastic saved first within each; the left nav jumps between categories */
 const caseBand=t=>t==null?"No tonnage reported":t>=10000?"10,000+ tonnes":t>=1000?"1,000 to 10,000 tonnes":t>=100?"100 to 1,000 tonnes":"Under 100 tonnes";
 const caseBandSlug=b=>"caseband-"+b.toLowerCase().replace(/[^a-z0-9]+/g,"-");
 function renderCases(){
   const g=$("#g-cases"); g.replaceChildren();
   const bands=[]; let lastBand=null;
-  CASES.filter(c=>cat==="All"||c.cat===cat).slice().sort((a,b)=>(b.t??-1)-(a.t??-1)).forEach(c=>{
-    const band=caseBand(c.t);
+  CASES.filter(c=>cat==="All"||c.cat===cat).slice().sort((a,b)=>a.cat.localeCompare(b.cat)||(b.t??-1)-(a.t??-1)).forEach(c=>{
+    const band=c.cat;
     if(band!==lastBand){ lastBand=band; bands.push(band); const m=document.createElement("div"); m.className="cat-mark"; m.id=caseBandSlug(band); m.setAttribute("aria-hidden","true"); g.append(m); }
-    const nb=c.brand.normalize("NFD").replace(/[\u0300-\u036f]/g,""), ph=/^Nesquik/.test(c.product)?"k-paper-pouch.png":CASE_IMG[nb]||(Object.entries(CASE_IMG).find(([k])=>nb.startsWith(k))||[])[1];
+    const nb=caseNb(c), ph=caseHoverImg(c);
     const t=document.createElement("button"); t.type="button"; t.className="tile swap case"; t.dataset.case=caseKey(c);
-    const br=pick(CASE_BRAND,/^Nesquik/.test(c.product)?"Nesquik":nb);
+    const br=caseBrandImg(c);
     if(br) t.classList.add("has-brand");
     t.innerHTML=`<span class="art ph${br?" flip":""}">${ph?`<img class="now" src="img/${ph}" alt="${esc(c.to)}" loading="lazy">`:""}${br?`<img class="brand" src="img/brand/${br}" alt="${esc(c.brand)} ${esc(c.product)} as sold" loading="lazy">`:""}</span><span class="nm" style="color:var(--ink);font-weight:600;font-size:14px">${esc(c.brand)}</span><span class="cnum">${c.t!=null?fmt(c.t,c.t<10?1:0)+" tonnes":"Not reported"}</span><span class="nm">${c.t!=null?"of plastic saved":"&nbsp;"}</span>`;
     const bef=CASE_BEFORE[c.brand]||oldPhoto(c.from);
