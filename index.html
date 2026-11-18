@@ -1166,7 +1166,7 @@ aside.drawer.modal figcaption span{font-size:13px}
       @media (max-width:760px){
         .cx-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-inline:-16px}
         .cx-scroll::-webkit-scrollbar{display:none}
-        .cx-svg{width:860px;max-width:none;max-height:none;min-height:0;padding-inline:16px;box-sizing:content-box}
+        .cx-svg{width:960px;max-width:none;max-height:none;min-height:0;padding-inline:16px;box-sizing:content-box}
         .cx-swipe{display:block}
         .cx-notes{grid-template-columns:minmax(0,1fr)}
       }
@@ -1178,7 +1178,7 @@ aside.drawer.modal figcaption span{font-size:13px}
     <div class="cx-frame">
       <p class="cx-swipe">Swipe sideways to see both cycles</p>
       <div class="cx-scroll" id="cxScroll">
-        <svg class="cx-svg" id="cxSvg" viewBox="-40 0 1100 890" role="img" aria-labelledby="cxTitle">
+        <svg class="cx-svg" id="cxSvg" viewBox="-70 0 1140 890" role="img" aria-labelledby="cxTitle">
           <title id="cxTitle">Circular economy systems diagram: a biological cycle on the left and a technical cycle on the right, both feeding a central chain of parts manufacturer, product manufacturer and service provider.</title>
           <defs>
             <marker id="cxAg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--bio)"/></marker>
@@ -1191,8 +1191,8 @@ aside.drawer.modal figcaption span{font-size:13px}
           <g id="cxNodes"></g>
           <text x="500" y="826" text-anchor="middle">Minimise systematic leakage</text>
           <text x="500" y="846" text-anchor="middle">and negative externalities</text>
-          <text x="40" y="128" class="cx-mute">Renewables flow management</text>
-          <text x="960" y="128" text-anchor="end" class="cx-mute">Stock management</text>
+          <text x="-50" y="30" class="cx-mute">Renewables flow management</text>
+          <text x="1050" y="30" text-anchor="end" class="cx-mute">Stock management</text>
         </svg>
       </div>
       <div class="cx-tip" id="cxTip" aria-live="polite"><b>How it works</b>Materials move from the top down to people, then loop back. Hover or tap a step for a one-line explanation.</div>
@@ -1206,6 +1206,26 @@ aside.drawer.modal figcaption span{font-size:13px}
       const NS="http://www.w3.org/2000/svg", svg=document.getElementById("cxSvg"), sec=document.getElementById("v-circular");
       const gL=document.getElementById("cxLines"), gD=document.getElementById("cxDots"), gN=document.getElementById("cxNodes"), tip=document.getElementById("cxTip");
       const el=(t,a,p)=>{ const e=document.createElementNS(NS,t); for(const k in a) e.setAttribute(k,a[k]); p&&p.append(e); return e; };
+      /* geometry: every loop is a true circular arc through its start and end point */
+      const f=p=>p[0].toFixed(1)+","+p[1].toFixed(1);
+      function circ(S,E,k,left){ const mx=(S[0]+E[0])/2,my=(S[1]+E[1])/2,dx=E[0]-S[0],dy=E[1]-S[1],h=Math.hypot(dx,dy)/2,r=h*k,d=Math.sqrt(Math.max(0,r*r-h*h)); let nx=-dy/(2*h),ny=dx/(2*h); if((nx<0)!==left){nx=-nx;ny=-ny;} return {x:mx+nx*d,y:my+ny*d,r}; }
+      const ang=(c,p)=>Math.atan2(p[1]-c.y,p[0]-c.x), at=(c,a)=>[c.x+c.r*Math.cos(a),c.y+c.r*Math.sin(a)];
+      function span(S,E,k,left,dir){ const c=circ(S,E,k,left), a0=ang(c,S); let s=(ang(c,E)-a0)*dir; while(s<=0) s+=2*Math.PI; return {c,a0,s,dir}; }
+      const aAt=(sp,t)=>sp.a0+sp.dir*sp.s*t, pAt=(sp,t)=>at(sp.c,aAt(sp,t));
+      function arcD(sp,t0,t1,trim0,trim1){ const c=sp.c,a0=aAt(sp,t0)+sp.dir*(trim0||0)/c.r,a1=aAt(sp,t1)-sp.dir*(trim1||0)/c.r; return "M"+f(at(c,a0))+" A"+c.r.toFixed(1)+","+c.r.toFixed(1)+" 0 "+(Math.abs(a1-a0)>Math.PI?1:0)+" "+(sp.dir>0?1:0)+" "+f(at(c,a1)); }
+      /* outward label spot for a node on a ring */
+      function out(sp,t,r,gap){ const a=aAt(sp,t),p=pAt(sp,t),u=[Math.cos(a),Math.sin(a)],q=[p[0]+u[0]*(r+gap),p[1]+u[1]*(r+gap)]; return [q[0],q[1]+4,u[0]<-.35?"end":u[0]>.35?"start":"middle"]; }
+      const CON=[400,485], USR=[600,485], CR=54;
+      /* biological wing: one big ring from collection round to the top of the chain, plus an inner feedstock ring */
+      const BR=span([388,600],[434,128],1.12,true,1), T={ext:.13,ad:.31,bio:.5,farm:.76}, BRr={ext:22,ad:20,bio:52,farm:22};
+      const P_={}; for(const k in T) P_[k]=pAt(BR,T[k]);
+      const FR=span(P_.ext,[438,152],1,true,1); /* inner ring, a clean semicircle */
+      const adA=aAt(BR,T.ad), adU=[Math.cos(adA),Math.sin(adA)], GAS=[P_.ad[0]+adU[0]*78,P_.ad[1]+adU[1]*78];
+      const CAS=[165,142,120].map((d,i)=>span([394,592-i*4],[CON[0]+(CR+1)*Math.cos(d*Math.PI/180),CON[1]+(CR+1)*Math.sin(d*Math.PI/180)],1.25,true,1));
+      /* technical wing: nested rings, tightest first */
+      const TL=[["share",[651,490],1.18,.5,13],["maint",[637,446],1.14,.45,16],["reuse",[568,298],1.1,.4,19],["refurb",[568,212],1.1,.37,21],["recycle",[568,124],1.1,.35,23]]
+        .map(([id,E,k,t,r],i)=>{ const sp=span([618+i*4,590+i*4],E,k,false,-1); return {id,sp,r,t:(sp.a0-(24-i*6)*Math.PI/180)/sp.s}; }); /* each step sits just below its ring's widest point */
+      const TP={}; TL.forEach(o=>TP[o.id]=pAt(o.sp,o.t));
       /* lines: id, kind (g bio / b tech / k leak), d, particle speed px/s, spawn every s, arrow, group (node it belongs to) */
       const L=[
         ["inG","g","M440,84 V144",40,1.6,1,"ren"],
@@ -1214,45 +1234,41 @@ aside.drawer.modal figcaption span{font-size:13px}
         ["b1","b","M560,190 V230",40,1.6,1,"parts"],
         ["g2","g","M440,276 V316",40,1.6,1,"product"],
         ["b2","b","M560,276 V316",40,1.6,1,"product"],
-        ["g3","g","M440,362 V398 H400 V431",40,1.6,1,"service"],
-        ["b3","b","M560,362 V398 H600 V431",40,1.6,1,"service"],
-        ["regen","g","M222,310 C232,272 246,248 258,229",34,2.2,1,"regen"],
-        ["farm","g","M302,198 C350,168 396,150 432,146",40,1.8,1,"farm"],
-        ["feed","g","M322,656 C262,600 246,452 282,350 C312,268 372,206 432,152",46,2.0,1,"feed"],
-        ["toExt","g","M394,580 C388,612 384,636 374,656",30,2.2,1,"ext"],
-        ["c1","g","M394,590 C320,606 290,540 351,500",56,1.6,1,"cascade"],
-        ["c2","g","M394,586 C336,594 322,552 356,516",62,1.3,1,"cascade"],
-        ["c3","g","M394,582 C356,584 348,562 364,530",68,1.0,1,"cascade"],
-        ["toAD","g","M322,690 C300,700 280,692 268,676",28,2.4,1,"ad"],
-        ["toBio","g","M236,642 C222,580 210,500 204,442",30,2.4,1,"bio"],
-        ["toGas","g","M226,654 C190,652 160,640 138,622",22,3.2,1,"biogas"],
-        ["share","b","M612,580 C650,592 696,590 698,556 C700,522 678,500 652,494",92,0.55,1,"share"],
-        ["maint","b","M614,584 C690,612 756,578 758,516 C760,456 700,432 640,450",84,0.75,1,"maint"],
-        ["reuse","b","M616,588 C730,634 820,560 820,458 C820,350 700,300 568,298",72,1.15,1,"reuse"],
-        ["refurb","b","M618,592 C770,654 884,540 884,400 C884,270 722,212 568,212",62,1.7,1,"refurb"],
-        ["recyc","b","M620,596 C820,672 952,520 952,330 C952,166 744,120 568,124",52,2.5,1,"recycle"],
+        ["g3","g","M440,362 V398 H400 V427",40,1.6,1,"service"],
+        ["b3","b","M560,362 V398 H600 V427",40,1.6,1,"service"],
+        ["toExt","g",arcD(BR,0,T.ext,0,BRr.ext+6),34,2.2,1,"ext"],
+        ["toAD","g",arcD(BR,T.ext,T.ad,BRr.ext+3,BRr.ad+6),34,2.2,1,"ad"],
+        ["toBio","g",arcD(BR,T.ad,T.bio,BRr.ad+3,BRr.bio+6),34,2.2,1,"bio"],
+        ["regen","g",arcD(BR,T.bio,T.farm,BRr.bio+3,BRr.farm+6),34,2.2,1,"regen"],
+        ["farm","g",arcD(BR,T.farm,1,BRr.farm+3,2),40,1.8,1,"farm"],
+        ["feed","g",arcD(FR,0,1,BRr.ext+3,2),46,2.0,1,"feed"],
+        ["toGas","g","M"+f([P_.ad[0]+adU[0]*(BRr.ad+3),P_.ad[1]+adU[1]*(BRr.ad+3)])+" L"+f([GAS[0]-adU[0]*24,GAS[1]-adU[1]*24]),22,3.2,1,"biogas"],
+        ...CAS.map((sp,i)=>["c"+i,"g",arcD(sp,0,1,0,2),56+i*6,1.6-i*.3,1,"cascade"]),
+        ...TL.map((o,i)=>[o.id,"b",arcD(o.sp,0,1,0,2),[92,84,72,62,52][i],[.55,.75,1.15,1.7,2.5][i],1,o.id]),
         ["leakG","k","M400,594 V778",22,3.6,1,"leak"],
         ["leakB","k","M600,594 V778",22,3.6,1,"leak"]
       ];
-      /* nodes: id, kind, x, y, r, label lines, label x, y, anchor, explanation */
+      const lb=(id,lines)=>{ const o=TL.find(x=>x.id===id),p=TP[id]; return [o.r,lines,p[0]+o.r+10,p[1]+(lines.length>1?-2:4),"start"]; };
+      const casL=CAS[0].c, regL=out(BR,(T.bio+T.farm)/2,0,14), feedP=pAt(FR,.5);
+      /* nodes: id, kind, x, y, r, label lines, label x, y, anchor, name, explanation */
       const N=[
         ["ren","g",440,62,18,["Renewables"],412,66,"end","Renewables","Materials and energy that grow back or don't run out, like plants, wood and sunlight."],
         ["fin","b",560,62,18,["Finite materials"],588,66,"start","Finite materials","Oil, gas, metals and minerals: once used up, they're gone. Plastic is made from oil and gas."],
-        ["farm","g",276,206,24,["Farming /","collection¹"],276,158,"middle","Farming / collection","Growing crops, forestry, hunting and fishing: where plant and animal materials enter the economy."],
-        ["bio","g",200,374,66,[],0,0,"","Biosphere","Nature itself. Clean biological materials return to the soil and grow back."],
-        ["regen","g",0,0,0,["Regeneration"],122,378,"end","Regeneration","Putting nutrients back into the soil so the land can grow the next crop."],
-        ["feed","g",0,0,0,["Biochemical","feedstock"],312,300,"start","Biochemical feedstock","Plant-based materials made into new things, from paper fibre to bio-based chemicals."],
-        ["ext","g",348,680,24,["Extraction of","biochemical","feedstock²"],348,728,"middle","Extraction of biochemical feedstock","Pulling useful chemicals and fibres out of food and plant waste before it breaks down."],
-        ["ad","g",244,662,22,["Anaerobic","digestion"],244,706,"middle","Anaerobic digestion","Microbes break down food and plant waste without air, making biogas and fertiliser."],
-        ["biogas","g",116,606,20,["Biogas"],116,644,"middle","Biogas","Gas captured from digestion for heat and power: a last bit of value before nutrients go back to soil."],
-        ["cascade","g",0,0,0,["Cascades"],342,472,"end","Cascades","Using a material again for a lower-grade job each time, like cotton shirt, then insulation, then paper."],
-        ["consumer","g",400,485,50,[],0,0,"","Consumer","Someone who uses a product up, like food or a paper bag, so it can go back to nature."],
-        ["user","b",600,485,50,[],0,0,"","User","Someone who uses a product without using it up, like a phone, a jar or a refill bottle."],
-        ["share","b",698,556,13,["Share"],718,572,"start","Share","More people use the same thing, like a library, a tool hire shop or shared crates."],
-        ["maint","b",758,516,16,["Maintain /","prolong"],782,524,"start","Maintain / prolong","Repair and look after it so it lasts longer. The tightest loop keeps the most value."],
-        ["reuse","b",820,458,19,["Reuse /","redistribute"],846,464,"start","Reuse / redistribute","Pass it on as it is: second-hand sales, returnable bottles, refillable packs."],
-        ["refurb","b",884,400,21,["Refurbish /","remanufacture"],912,406,"start","Refurbish / remanufacture","Rebuild it to as-new with fresh parts, then sell it again."],
-        ["recycle","b",952,330,23,["Recycle"],982,335,"start","Recycle","Break it down to raw material and start again. The widest loop: most of the value and energy is lost."],
+        ["farm","g",...P_.farm,BRr.farm,["Farming /","collection¹"],...out(BR,T.farm,BRr.farm,12).map((v,i)=>i==1?v-14:v),"Farming / collection","Growing crops, forestry, hunting and fishing: where plant and animal materials enter the economy."],
+        ["bio","g",...P_.bio,BRr.bio,[],0,0,"","Biosphere","Nature itself. Clean biological materials return to the soil and grow back."],
+        ["regen","g",0,0,0,["Regeneration"],...regL,"Regeneration","Putting nutrients back into the soil so the land can grow the next crop."],
+        ["feed","g",0,0,0,["Biochemical","feedstock"],feedP[0]+14,feedP[1]-4,"start","Biochemical feedstock","Plant-based materials made into new things, from paper fibre to bio-based chemicals."],
+        ["ext","g",...P_.ext,BRr.ext,["Extraction of","biochemical","feedstock²"],P_.ext[0],P_.ext[1]+BRr.ext+18,"middle","Extraction of biochemical feedstock","Pulling useful chemicals and fibres out of food and plant waste before it breaks down."],
+        ["ad","g",...P_.ad,BRr.ad,["Anaerobic","digestion"],P_.ad[0]+BRr.ad+10,P_.ad[1]-3,"start","Anaerobic digestion","Microbes break down food and plant waste without air, making biogas and fertiliser."],
+        ["biogas","g",...GAS,18,["Biogas"],GAS[0],GAS[1]+36,"middle","Biogas","Gas captured from digestion for heat and power: a last bit of value before nutrients go back to soil."],
+        ["cascade","g",0,0,0,["Cascades"],casL.x-casL.r*.4,casL.y-casL.r-10,"end","Cascades","Using a material again for a lower-grade job each time, like cotton shirt, then insulation, then paper."],
+        ["consumer","g",...CON,CR,["Used up"],0,0,"","Used up","Things that get eaten, worn away or broken down as you use them, like food or a paper bag. They must be safe to go back to nature. (EMF calls this the consumer.)"],
+        ["user","b",...USR,CR,["Kept","in use"],0,0,"","Kept in use","Things that survive being used, like a phone, a jar or a refill bottle, so they can be passed on, repaired or refilled. (EMF calls this the user.)"],
+        ["share","b",...TP.share,...lb("share",["Share"]),"Share","More people use the same thing, like a library, a tool hire shop or shared crates."],
+        ["maint","b",...TP.maint,...lb("maint",["Maintain /","prolong"]),"Maintain / prolong","Repair and look after it so it lasts longer. The tightest loop keeps the most value."],
+        ["reuse","b",...TP.reuse,...lb("reuse",["Reuse /","redistribute"]),"Reuse / redistribute","Pass it on as it is: second-hand sales, returnable bottles, refillable packs."],
+        ["refurb","b",...TP.refurb,...lb("refurb",["Refurbish /","remanufacture"]),"Refurbish / remanufacture","Rebuild it to as-new with fresh parts, then sell it again."],
+        ["recycle","b",...TP.recycle,...lb("recycle",["Recycle"]),"Recycle","Break it down to raw material and start again. The widest loop: most of the value and energy is lost."],
         ["parts","p",500,168,0,["Parts manufacturer"],0,0,"","Parts manufacturer","Turns raw materials into components and packaging materials."],
         ["product","p",500,254,0,["Product manufacturer"],0,0,"","Product manufacturer","Puts parts together into a finished product and its packaging. Most design decisions land here."],
         ["service","p",500,340,0,["Service provider"],0,0,"","Service provider","Sells, rents or delivers the product to people."],
@@ -1260,15 +1276,15 @@ aside.drawer.modal figcaption span{font-size:13px}
       ];
       const P={};
       L.forEach(([id,k,d,sp,ev,ar,grp])=>{ const p=el("path",{d,class:"ln "+k,"data-g":grp},gL); if(ar) p.setAttribute("marker-end","url(#cxA"+k+")"); P[id]={el:p,k,sp,ev,grp,len:0,next:Math.random()*ev}; });
-      const label=(g,lines,x,y,anchor,cls)=>{ const t=el("text",{x,y,"text-anchor":anchor||"start"},g); if(cls) t.setAttribute("class",cls); lines.forEach((s,i)=>{ const ts=el("tspan",{x,dy:i?15:0},t); ts.textContent=s; }); return t; };
+      const label=(g,lines,x,y,anchor,cls,lh)=>{ const t=el("text",{x,y,"text-anchor":anchor||"start"},g); if(cls) t.setAttribute("class",cls); lines.forEach((s,i)=>{ const ts=el("tspan",{x,dy:i?(lh||15):0},t); ts.textContent=s; }); return t; };
       const nodes={}, bare=[];
       N.forEach(([id,k,x,y,r,lines,lx,ly,anc,name,txt])=>{
         const g=el("g",{class:"nd "+k+(r>=40?" big":"")+(k==="p"?" pill":""),tabindex:"0",role:"button","aria-label":name+": "+txt,"data-id":id},gN);
         if(k==="p"){ el("rect",{x:380,y:y-21,width:240,height:42,rx:21},g); label(g,lines,500,y+4.5,"middle"); }
         else if(id==="leak"){ /* hit area over the leakage text */ el("rect",{x:300,y:800,width:400,height:60,fill:"transparent"},g); }
         else if(r){ el("circle",{class:"ring",cx:x,cy:y,r},g); if(r<40) el("circle",{class:"core",cx:x,cy:y,r:Math.max(3,r*.22)},g);
-          else label(g,[name],x,y+8,"middle","cx-serif"); }
-        if(k!=="p"&&lines.length){ label(g,lines,lx,ly,anc); if(!r) bare.push(g); }
+          else label(g,lines.length?lines:[name],x,y+(lines.length>1?-3:8),"middle","cx-serif",22); }
+        if(k!=="p"&&lines.length&&r<40){ label(g,lines,lx,ly,anc); if(!r) bare.push(g); }
         nodes[id]={g,name,txt};
       });
       el("text",{x:400,y:566,"text-anchor":"middle",class:"cx-mute"},gN).textContent="Collection";
