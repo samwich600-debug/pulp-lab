@@ -1241,7 +1241,7 @@ const ALTS={
  sunscreen:[["sunscreen-stick","Solid sunscreen in paper tube"]],
  pads:[["pads-cotton","Cotton rounds in a paper box"]],
  wipes:[["wipes-cloth","Reusable cotton cloth"]],
- bottle:[["bottle-can","Aluminum can"],["bottle-carton","Paper carton"],["paper-bottle","Fiber bottle"],["steel-bottle","Stainless steel bottle"],["glass-refill","Refillable glass bottle"]],
+ bottle:[["bottle-can","Aluminum can"],["bottle-carton","Paper carton"],["paper-bottle","Fiber bottle"],["glass-refill","Refillable glass bottle"]],
  bag:[["bag-paper","Paper bag"],["bag-tote","Cotton tote"]],
  straw:[["straw-paper","Paper straws"],["straw-bamboo","Bamboo straws"]],
  lid:[["lid-fiber","Molded-fiber lid"]],
@@ -1366,6 +1366,9 @@ function renderStill(){
 $("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
 /* which library material backs each eco alternative (null = reusable item, not in the library) */
 const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null,"multipack-carton":"paperboard","blister-box":"paperboard","candy-paper":"glassine","spray-aluminum":"aluminum","soap-bar":"paperboard","sponge-cellulose":null,"storage-glass":"glass","liner-compost":"kraft-paper","tea-loose":null,"milk-glass":"glass","bread-paper":"kraft-paper","deo-card":"paperboard","floss-silk":null,"tp-paper":"kraft-paper","pods-powder":"corrugated","tape-paper":"kraft-paper","hanger-wood":null,"paper-bottle":"paper-bottle","steel-bottle":null,"glass-refill":"glass","tray-pulp":"molded-pulp","produce-paper":"kraft-paper","frozen-carton":"paperboard","egg-pulp":"molded-pulp","tub-carton":"paperboard","lipstick-paper":"paperboard","lipstick-metal":"aluminum","sunscreen-stick":"paperboard","pads-cotton":null,"wipes-cloth":null};
+/* rank each item's alternatives from least to most expensive: by the material's cost compared with plastic, per unit; reusables (no per-unit cost) go last */
+const altRank=k=>{ const m=byId[ALT_MAT[k]]; return m?mid(m.vs):Infinity; };
+Object.values(ALTS).forEach(a=>a.sort((x,y)=>altRank(x[0])-altRank(y[0])));
 const REUSE={"steel-bottle":"Reusable stainless steel bottle. Washed and refilled for years, it replaces many single-use bottles.","glass-refill":"Reusable glass bottle, refilled from a tap or dispenser. Replaces single-use bottles over many uses.","bag-tote":"Reusable cotton tote. Replaces hundreds of single-use bags over its life; needs ~130 uses to beat a plastic bag on carbon.","film-beeswax":"Reusable cotton coated in beeswax. Lasts about a year of washes, then composts."};
 const buyBox=k=>{ const b=(typeof BUY!=="undefined"&&BUY[k])||[]; const m=byId[ALT_MAT[k]]; const P=(typeof BUY_PRICE!=="undefined")?BUY_PRICE:{};
   return b.length?`<div class="buy"><span class="label">Buy in bulk</span>${m?`<span class="src">Typical unit cost for ${esc(m.name.toLowerCase())}: ${money(m.cost[0])}–${money(m.cost[1])} ${esc(m.unit)}</span>`:""}${b.map(([n,u,note])=>{ const pr=P[u]; return `<a href="${esc(u)}" target="_blank" rel="noopener"><span class="bn">${esc(n)}<em>${esc(note||"")}</em></span><span class="bp">${pr?esc(pr.unit):"price on site"}${pr&&pr.basis?`<em>${esc(pr.basis)}</em>`:""}</span></a>`; }).join("")}<span class="src">Approximate listed prices as of ${DATA_ASOF}, before shipping and tax.</span></div>`:""; };
@@ -1407,7 +1410,7 @@ function stillHTML(it){
         </div>
       </div>
     </div>
-    <div><span class="label">Plastic-free packaging</span><h2 style="font-size:22px;margin-top:4px">${alts.length>1?alts.length+" ways":"A way"} to make it without plastic</h2></div>
+    <div><span class="label">Plastic-free packaging</span><h2 style="font-size:22px;margin-top:4px">${alts.length>1?alts.length+" ways":"A way"} to make it without plastic</h2>${alts.length>1?`<span class="src">Ranked from least to most expensive</span>`:""}</div>
     <div class="alts">${alts.map(([k,l])=>altCard(it,k,l)).join("")}</div>
     <p class="src">Costs and lead times are indicative ranges at 1,000–50,000 units, before freight. <a href="#ideate" id="goIdeate">Get ideas tailored to your product →</a></p>`;
 }
