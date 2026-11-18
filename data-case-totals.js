@@ -1,0 +1,20 @@
+/* Each company's total plastic packaging, tonnes a year, to set "plastic saved" against. Compiled 18 November 2026.
+   parent:true = only the parent group's worldwide total is published, so the saving looks tiny next to it.
+   Years can differ from the case year; the caption says which year. */
+const CASE_TOTAL={
+ "Vital Proteins":{t:873000,year:"2024",who:"Nestlé worldwide",parent:true,est:false,src:"Packaging Gateway, citing Nestlé company data (2024)",url:"https://www.packaging-gateway.com/news/nestle-sets-out-five-pillar-packaging-plan-ahead-of-2025-goal/"},
+ "Sainsbury's":{t:117959,year:"2021",who:"Sainsbury's UK",parent:false,est:false,src:"The Grocer, citing Sainsbury's sustainability update",url:"https://www.thegrocer.co.uk/analysis-and-features/what-progress-have-the-big-four-supermarkets-made-on-their-plastic-pledges/657913.article"},
+ "Walkers":{t:2600030,year:"2022",who:"PepsiCo worldwide",parent:true,est:false,src:"Ellen MacArthur Foundation Global Commitment 2023 Progress Report, signatory data",url:"https://gc-data.emf.org/2023/ppu/"},
+ "Coca-Cola":{t:3220000,year:"2021",who:"Coca-Cola worldwide",parent:false,est:false,src:"Ellen MacArthur Foundation Global Commitment 2022 Progress Report (via Resource Recycling and Oceana)",url:"https://resource-recycling.com/plastics/2022/11/08/brands-boost-pcr-again-in-2021-but-use-more-virgin-plastic/"},
+ "Nestlé Japan":{t:1500000,year:"2019",who:"Nestlé worldwide",parent:true,est:false,src:"Packaging Europe, 'Nestlé shares key packaging sustainability metrics'",url:"https://packagingeurope.com/nestle-shares-key-packaging-sustainability-metrics/9010.article"},
+ "Mars Wrigley Australia":{t:207144,year:"2022",who:"Mars worldwide",parent:true,est:false,src:"Ellen MacArthur Foundation Global Commitment 2023 Progress Report, signatory data",url:"https://gc-data.emf.org/2023/ppu/"},
+ "Tesco":{t:257486,year:"2019",who:"Tesco UK",parent:false,est:false,src:"Tesco PLC blog, 'Our packaging footprint – towards a Closed Loop' (Sept 2020)",url:"https://tescoplc.com/blog/our-packaging-footprint-towards-a-closed-loop"},
+ "Waitrose":{t:17500,year:"2019",who:"Waitrose own-label",parent:false,est:false,src:"UK Parliament oral evidence, Karen Graley (Waitrose), July 2019",url:"https://committees.parliament.uk/oralevidence/9516/html"},
+ "Lidl GB":{t:59182,year:"2019",who:"Lidl GB",parent:false,est:false,src:"Lidl GB plastic footprint figure as reported by The Grocer",url:"https://www.thegrocer.co.uk/news/lidl-makes-new-pledge-to-cut-own-label-plastic-by-40-by-2025/648445.article"},
+ "Aldi UK":{t:124940,year:"2023",who:"Aldi UK",parent:false,est:false,src:"Aldi UK, 'How we're tackling packaging and plastic waste'",url:"https://www.aldi.co.uk/corporate/corporate-responsibility/greener/product-packaging-and-waste"},
+ "Morrisons":{t:100155,year:"2017",who:"Morrisons UK",parent:false,est:false,src:"EIA and Greenpeace, 'Checking out on plastics' (2018), supermarket survey",url:"https://eia-international.org/wp-content/uploads/EIA-report-Checking-out-on-plastics-single-pages-for-print.pdf"},
+ "Gillette":{t:776220,year:"2022",who:"P&G worldwide",parent:true,est:false,src:"P&G Citizenship Report 2022, Data and Metrics: Plastics Packaging",url:"https://origprod-eus2-us.pg.com/citizenship-report-2022/environmental-sustainability"},
+ "Dove (Unilever)":{t:698000,year:"2022",who:"Unilever worldwide",parent:true,est:false,src:"Ellen MacArthur Foundation Global Commitment 2023 Progress Report, signatory data",url:"https://gc-data.emf.org/2023/ppu/"},
+ "Native":{t:776220,year:"2022",who:"P&G worldwide",parent:true,est:false,src:"P&G Citizenship Report 2022, Data and Metrics: Plastics Packaging",url:"https://origprod-eus2-us.pg.com/citizenship-report-2022/environmental-sustainability"},
+ "H&M Group":{t:17445,year:"2020",who:"H&M Group worldwide",parent:false,est:true,src:"H&M Group Sustainability Performance Report 2020, p.46–47",url:"https://hmgroup.com/wp-content/uploads/2021/03/HM-Group-Sustainability-Performance-Report-2020.pdf"}
+};

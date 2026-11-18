@@ -886,6 +886,26 @@ aside.drawer.modal figcaption span{font-size:13px}
 .toneq img{width:56px;height:72px;object-fit:contain}
 .toneq>div{display:grid;gap:3px}
 .toneq b{font-family:"Instrument Serif",serif;font-weight:400;font-size:24px;line-height:1.1}
+
+/* case popup: plastic saved out of the company's total */
+.totbar{display:grid;gap:8px}
+.totbar>b{font-family:"Instrument Serif",serif;font-weight:400;font-size:30px;line-height:1.05}
+.totbar>b span{font-family:var(--body);font-size:14px;color:var(--muted)}
+.totbar .track{display:block;height:14px;background:var(--line);border-radius:3px;overflow:hidden}
+.totbar .track i{display:block;height:100%;background:var(--ink)}
+.totbar .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px}
+.totbar .legend span{display:inline-flex;align-items:center;gap:6px}
+.totbar .legend i{width:10px;height:10px;border-radius:2px;background:var(--line);display:inline-block}
+.totbar .legend i.on{background:var(--ink)}
+
+/* Plastic item: companies that made this change */
+.itemcases{display:grid;gap:10px}
+.ic-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.ic{all:unset;cursor:pointer;display:grid;gap:4px;align-content:start;background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:12px}
+.ic:hover{border-color:var(--ink)} .ic:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.ic img{width:100%;aspect-ratio:4/3;object-fit:contain;margin-bottom:4px}
+.ic b{font-size:14px}
+.ic>span:not(.src){font-size:12.5px;color:var(--muted)}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1062,6 +1082,7 @@ aside.drawer.modal figcaption span{font-size:13px}
 <script src="data-specs.js" charset="utf-8"></script>
 <script src="data-prices.js" charset="utf-8"></script>
 <script src="data-shares.js" charset="utf-8"></script>
+<script src="data-case-totals.js" charset="utf-8"></script>
 <script>
 (function(){
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -1440,6 +1461,46 @@ function shareHTML(it){
   }
   return `<div class="shares"><div>${a}</div><div>${b}</div></div>`;
 }
+/* Plastic page: real companies that already made this item's switch (keys are "brand|product" from data-cases.js) */
+const ITEM_CASES={
+ toiletwrap:["Sainsbury's|Toilet and kitchen roll"],
+ multipack:["Coca-Cola|Can multipacks","Carlsberg|Snap Pack can multipacks","Heineken UK|Green Grip multipacks","Walkers|Crisp multipacks","Tesco|Tinned food multipacks"],
+ chips:["Walkers|Crisp multipacks"],
+ candy:["Nestlé|Smarties","Mars Wrigley Australia|Mars, Snickers, Milky Way bars","Nestlé Japan|KitKat minis bags"],
+ yogurt:["Arla|Skyr and quark buckets"],
+ icecream:["Upfield|Flora plant butter and spread tubs","Vital Proteins|Collagen Peptides canister"],
+ straw:["Tetra Pak|Carton straws","Starbucks|Cold drink lids"],
+ lid:["Starbucks|Cold drink lids","McDonald's UK|McFlurry"],
+ clamshell:["Waitrose|Organic grapes","Woolworths Australia|Fresh produce"],
+ meattray:["Lidl GB|Beef mince","Woolworths Australia|Fresh produce"],
+ mealtray:["Iceland|Frozen ready meals"],
+ produce:["Morrisons|Loose fruit and veg","Woolworths Australia|Fresh produce"],
+ mailer:["H&M Group|Online order bags","Amazon|Delivery void fill (N. America)"],
+ blister:["Gillette|Razor packs","Logitech|Mouse packaging","Hasbro|Toy and game packaging","Orkla Salvequick|Plaster packs"],
+ film:["Mattel|UNO decks"],
+ sachet:["Just Eat × Hellmann's|Sauce sachets (Notpla)"],
+ shampoo:["Ethique|Shampoo and conditioner bars","Garnier|Shampoo bars","Lush|'Naked' solid cosmetics"],
+ jug:["Lenor (P&G)|Paper bottle pilot"],
+ deodorant:["Native|Plastic-free deodorant","Dove (Unilever)|Refillable deodorant"],
+ sunscreen:["La Roche-Posay|Anthelios sunscreen tube"],
+ bag:["adidas|Shopping bags"]
+};
+const caseKey=c=>c.brand+"|"+c.product;
+function itemCasesHTML(it){
+  const keys=ITEM_CASES[it.id]||[]; if(!keys.length||typeof CASES==="undefined") return "";
+  const cs=keys.map(k=>CASES.find(c=>caseKey(c)===k)).filter(Boolean); if(!cs.length) return "";
+  return `<div class="itemcases"><span class="label">Companies that already made this change</span><div class="ic-row">${cs.map(c=>{
+    const nb=c.brand.normalize("NFD").replace(/[̀-ͯ]/g,""), br=pick(CASE_BRAND,/^Nesquik/.test(c.product)?"Nesquik":nb);
+    return `<button type="button" class="ic" data-case="${esc(caseKey(c))}">${br?`<img src="img/brand/${br}" alt="" loading="lazy">`:""}<b>${esc(c.brand)}</b><span>${esc(c.product)}</span><span class="src">${c.t!=null?fmt(c.t,c.t<10?1:0)+" t of plastic saved":esc(c.to)}</span></button>`; }).join("")}</div><span class="src">Tap one to read the full story on Real World.</span></div>`;
+}
+/* jump to Real World and open that company's story */
+document.addEventListener("click",e=>{
+  const b=e.target.closest&&e.target.closest(".ic[data-case]"); if(!b) return;
+  e.stopPropagation(); const k=b.dataset.case;
+  if(typeof closeFocus==="function"&&focusOpen) closeFocus();
+  location.hash="case-studies";
+  setTimeout(()=>{ const t=[...document.querySelectorAll("#g-cases .tile")].find(x=>x.dataset.case===k); if(!t){ const all=$$("#caseSeg button")[0]; all&&all.click(); } const t2=[...document.querySelectorAll("#g-cases .tile")].find(x=>x.dataset.case===k); t2&&t2.click(); },400);
+},true);
 function stillHTML(it){
   const alts=ALTS[it.id]||[];
   const perM=it.g*1e6/1000; // kg per million units
@@ -1463,6 +1524,7 @@ function stillHTML(it){
     </div>
     <div><span class="label">Plastic-free packaging</span><h2 style="font-size:22px;margin-top:4px">${alts.length>1?alts.length+" ways":"A way"} to make it without plastic</h2>${alts.length>1?`<span class="src">Ranked from least to most expensive</span>`:""}</div>
     <div class="alts">${alts.map(([k,l])=>altCard(it,k,l)).join("")}</div>
+    ${itemCasesHTML(it)}
     <p class="src">Costs and lead times are indicative ranges at 1,000–50,000 units, before freight. <a href="#ideate" id="goIdeate">Get ideas tailored to your product →</a></p>`;
 }
 
@@ -1703,6 +1765,19 @@ const CASE_BEFORE={"Hasbro":"case-before-blister.png"};
 const OLD_PHOTO=[[/shrink/i,"c-shrink.png"],[/blister/i,"p-blister.png"],[/bottle/i,"p-bottle.png"],[/straw/i,"p-straw.png"],[/mailer/i,"p-mailer.png"],[/clamshell|punnet|tray/i,"p-clamshell.png"],[/tub/i,"p-yogurt.png"],[/lid/i,"p-lid.png"],[/tube|stick/i,"c-toothpaste.png"],[/foam|air pillow|eps/i,"c-bubble.png"],[/film|wrap/i,"p-film.png"],[/pouch|sachet|flow/i,"c-sachet.png"],[/bag/i,"p-bag.png"]];
 const oldPhoto=from=>{ const hit=OLD_PHOTO.find(([re])=>re.test(from||"")); return hit?hit[1]:null; };
 /* tonnes in everyday terms: 1 tonne = 1,000 kg ≈ 83,000 empty plastic water bottles (12 g each, the Plastic page figure) */
+/* plastic saved next to the company's total plastic packaging, as a bar */
+function totalBar(c){
+  const T=(typeof CASE_TOTAL!=="undefined")&&CASE_TOTAL[c.brand];
+  if(c.t==null) return "";
+  if(!T) return `<div class="totbar"><span class="label">Out of how much plastic?</span><span class="src">${esc(c.brand)} doesn't publish its total plastic packaging, so we can't show what share this saving is.</span></div>`;
+  const p=c.t/T.t*100, w=Math.max(p,0.6);
+  const pTxt=p>=10?Math.round(p)+"%":p>=1?p.toFixed(1)+"%":p>=0.1?p.toFixed(2)+"%":"less than 0.1%";
+  return `<div class="totbar"><span class="label">Out of how much plastic?</span>
+    <b>${pTxt} <span>of ${esc(T.who)}'s plastic packaging</span></b>
+    <span class="track" aria-hidden="true"><i style="width:${w}%"></i></span>
+    <span class="legend"><span><i class="on"></i>${fmt(c.t,c.t<10?1:0)} t saved (${c.year})</span><span><i></i>${fmt(T.t)} t a year in total (${esc(T.year)})${T.est?", estimate":""}</span></span>
+    <span class="src">${T.parent?`No figure for ${esc(c.brand)} alone, so this uses the whole group's worldwide total. `:""}${T.year!==String(c.year)?"The total is from a different year than the saving. ":""}Source: <a href="${esc(T.url)}" target="_blank" rel="noopener">${esc(T.src)}</a>.</span></div>`;
+}
 function tonEq(t){
   const n=t*1e6/12, km=n*0.22/1000, earth=km/40075;
   const nTxt=n>=1e9?fmt(n/1e9,1)+" billion":n>=1e6?fmt(n/1e6,n>=1e8?0:1)+" million":fmt(n);
@@ -1741,7 +1816,7 @@ function renderCases(){
     const band=caseBand(c.t);
     if(band!==lastBand){ lastBand=band; bands.push(band); const m=document.createElement("div"); m.className="cat-mark"; m.id=caseBandSlug(band); m.setAttribute("aria-hidden","true"); g.append(m); }
     const nb=c.brand.normalize("NFD").replace(/[\u0300-\u036f]/g,""), ph=/^Nesquik/.test(c.product)?"k-paper-pouch.png":CASE_IMG[nb]||(Object.entries(CASE_IMG).find(([k])=>nb.startsWith(k))||[])[1];
-    const t=document.createElement("button"); t.type="button"; t.className="tile swap case";
+    const t=document.createElement("button"); t.type="button"; t.className="tile swap case"; t.dataset.case=caseKey(c);
     const br=pick(CASE_BRAND,/^Nesquik/.test(c.product)?"Nesquik":nb);
     if(br) t.classList.add("has-brand");
     t.innerHTML=`<span class="art ph${br?" flip":""}">${ph?`<img class="now" src="img/${ph}" alt="${esc(c.to)}" loading="lazy">`:""}${br?`<img class="brand" src="img/brand/${br}" alt="${esc(c.brand)} ${esc(c.product)} as sold" loading="lazy">`:""}</span><span class="nm" style="color:var(--ink);font-weight:600;font-size:14px">${esc(c.brand)}</span><span class="cnum">${c.t!=null?fmt(c.t,c.t<10?1:0)+" tonnes":"Not reported"}</span><span class="nm">${c.t!=null?"of plastic saved":"&nbsp;"}</span>`;
@@ -1754,6 +1829,7 @@ function renderCases(){
         ${ph?`<figure style="margin:0;display:grid;gap:8px;justify-items:center;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px"><img src="img/${ph}" alt="${esc(c.to)}" style="width:100%;max-width:260px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption class="src" style="text-align:center">Their solution: ${esc(c.to)}<br><span style="font-size:11px">Unbranded example</span></figcaption></figure>`:""}
         <div class="mstats"><div><span class="label">${esc(c.cat)} · ${c.year}</span><h2 id="dTitle" style="font-size:30px">${esc(c.brand)}</h2><p class="src" style="margin:4px 0 0">${esc(c.product)}</p></div>
       <div class="big">${c.t!=null?`<b>${fmt(c.t,c.t<10?1:0)} tonnes</b><span>of plastic saved ${esc(c.note)}</span>`:`<b style="font-size:28px">No tonnage</b><span>${esc(c.note)}</span>`}</div>
+      ${totalBar(c)}
       ${c.t!=null?tonEq(c.t):""}
       <div class="kv">
         <div class="wide"><span class="label">Switch</span><span>${esc(c.from)} → <b style="font-family:var(--body);font-size:14px">${esc(c.to)}</b></span></div>
