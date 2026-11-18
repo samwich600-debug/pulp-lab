@@ -836,6 +836,16 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies .fact .src{font-size:12px;line-height:1.35}
 #v-companies .fact:nth-child(2) b{color:#B0561E}
 #v-companies .swapline .more{font-size:clamp(20px,2vw,28px)}
+/* Rankings: the switching graphic fits its column; facts wrap, the swap lines stack */
+#v-companies .facts{grid-template-columns:repeat(auto-fit,minmax(128px,1fr))}
+#v-companies .fact{min-width:0;padding:12px 14px}
+#v-companies .fact .label{font-size:10px;letter-spacing:.1em}
+#v-companies .fact b{font-size:clamp(24px,2.3vw,32px);white-space:nowrap}
+#v-companies .fact .src{font-size:11.5px}
+#v-companies .swapline{flex-direction:column;align-items:flex-start;gap:10px}
+#v-companies .swapline .more{margin-left:0}
+#v-companies .swapline .arr{display:none}
+#v-companies .profit.graphic{gap:16px;padding:18px}
 </style>
 
 <header class="top"><div class="wrap">
