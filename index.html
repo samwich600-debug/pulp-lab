@@ -1559,6 +1559,9 @@ $$(".foot").forEach(f=>f.insertAdjacentHTML("beforeend",` <span class="foot-asof
 /* ---------- case studies (50) ---------- */
 /* before photos for the case studies that have one: what the brand used to ship */
 const CASE_BEFORE={"Hasbro":"case-before-blister.png"};
+/* a photo of the old product for any case, from what the brand used to ship */
+const OLD_PHOTO=[[/shrink/i,"c-shrink.png"],[/blister/i,"p-blister.png"],[/bottle/i,"p-bottle.png"],[/straw/i,"p-straw.png"],[/mailer/i,"p-mailer.png"],[/clamshell|punnet|tray/i,"p-clamshell.png"],[/tub/i,"p-yogurt.png"],[/lid/i,"p-lid.png"],[/tube|stick/i,"c-toothpaste.png"],[/foam|air pillow|eps/i,"c-bubble.png"],[/film|wrap/i,"p-film.png"],[/pouch|sachet|flow/i,"c-sachet.png"],[/bag/i,"p-bag.png"]];
+const oldPhoto=from=>{ const hit=OLD_PHOTO.find(([re])=>re.test(from||"")); return hit?hit[1]:null; };
 const CASE_AFTER={"Hasbro":"e-blister-box.png"};
 /* photos for the lesson line: what the maker should look at */
 const LESSON_IMG={"Hasbro":[["lesson-window.png","Window sheet: clear plastic in a paper box, easy to swap for paper"],["lesson-twist.png","Plastic twist ties: easy to replace with paper ties"]]};
@@ -1589,7 +1592,7 @@ function renderCases(){
     const br=pick(CASE_BRAND,/^Nesquik/.test(c.product)?"Nesquik":nb);
     if(br) t.classList.add("has-brand");
     t.innerHTML=`<span class="art ph${br?" flip":""}">${ph?`<img class="now" src="img/${ph}" alt="${esc(c.to)}" loading="lazy">`:""}${br?`<img class="brand" src="img/brand/${br}" alt="${esc(c.brand)} ${esc(c.product)} as sold" loading="lazy">`:""}</span><span class="nm" style="color:var(--ink);font-weight:600;font-size:14px">${esc(c.brand)}</span><span class="cnum">${c.t!=null?fmt(c.t,c.t<10?1:0)+" tonnes":"Not reported"}</span><span class="nm">${c.t!=null?"of plastic saved":"&nbsp;"}</span>`;
-    const bef=CASE_BEFORE[c.brand];
+    const bef=CASE_BEFORE[c.brand]||oldPhoto(c.from);
     const aft=CASE_AFTER[c.brand]||ph;
     const lessonImgs=(LESSON_IMG[c.brand]||[]).map(([f,l])=>`<figure style="margin:0;display:grid;gap:6px;justify-items:center;text-align:center"><img src="img/${f}" alt="${esc(l)}" style="width:100%;max-width:200px;aspect-ratio:1;object-fit:contain;border-radius:12px;background:#fff"><figcaption class="src">${esc(l)}</figcaption></figure>`).join("");
     const caseBody=`
