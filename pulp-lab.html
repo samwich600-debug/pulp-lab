@@ -189,6 +189,11 @@ input[type=number]{width:96px}
 .tile:hover .art.flip .now,.tile:focus-visible .art.flip .now{opacity:0;transform:scale(1.04)}
 .tile:hover .art.flip .brand,.tile:focus-visible .art.flip .brand{opacity:1;transform:scale(1.03) translateY(-4px)}
 @media (prefers-reduced-motion:reduce){.art.flip img{transition:opacity .2s}}
+/* Real World: the branded product shows first; hover shows the unbranded eco version */
+.tile.case .art.flip>img.brand{opacity:1;transform:none}
+.tile.case .art.flip>img.now{opacity:0;transform:scale(.92) translateY(6px)}
+.tile.case:hover .art.flip>img.brand,.tile.case:focus-visible .art.flip>img.brand{opacity:0;transform:scale(1.04)}
+.tile.case:hover .art.flip>img.now,.tile.case:focus-visible .art.flip>img.now{opacity:1;transform:scale(1.03) translateY(-4px)}
 .pair{display:grid;grid-template-columns:minmax(0,1fr) 72px minmax(0,1fr);align-items:center;gap:8px}
 .pair figure{margin:0;display:grid;gap:10px;justify-items:center;text-align:center;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px 12px}
 .pair figure.now{background:var(--moss-soft);border-color:color-mix(in srgb,var(--moss) 35%,var(--line))}
@@ -865,6 +870,16 @@ aside.drawer.modal figcaption span{font-size:13px}
 
 /* Swaps: category timeline on the left, same as Plastic */
 @media (min-width:900px){#v-already-swapped{padding-left:150px}}
+
+/* item popup: share graphs (100-square grid, one square = 1%) */
+.shares{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;border-top:1px solid var(--line);padding-top:16px}
+.shares>div{display:grid;gap:6px;align-content:start;min-width:0}
+.shares .pct{font-family:"Instrument Serif",serif;font-size:34px;line-height:1}
+.waffle{display:grid;grid-template-columns:repeat(20,1fr);gap:2px;max-width:220px}
+.waffle i{aspect-ratio:1;background:var(--line);border-radius:1px;position:relative;overflow:hidden}
+.waffle i.on{background:var(--ink)}
+.waffle i.part::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--f);background:var(--ink)}
+@media (max-width:600px){.shares{grid-template-columns:1fr}}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1039,6 +1054,7 @@ aside.drawer.modal figcaption span{font-size:13px}
 <script src="data-buy.js" charset="utf-8"></script>
 <script src="data-specs.js" charset="utf-8"></script>
 <script src="data-prices.js" charset="utf-8"></script>
+<script src="data-shares.js" charset="utf-8"></script>
 <script>
 (function(){
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -1390,6 +1406,33 @@ function altCard(it,k,label){
     ${buyBox(k)}
   </article>`;
 }
+/* how big a part of the problem this item is: share of world plastic waste and of litter found on beaches */
+const pctTxt=p=>p>=10?Math.round(p)+"%":p>=1?p.toFixed(1)+"%":p>=0.1?p.toFixed(2)+"%":p>=0.01?p.toFixed(3)+"%":"under 0.01%";
+const waffle=p=>{ const full=Math.floor(p), f=p-full; return `<span class="waffle" aria-hidden="true">${Array.from({length:100},(_,j)=>j<full?'<i class="on"></i>':j===full&&f>0?`<i class="part" style="--f:${Math.max(f*100,8)}%"></i>`:"<i></i>").join("")}</span>`; };
+const bigN=n=>n>=1e12?fmt(n/1e12,n%1e12?1:0)+" trillion":n>=1e9?fmt(n/1e9,n%1e9?1:0)+" billion":fmt(n/1e6,0)+" million";
+const srcA=(t,u)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`;
+function shareHTML(it){
+  if(typeof WASTE==="undefined") return "";
+  const w=WASTE[it.id], g=w&&(w.g||it.g);
+  let a;
+  if(w&&w.region==="world"&&w.n){
+    const t=w.n*g/1e6, p=t/WORLD_WASTE.t*100;
+    a=`<span class="label">Share of the world's plastic waste</span><b class="pct">${pctTxt(p)}</b>${waffle(p)}<span class="src">Estimate: ${bigN(w.n)} a year (${w.year}) × ~${g} g ≈ ${fmt(t>=1e6?t/1e6:t/1e3,1)} ${t>=1e6?"million":"thousand"} tonnes, out of ${WORLD_WASTE.t/1e6} million tonnes of plastic waste a year (${WORLD_WASTE.year}).${w.note?" "+esc(w.note)+".":""} Sources: ${srcA(w.src,w.url)}; ${srcA(WORLD_WASTE.src,WORLD_WASTE.url)}.</span>`;
+  } else if(w){
+    a=`<span class="label">Share of the world's plastic waste</span><span class="src">No worldwide figure published. Measured only in ${esc(w.region)}: ${w.t?fmt(w.t/1000,0)+" thousand tonnes":bigN(w.n)} a year (${w.year}).${w.note?" "+esc(w.note)+".":""} Source: ${srcA(w.src,w.url)}.</span>`;
+  } else {
+    a=`<span class="label">Share of the world's plastic waste</span><span class="src">No published count for this item yet, so no share is shown.</span>`;
+  }
+  const c=LITTER_CATS[LITTER[it.id]];
+  let b;
+  if(c){
+    const p=c.n/(c.total||ICC.total)*100;
+    b=`<span class="label">Share of litter picked up on beaches</span><b class="pct">${pctTxt(p)}</b>${waffle(p)}<span class="src">${fmt(c.n)} ${esc(c.name)} out of ${fmt(c.total||ICC.total)} items collected${c.region?" in "+esc(c.region):" worldwide"} (${ICC.year}). Counted as all ${esc(c.name)}, not only this item. Source: ${srcA(ICC.src,ICC.url)}.</span>`;
+  } else {
+    b=`<span class="label">Share of litter picked up on beaches</span><span class="src">Not among the most-collected items in the ${ICC.year} International Coastal Cleanup, so not counted separately. Source: ${srcA(ICC.src,ICC.url)}.</span>`;
+  }
+  return `<div class="shares"><div>${a}</div><div>${b}</div></div>`;
+}
 function stillHTML(it){
   const alts=ALTS[it.id]||[];
   const perM=it.g*1e6/1000; // kg per million units
@@ -1408,6 +1451,7 @@ function stillHTML(it){
         <div class="kv">
           <div class="wide">${it.beach?`<span class="pill">Top-10 beach litter item</span>`:`<span class="src">Not a top-10 beach item, but breaks into microplastics once loose</span>`}</div>
         </div>
+        ${shareHTML(it)}
       </div>
     </div>
     <div><span class="label">Plastic-free packaging</span><h2 style="font-size:22px;margin-top:4px">${alts.length>1?alts.length+" ways":"A way"} to make it without plastic</h2>${alts.length>1?`<span class="src">Ranked from least to most expensive</span>`:""}</div>
@@ -1653,11 +1697,11 @@ const CASE_AFTER={"Hasbro":"e-blister-box.png","Nestlé Japan":"brand/nestle-jap
 /* photos for the lesson line: what the maker should look at */
 const LESSON_IMG={"Hasbro":[["lesson-window.png","Window sheet: clear plastic in a paper box, easy to swap for paper"],["lesson-twist.png","Plastic twist ties: easy to replace with paper ties"]],"Burger King UK":[["brand/burger-king-books.webp","Burger King's plastic-free books, Sweden and Denmark (brand photo)"]]};
 const CASE_BRAND_SRC={"Upfield": "", "Sainsbury's": "https://uk.fsc.org/sites/default/files/2024-03/Sainsbury%27s%20packaging%20image.png", "Walkers": "https://www.packagingstrategies.com/ext/resources/2023/10/31/Walkers-Paper.webp?t=1699398578", "Coca-Cola": "https://i0.wp.com/thedieline.com/wp-content/uploads/2022/08/0c0eba5a-c6be-4e74-ac85-f1f20756906d_Coke_Stacked62f27e06cec63png.webp?w=800&quality=65&ssl=1", "Orkla Salvequick": "https://www.smurfitkappa.com/-/m/images/image-text-teaser-680-x-450/case-studies/orkla-salvequick_680x450_approach.jpg", "Carlsberg": "https://media.madisonpublications.eu/uploads/2018/09/06075942/2C86FC9A-B79F-47A8-932A-81C741192423.jpeg", "Heineken UK": "https://www.grocerygazette.co.uk/wp-content/uploads/2022/10/Heineken-topper-1024x683.jpg", "Nestle": "https://i0.wp.com/thedieline.com/wp-content/uploads/2021/02/8bd5ff2c-5a2d-4f8d-8903-84c938bf5093_smartiespaperpackaging_web.jpg", "Nestle Japan": "https://soranews24.com/wp-content/uploads/sites/3/2019/08/japanese-kit-kats-kitkats-plastic-paper-packaging-new-recycle-environmentally-friendly-packaging-sustainable-chocolates-japan-new-marketing-6-1.jpg", "Nesquik": "https://d2dyh47stel7w4.cloudfront.net/Pictures/1120xAny/9/5/9/155959_nesquikallnatural1_883464_crop.jpg", "Mars Wrigley Australia": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/8/6/5/10865_image21_81815.jpg", "Arla": "https://images.arla.com/recordid/8756524F-7668-47F7-A66DD67069E1E4D6/picture.jpg?width=1200&height=630&mode=max&format=jpg", "Diageo": "https://www.packagingstrategies.com/ext/resources/2020-Postings/New-Packages/JW-Black-for-web.png?height=635&t=1613505211&width=1200", "Absolut": "https://www.circularonline.co.uk/wp-content/uploads/2023/06/2fc0565e-bd59-4c1a-a14f-1dc01cb850bd-1-768x768-1.webp", "Tetra Pak": "https://papermart.in/wp-content/uploads/2019/07/Tetra-Pak-Introduces-Paper-Straws-for-Beverage-Products-in-Europe-799x1024-1.jpg", "Tesco": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/9/6/2/224962_beanswithoutplasticwrap_593232.jpg", "Waitrose": "https://d3fwccq2bzlel7.cloudfront.net/Pictures/1120xAny/2/0/8/49208_2_1213621.jpg", "Lidl GB": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/5/5/0/295550_birchwood_vacpackmince_10_75731_crop.jpeg", "Aldi UK": "https://media.madisonpublications.eu/uploads/2020/02/06075021/Aldi-Chicken-Pesto-Pizza1.jpg", "Iceland": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/8/1/1/125811_Hungry-Heroes-Too-Cool_WEB.jpg", "Woolworths Australia": "https://www.australianmanufacturing.com.au/wp-content/uploads/2021/05/3.-Woolworths-packaging-pulp-tray-for-mini-tomatoes-and-paper-meat-trays.jpg", "Morrisons": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/7/5/7/132757_Morrisons-paper-packaging-web.jpg", "Amazon": "https://imgproxy.divecdn.com/lkF51ux4RQ0kMffqmzCWJ1YIZzqP1A4jijM4WhwkvcE/g:ce/rs:fit:770:435/Z3M6Ly9kaXZlc2l0ZS1zdG9yYWdlL2RpdmVpbWFnZS9BTVpOX0Fpcl9QaWxsb3dfUmVtb3ZhbF83LmpwZw==.webp", "McDonald's UK & Ireland": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/9/9/6/180996_happymeals_682859.jpg", "McDonald's UK": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1120xAny/2/1/3/164213_mcflurry_432687.jpg", "Burger King UK": "https://cms.dandad.org/images/f4nPfIUZap-O7gg_c7E_SLywcvk=/32700/width-1600/3000x2400_YwUAuDd.jpg", "Starbucks": "https://www.packagingstrategies.com/ext/resources/2020-Postings/Packager-News/Starbucks-for-web.jpg", "Just Eat": "https://ethicalmarketingnews.com/wp-content/uploads/2019/11/justeat-hellmans.jpg", "IKEA": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/6/6/0/4660_ikeapace020320.jpg", "Samsung": "https://images.samsung.com/is/image/samsung/assets/us/explore/brand/take-charge-of-sustainability-with-galaxy/01042022/Galaxy_S21_packaging.jpg", "LEGO": "https://www.esgtoday.com/wp-content/uploads/2025/11/Lego-paper-bag2.jpg", "Hasbro": "https://www.hasbro.com/common/productimages/en_US/145BAA1FC0404F5CA6C1AEC1CEF13487/235f34beb043f5480f1cb99c6a82bef9cd69de10.jpg", "Ethique": "https://cdn.shopify.com/s/files/1/0025/1717/2339/files/PDP_GENTLE-Shampoo_ETHIQUE_2026_2000x2000-1.jpg?v=1778009760", "Apple": "https://upload.wikimedia.org/wikipedia/commons/8/8c/IPhone_15_Pro_Max_and_the_box%2C_2023%2C_01.jpg", "Dell": "https://cdn.pokde.net/wp-content/uploads/2022/04/dell-sustainable-packaging.jpg", "Google": "https://fdn.gsmarena.com/imgroot/news/23/10/google-pixel-8-unboxing/-1200w5/gsmarena_001.jpg", "HP": "https://www.hp.com/content/dam/sites/garage-press/press/press-releases/2020/molded-fiber-announcement/HP%20MF_HP%20Desktop%20Mini%202.jpg", "Mattel": "https://i0.wp.com/thedieline.com/wp-content/uploads/2020/10/24bb2957-9906-4b59-9b9b-a2f909c498f2_https___hypebeastcom_image_2020_10_mattelunonothinbutpapersustainabilitydesign001.jpg", "Gillette": "https://dmrqkbkq8el9i.cloudfront.net/Pictures/1024x536/1/4/6/228146_00000000_glltt_557_proglide_we_razor_1up_v2_tabletop_page_2_843620.jpg", "Logitech": "https://www.logitech.com/blog/wp-content/uploads/2025/04/Copy-of-PR_image_boxes_wiped.png", "Microsoft": "https://i0.wp.com/thedieline.com/wp-content/uploads/2025/04/df51e440-5ba7-4536-9d42-8f449b1c3d2c.jpg", "Lush": "https://lush.co.za/cdn/shop/files/honey_shampoo_bar.jpg?v=1721733777", "Lenor (P&G)": "https://storage.ghost.io/c/61/60/61607b5b-1c0b-4249-a886-4bc4c284c107/content/images/d2wrwj382xgrci-cloudfront-net/Pictures/2000xany/9/7/3/2973_lenor-20-07.jpg", "Dove (Unilever)": "https://assets.unileversolutions.com/v1/33161020.jpg", "Garnier": "https://static.thcdn.com/productimg/original/12732545-2085086944127479.jpg", "Sony": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgpZVCdGrCxNu5-eerbvThr-g6If1RcAPIOOlo85pbr0_17VdEtxcDDfN-i8iRRznb6xXAnulwcKJFudkoZ4Xvv-V_qHKKN7fJhQvNI1WQCn6jDMpMIviTuWJLmc3WqpOIQTCd0xn_930xa/s16000/Sony-WF-1000XM4-Packaging.jpg", "La Roche-Posay": "https://prix.formesdeluxe.com/app/uploads/2021/05/la-roche-posay-carton.png", "Native": "https://cdn.shopify.com/s/files/1/1361/9483/products/COCONUT_PlasticTube_Front_01f0203f-3266-4a20-b532-1e8c472c8a60.png?v=1571183541", "H&M Group": "https://www.theindustry.fashion/wp-content/uploads/2021/07/HandM-e1632941770731.jpg", "adidas": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhFaCStx8Ja6s3ytO2h5mDv-h5b_loiV4fsBUTagbcmnpuUx2pr2nKowQQxGVCx8gCax4kV4bQlVSdqOM-xElc_6a0pfv1KVYPdI5z3VZTiWWO2X92uiQp23WxDItvdmZBI1-wExCSRUrWo/s1600/adidas+new+policy.jpg", "Vital Proteins": ""};
-/* real branded product photos, shown on hover; add a file to img/brand/ and a line here */
+/* real branded product photos, shown first on Real World (the unbranded eco version shows on hover); add a file to img/brand/ and a line here */
 const CASE_BRAND={"Upfield": "upfield.png", "Vital Proteins": "vital-proteins.png", "Sainsbury's": "sainsbury-s.png", "Walkers": "walkers.png", "Coca-Cola": "coca-cola.png", "Orkla Salvequick": "orkla-salvequick.png", "Carlsberg": "carlsberg.png", "Heineken UK": "heineken-uk.png", "Nestle": "nestle.png", "Nestle Japan": "nestle-japan.png", "Nesquik": "nesquik.png", "Mars Wrigley Australia": "mars-wrigley-australia.png", "Arla": "arla.png", "Diageo": "diageo.png", "Absolut": "absolut.png", "Tetra Pak": "tetra-pak.png", "Tesco": "tesco.png", "Waitrose": "waitrose.png", "Lidl GB": "lidl-gb.png", "Aldi UK": "aldi-uk.png", "Iceland": "iceland.png", "Woolworths Australia": "woolworths-australia.png", "Morrisons": "morrisons.png", "Amazon": "amazon.png", "McDonald's UK & Ireland": "mcdonald-s-uk-ireland.png", "McDonald's UK": "mcdonald-s-uk.png", "Burger King UK": "burger-king-uk.png", "Starbucks": "starbucks.png", "Just Eat": "just-eat.png", "IKEA": "ikea.png", "Samsung": "samsung.png", "LEGO": "lego.png", "Hasbro": "hasbro.png", "Ethique": "ethique.png", "Apple": "apple.png", "Dell": "dell.png", "Google": "google.png", "HP": "hp.png", "Mattel": "mattel.png", "Gillette": "gillette.png", "Logitech": "logitech.png", "Microsoft": "microsoft.png", "Lush": "lush.png", "Lenor (P&G)": "lenor-p-g.png", "Dove (Unilever)": "dove-unilever.png", "Garnier": "garnier.png", "Sony": "sony.png", "La Roche-Posay": "la-roche-posay.png", "Native": "native.png", "H&M Group": "h-m-group.png", "adidas": "adidas.png"};
 const pick=(map,nb)=>map[nb]||(Object.entries(map).find(([k])=>nb.startsWith(k))||[])[1];
 
-const CASE_IMG={"Upfield":"k-tub-paper.png","Vital Proteins":"s-canister.png","Sainsbury's":"s-tp.png","Walkers":"e-chips-paper.png","Coca-Cola":"s-collar.png","Orkla Salvequick":"k-plasters.png","Carlsberg":"e-bottle-can.png","Heineken UK":"s-collar.png","Nestle":"c-mints.png","Nestle Japan":"c-wrapper.png","Mars Wrigley Australia":"c-wrapper.png","Arla":"e-yogurt-paper.png","Diageo":"k-paperbottle.png","Absolut":"k-paperbottle.png","Tetra Pak":"e-straw-paper.png","Tesco":"k-tins.png","Waitrose":"e-clamshell-pulp.png","Lidl GB":"k-mince.png","Aldi UK":"k-pizza.png","Iceland":"k-tray.png","Woolworths Australia":"e-bag-paper.png","Morrisons":"e-bag-paper.png","Amazon":"e-mailer-paper.png","McDonald's UK & Ireland":"k-toy.png","McDonald's UK":"e-yogurt-paper.png","Burger King UK":"k-toy.png","Starbucks":"c-coldcup.png","Just Eat":"k-seaweed.png","IKEA":"e-mailer-box.png","Samsung":"k-phone.png","LEGO":"k-bricks.png","Hasbro":"k-game.png","Ethique":"e-shampoo-bar.png","Apple":"k-phone.png","Dell":"s-mushroom.png","Google":"k-phone.png","HP":"k-electronics.png","Mattel":"k-game.png","Gillette":"e-razor-safety.png","Logitech":"k-electronics.png","Microsoft":"k-electronics.png","Lush":"e-shampoo-bar.png","Lenor (P&G)":"k-paperbottle.png","Dove (Unilever)":"s-deo.png","Garnier":"e-shampoo-bar.png","Sony":"k-electronics.png","La Roche-Posay":"k-tube.png","Native":"s-deo.png","H&M Group":"e-mailer-paper.png","adidas":"e-bag-paper.png"};
+const CASE_IMG={"Upfield":"k-tub-paper.png","Vital Proteins":"s-canister.png","Sainsbury's":"s-tp.png","Walkers":"e-chips-paper.png","Coca-Cola":"s-collar.png","Orkla Salvequick":"k-plasters.png","Carlsberg":"e-bottle-can.png","Heineken UK":"s-collar.png","Nestle":"c-mints.png","Nestle Japan":"c-wrapper.png","Mars Wrigley Australia":"c-wrapper.png","Arla":"e-yogurt-paper.png","Diageo":"k-paperbottle.png","Absolut":"k-paperbottle.png","Tetra Pak":"e-straw-paper.png","Tesco":"k-tins.png","Waitrose":"e-clamshell-pulp.png","Lidl GB":"k-mince.png","Aldi UK":"k-pizza.png","Iceland":"k-tray.png","Woolworths Australia":"e-bag-paper.png","Morrisons":"e-bag-paper.png","Amazon":"e-mailer-paper.png","McDonald's UK & Ireland":"k-toy.png","McDonald's UK":"e-yogurt-paper.png","Burger King UK":"k-toy.png","Starbucks":"c-coldcup.png","Just Eat":"k-seaweed.png","IKEA":"e-mailer-box.png","Samsung":"k-phone.png","LEGO":"k-bricks.png","Hasbro":"k-game.png","Ethique":"e-shampoo-bar.png","Apple":"k-phone.png","Dell":"s-mushroom.png","Google":"k-phone.png","HP":"k-electronics.png","Mattel":"k-game.png","Gillette":"e-razor-safety.png","Logitech":"k-electronics.png","Microsoft":"k-electronics.png","Lush":"k-shampoo-round.png","Lenor (P&G)":"k-paperbottle.png","Dove (Unilever)":"s-deo.png","Garnier":"e-shampoo-bar.png","Sony":"k-electronics.png","La Roche-Posay":"k-tube.png","Native":"s-deo.png","H&M Group":"e-mailer-paper.png","adidas":"e-bag-paper.png"};
 
 const tfmt=t=>t>=1000?fmt(t/1000,t>=10000?0:1)+"k":fmt(t,t<10?1:0);
 const CATS=["All",...[...new Set(CASES.map(c=>c.cat))].sort()];
