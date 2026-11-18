@@ -986,7 +986,7 @@ aside.drawer.modal figcaption span{font-size:13px}
     <nav class="cats" id="catNav" aria-label="Categories"></nav>
     <div class="focus" id="stillFocus" hidden></div>
     <div class="vhrow">
-      <div class="vh"><h1 id="stillTitle">Easy to make plastic-free. Still plastic.</h1><p id="stillSub">Tap an item to see what it leaves behind.</p></div>
+      <div class="vh"><h1 id="stillTitle">Easy to make plastic-free.</h1><p id="stillSub">Tap an item to see what it leaves behind.</p></div>
       <button type="button" class="switch" id="ecoSwitch" role="switch" aria-checked="false">Show eco versions <span class="knob" aria-hidden="true"></span></button>
     </div>
     <div class="gallery four" id="g-still"></div>
@@ -1433,7 +1433,7 @@ function watchCats(){
 function renderStill(){
   const g=$("#g-still"); [...g.children].filter(c=>c.id!=="stillFocus").forEach(c=>c.remove());
   $("#catNav").hidden = layout==="index";
-  $("#stillTitle").textContent = eco ? "The same things, without the plastic." : "Easy to make plastic-free. Still plastic.";
+  $("#stillTitle").textContent = eco ? "The same things, without the plastic." : "Easy to make plastic-free.";
   $("#stillSub").textContent = eco ? "Every one of these swaps is on the market today." : "Tap an item to see what it leaves behind.";
   g.classList.toggle("plain", layout==="index");
   if(layout==="index"){ renderIndex(); return; }
