@@ -679,6 +679,11 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-still-plastic .focus .fimg{justify-self:start;place-items:center start;padding-left:0}
 .focusing .cats{display:none}
 
+/* Item view: the two headline figures sit under the not-recycled percentage, set large */
+#v-still-plastic .fbody .kvbig{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px;margin:4px 0 2px}
+#v-still-plastic .fbody .kvbig b{font-family:var(--serif);font-weight:400;font-size:clamp(38px,3.6vw,56px);line-height:1;letter-spacing:-.025em}
+#v-still-plastic .fbody .kvbig .label{font-size:11px}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -1127,11 +1132,15 @@ function stillHTML(it){
       <div class="mstats">
         <div><span class="label">${esc(it.resin)}</span><h2 id="dTitle">${esc(it.name)}</h2></div>
         <div class="big"><b>${esc(it.count)}</b><span>${esc(it.scope)}</span>${["bottle","bag"].includes(it.id)?`<span class="pill g" style="justify-self:start;margin-top:6px">Sourced figure</span>`:/commonly cited/.test(it.scope)?`<span class="pill" style="justify-self:start;margin-top:6px">Commonly cited estimate</span>`:```}</div>
-        <div class="big"><b>${it.nr}%</b><span>not recycled</span>${dots(it.nr)}<span class="src" style="margin-top:6px">${esc(it.nrSrc)}</span></div>
-        <div class="kv">
+        <div class="big"><b>${it.nr}%</b><span>not recycled</span></div>
+        <div class="kv kvbig">
           <div><span class="label">Mismanaged worldwide</span><b>${OECD_MISMANAGED}%</b><span class="src">of plastic waste is dumped, burned or leaked (OECD)</span></div>
           <div><span class="label">Plastic per million</span><b>${perM>=1000?fmt(perM/1000,1)+" t":fmt(perM)+" kg"}</b><span class="src">at ~${it.g} g each</span></div>
+        </div>
+        <div class="big">${dots(it.nr)}<span class="src" style="margin-top:6px">${esc(it.nrSrc)}</span></div>
+        <div class="kv">
           <div class="wide">${it.beach?`<span class="pill">Top-10 beach litter item</span>`:`<span class="src">Not a top-10 beach item, but breaks into microplastics once loose</span>`}</div>
+        </div>
         </div>
       </div>
     </div>
