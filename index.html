@@ -541,6 +541,17 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 /* Home grid: rows away from the middle of the screen soften slightly while you scroll */
 #g-still .tile.hoverswap{transition:opacity .45s var(--ease),filter .5s ease}
 
+/* Ideate: brief bar on top, drawing board in the middle, Materials below */
+.promptbar{position:static;transform:none;left:auto;bottom:auto;width:100%;margin:0 0 18px;padding:12px 12px 12px 28px;border-radius:28px;background:#fff;border:1.5px solid var(--ink);box-shadow:0 12px 34px rgba(0,0,0,.07);flex-wrap:wrap;gap:10px 12px}
+.promptbar .invite{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);cursor:text}
+.promptbar .invite span{text-transform:none;letter-spacing:0;font-weight:400;font-size:14px;color:var(--muted)}
+.promptbar input[type=text]{font-size:20px;padding:10px 4px;flex:1 1 320px}
+.promptbar input[type=text]::placeholder{color:#B9B8B1;opacity:1}
+.board{grid-template-columns:minmax(0,1fr);min-height:min(64vh,600px)}
+.rail{border-left:0;border-top:0;background:transparent;backdrop-filter:none;max-height:none;overflow:visible;padding:28px 0 0}
+.rail .stack{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+@media (max-width:860px){.promptbar{border-radius:22px;margin-bottom:14px}}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -581,11 +592,19 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 
   <section id="v-already-swapped" data-view hidden>
     <div class="vh"><h1>Already on shelves, plastic-free.</h1><p>Everyday products that made the switch. Tap one to see how.</p></div>
-    <div class="gallery" id="g-swap"></div>
+    <div class="gallery four" id="g-swap"></div>
   </section>
 
   <section id="v-ideate" data-view hidden>
     <div class="studio">
+      <form class="promptbar" id="ideaForm">
+          <label for="brief" class="invite">What are you making? <span>Type it here, then press Generate.</span></label>
+          <input id="brief" type="text" placeholder="What are you making? e.g. a soy candle in a jar, shipped online" autocomplete="off">
+          <label class="qty"><input type="number" id="qty" min="1" value="5000" aria-label="Units per year"><span>/yr</span></label>
+          <select id="region" aria-label="Where you're based"><option>United States</option><option>Canada</option><option>United Kingdom</option><option>European Union</option><option>Australia</option><option>Asia</option><option>Latin America</option></select>
+          <button class="btn ghost" type="button" id="ideaStop" hidden>Stop</button>
+          <button class="btn" type="submit" id="ideaBtn">Generate materials</button>
+        </form>
       <div class="board" id="board">
         <div class="surface" id="surface">
           <canvas id="pad" width="1200" height="900" aria-label="Drawing board. Draw your idea or drop an image."></canvas>
@@ -605,23 +624,15 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
             <input type="file" id="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
           </div>
         </div>
+      </div>
         <aside class="rail" id="rail" aria-live="polite">
           <div class="rail-head"><span class="label">Materials</span><span class="status" id="ideaStatus" role="status"></span></div>
           <div class="railtools"><button type="button" class="chipbtn" id="copyBrief">Copy brief</button><button type="button" class="chipbtn" id="dlBrief" hidden>Download</button><button type="button" class="chipbtn" id="saveBrief">Save</button><select id="savedBriefs" aria-label="Saved briefs"><option value="">Saved briefs</option></select></div>
           <p class="read" id="sketchRead" hidden></p>
           <div class="stack" id="ideas"></div>
         </aside>
-        <form class="promptbar" id="ideaForm">
-          <label for="brief" class="sr">What are you making?</label>
-          <input id="brief" type="text" placeholder="What are you making? e.g. a soy candle in a jar, shipped online" autocomplete="off">
-          <label class="qty"><input type="number" id="qty" min="1" value="5000" aria-label="Units per year"><span>/yr</span></label>
-          <select id="region" aria-label="Where you're based"><option>United States</option><option>Canada</option><option>United Kingdom</option><option>European Union</option><option>Australia</option><option>Asia</option><option>Latin America</option></select>
-          <button class="btn ghost" type="button" id="ideaStop" hidden>Stop</button>
-          <button class="btn" type="submit" id="ideaBtn">Generate materials</button>
-        </form>
-      </div>
     </div>
-  </section>
+    </section>
 
   <section id="v-materials" data-view hidden>
     <div class="vh"><h1>Materials</h1><p>Tap a swatch for cost, source and lead time.</p></div>
@@ -744,7 +755,21 @@ const STILL=[
  {id:"multipack",name:"Drink multipack",art:"bottle",resin:"PET #1 film wrap",g:12,count:"Billions",scope:"multipacks a year worldwide (rough estimate)",nr:95,nrSrc:"Estimate: the film wrap is not accepted in most curbside programs",beach:false,swap:"Cardboard carton multipack",brief:"Multipacks of drinks for a grocery shelf"},
  {id:"blister",name:"Blister pack",art:"toothbrush",resin:"PET or PVC blister",g:8,count:"Billions",scope:"packs a year worldwide (rough estimate)",nr:99,nrSrc:"Plastic and card glued together; not accepted curbside",beach:false,swap:"Folded paperboard box",brief:"Retail boxes for small products"},
  {id:"candy",name:"Candy wrapper",art:"chips",resin:"Plastic film",g:2,count:"Billions",scope:"wrappers a year worldwide (rough estimate)",nr:99,nrSrc:"Small multilayer films; not accepted curbside",beach:false,swap:"Paper candy wrapper",brief:"Wrapped chocolate bars for a café counter"},
- {id:"spray",name:"Spray bottle",art:"bottle",resin:"HDPE #2 + PP trigger",g:50,count:"Hundreds of millions",scope:"a year in the US (rough estimate)",nr:71,nrSrc:"EPA 2018: about 29% of HDPE bottles recycled; triggers are often lost",beach:false,swap:"Refillable aluminum spray bottle",brief:"Refillable cleaning spray for a home shop"}
+ {id:"spray",name:"Spray bottle",art:"bottle",resin:"HDPE #2 + PP trigger",g:50,count:"Hundreds of millions",scope:"a year in the US (rough estimate)",nr:71,nrSrc:"EPA 2018: about 29% of HDPE bottles recycled; triggers are often lost",beach:false,swap:"Refillable aluminum spray bottle",brief:"Refillable cleaning spray for a home shop"},
+ {id:"dishsoap",name:"Dish soap bottle",art:"bottle",resin:"HDPE #2 + PP pump",g:50,count:"Billions",scope:"bottles a year worldwide (rough estimate)",nr:71,nrSrc:"Estimate: HDPE bottles are about 30% recycled in the US (EPA 2018)",beach:false,swap:"Soap bar in paper",brief:"Dish soap bars for a kitchen-goods shop"},
+ {id:"sponge",name:"Scrub sponge",art:"bag",resin:"PU foam + PET mesh",g:10,count:"Hundreds of millions",scope:"sponges a year in the US (rough estimate)",nr:99,nrSrc:"Estimate: foam and mesh are not accepted curbside",beach:false,swap:"Cellulose sponge",brief:"Plant-based sponges for a cleaning kit"},
+ {id:"storage",name:"Food storage container",art:"clamshell",resin:"PP #5",g:60,count:"Hundreds of millions",scope:"containers a year in the US (rough estimate)",nr:95,nrSrc:"Estimate: PP #5 is reprocessed under 5% (Greenpeace USA 2022)",beach:false,swap:"Glass food jar",brief:"Glass storage jars for a pantry shop"},
+ {id:"binliner",name:"Bin liner",art:"bag",resin:"LDPE #4 film",g:10,count:"Billions",scope:"liners a year worldwide (rough estimate)",nr:99,nrSrc:"Estimate: film liners are rejected by recyclers",beach:false,swap:"Compostable paper liner",brief:"Compostable liners for a kitchen bin"},
+ {id:"teabag",name:"Tea bag",art:"pod",resin:"PET or nylon mesh",g:2,count:"Billions",scope:"tea bags a year worldwide (rough estimate)",nr:99,nrSrc:"Estimate: plastic mesh bags are not recyclable",beach:false,swap:"Loose tea in a tin",brief:"Loose-leaf tea for a café counter"},
+ {id:"milk",name:"Milk jug",art:"jug",resin:"HDPE #2",g:40,count:"Hundreds of millions",scope:"jugs a year in the US (rough estimate)",nr:71,nrSrc:"EPA 2018: about 29% of HDPE bottles recycled",beach:false,swap:"Glass milk bottle",brief:"Milk in glass bottles for a local dairy"},
+ {id:"breadbag",name:"Bread bag",art:"bag",resin:"LDPE #4 film",g:3,count:"Billions",scope:"bags a year worldwide (rough estimate)",nr:99,nrSrc:"Estimate: thin film bags are rejected by curbside programs",beach:false,swap:"Paper bread bag",brief:"Paper bags for a bakery counter"},
+ {id:"handsoap",name:"Hand soap pump",art:"shampoo",resin:"HDPE #2 + PP pump",g:50,count:"Hundreds of millions",scope:"pumps a year in the US (rough estimate)",nr:71,nrSrc:"EPA 2018: about 29% of HDPE bottles recycled",beach:false,swap:"Soap bar in paper",brief:"Bar soap for a bathroom refill shop"},
+ {id:"deodorant",name:"Deodorant stick",art:"razor",resin:"PP case + PE",g:60,count:"Hundreds of millions",scope:"sticks a year worldwide (rough estimate)",nr:99,nrSrc:"Estimate: mixed plastic cases are not accepted curbside",beach:false,swap:"Cardboard deodorant tube",brief:"Cardboard-tube deodorant for a grooming line"},
+ {id:"floss",name:"Dental floss spool",art:"toothbrush",resin:"Nylon or PTFE",g:10,count:"Billions of metres",scope:"of floss a year (rough estimate)",nr:99,nrSrc:"Estimate: floss and its plastic spool are not recyclable",beach:false,swap:"Silk floss in a glass jar",brief:"Silk floss in glass for a bathroom shop"},
+ {id:"toiletwrap",name:"Toilet paper wrap",art:"film",resin:"LDPE film",g:4,count:"Billions",scope:"wraps a year worldwide (rough estimate)",nr:99,nrSrc:"Estimate: film wraps are rejected by curbside programs",beach:false,swap:"Paper-wrapped toilet paper",brief:"Paper-wrapped toilet paper for a bulk shop"},
+ {id:"pods",name:"Laundry pods",art:"pod",resin:"PVA film + PE",g:20,count:"Billions",scope:"pods a year worldwide (rough estimate)",nr:99,nrSrc:"Estimate: dissolvable film pouches are not recyclable",beach:false,swap:"Powder in a cardboard box",brief:"Powder laundry detergent for a launderette"},
+ {id:"tape",name:"Plastic tape",art:"film",resin:"PP film + acrylic adhesive",g:15,count:"Billions",scope:"rolls a year worldwide (rough estimate)",nr:99,nrSrc:"Estimate: tape is rarely accepted curbside",beach:false,swap:"Paper tape",brief:"Paper tape for a packing station"},
+ {id:"hangers",name:"Plastic hangers",art:"straw",resin:"PP #5",g:30,count:"Hundreds of millions",scope:"hangers a year worldwide (rough estimate)",nr:95,nrSrc:"Estimate: PP #5 is reprocessed under 5%",beach:false,swap:"Wooden hanger",brief:"Wooden hangers for a clothing shop"}
 ];
 
 /* ---------- ALREADY SWAPPED ---------- */
@@ -824,7 +849,21 @@ const ALTS={
  multipack:[["multipack-carton","Cardboard carton multipack"]],
  blister:[["blister-box","Folded paperboard box"]],
  candy:[["candy-paper","Paper candy wrapper"]],
- spray:[["spray-aluminum","Refillable aluminum spray bottle"]]
+ spray:[["spray-aluminum","Refillable aluminum spray bottle"]],
+ dishsoap:[["soap-bar","Soap bar in paper"]],
+ sponge:[["sponge-cellulose","Cellulose sponge"]],
+ storage:[["storage-glass","Glass food jar"]],
+ binliner:[["liner-compost","Compostable paper liner"]],
+ teabag:[["tea-loose","Loose tea in a tin"]],
+ milk:[["milk-glass","Glass milk bottle"]],
+ breadbag:[["bread-paper","Paper bread bag"]],
+ handsoap:[["soap-bar","Soap bar in paper"]],
+ deodorant:[["deo-card","Cardboard deodorant tube"]],
+ floss:[["floss-silk","Silk floss in a glass jar"]],
+ toiletwrap:[["tp-paper","Paper-wrapped toilet paper"]],
+ pods:[["pods-powder","Powder in a cardboard box"]],
+ tape:[["tape-paper","Paper tape"]],
+ hangers:[["hanger-wood","Wooden hanger"]]
 };
 /* plain-English cost difference vs the plastic version */
 const costDiff=p=>!isFinite(p)?"—":p>0?`${Math.round(p)}% more`:p<0?`${Math.round(-p)}% less`:"Same price";
@@ -877,7 +916,7 @@ function renderStill(){
 $("#layoutSeg").onclick=e=>{ const b=e.target.closest("button[data-layout]"); if(!b) return; layout=b.dataset.layout; $$("#layoutSeg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); renderStill(); };
 $("#ecoSwitch").onclick=()=>{ eco=!eco; $("#ecoSwitch").setAttribute("aria-checked",String(eco)); renderStill(); };
 /* which library material backs each eco alternative (null = reusable item, not in the library) */
-const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null,"multipack-carton":"paperboard","blister-box":"paperboard","candy-paper":"glassine","spray-aluminum":"aluminum"};
+const ALT_MAT={"bottle-can":"aluminum","bottle-carton":"paperboard","bag-paper":"kraft-paper","bag-tote":null,"straw-paper":"kraft-paper","straw-bamboo":"bamboo","lid-fiber":"molded-pulp","chips-paper":"glassine","chips-cellulose":"cellulose-film","cutlery-wood":"wood","cutlery-bamboo":"bamboo","toothbrush-bamboo":"bamboo","pod-paper":"molded-pulp","pod-aluminum":"aluminum","shampoo-bar":"paperboard","shampoo-aluminum":"aluminum","jug-sheets":"kraft-paper","jug-powder":"corrugated","yogurt-glass":"glass","yogurt-paper":"paperboard","clamshell-pulp":"molded-pulp","mailer-paper":"kraft-paper","mailer-box":"corrugated","film-beeswax":null,"razor-safety":"paperboard","swab-paper":"paperboard","toothpaste-tabs":null,"multipack-carton":"paperboard","blister-box":"paperboard","candy-paper":"glassine","spray-aluminum":"aluminum","soap-bar":"paperboard","sponge-cellulose":null,"storage-glass":"glass","liner-compost":"kraft-paper","tea-loose":null,"milk-glass":"glass","bread-paper":"kraft-paper","deo-card":"paperboard","floss-silk":null,"tp-paper":"kraft-paper","pods-powder":"corrugated","tape-paper":"kraft-paper","hanger-wood":null};
 const REUSE={"bag-tote":"Reusable cotton tote. Replaces hundreds of single-use bags over its life; needs ~130 uses to beat a plastic bag on carbon.","film-beeswax":"Reusable cotton coated in beeswax. Lasts about a year of washes, then composts."};
 const buyBox=k=>{ const b=(typeof BUY!=="undefined"&&BUY[k])||[]; const m=byId[ALT_MAT[k]]; const P=(typeof BUY_PRICE!=="undefined")?BUY_PRICE:{};
   return b.length?`<div class="buy"><span class="label">Buy in bulk</span>${m?`<span class="src">Typical unit cost for ${esc(m.name.toLowerCase())}: ${money(m.cost[0])}–${money(m.cost[1])} ${esc(m.unit)}</span>`:""}${b.map(([n,u,note])=>{ const pr=P[u]; return `<a href="${esc(u)}" target="_blank" rel="noopener"><span class="bn">${esc(n)}<em>${esc(note||"")}</em></span><span class="bp">${pr?esc(pr.unit):"price on site"}${pr&&pr.basis?`<em>${esc(pr.basis)}</em>`:""}</span></a>`; }).join("")}<span class="src">Approximate listed prices as of ${DATA_ASOF}, before shipping and tax.</span></div>`:""; };
@@ -938,7 +977,12 @@ const SWAP_PH={"Shampoo bar":"e-shampoo-bar","Canned water":"e-bottle-can","Boxe
 const HAVE_S=new Set(["s-tabs","s-tp","s-canister","s-deo","s-spray","s-milk","s-eggs","s-collar","s-mushroom","e-shampoo-bar","e-bottle-can","e-bottle-carton","e-jug-sheets","e-toothbrush-bamboo","e-film-beeswax","e-pod-paper"]);
 const swapArt=it=>{ const k=SWAP_PH[it.name]; return k&&HAVE_S.has(k)?`<span class="art ph"><img src="img/${k}.png" alt="${esc(it.name)}" loading="lazy"></span>`:svg(it.art); };
 SWAP.forEach(it=>{
-  const t=document.createElement("button"); t.type="button"; t.className="tile swap"; t.innerHTML=`${swapArt(it)}<span class="nm">${esc(it.name)}</span>`;
+  const t=document.createElement("button"); t.type="button"; t.className="tile swap hoverswap"; t.setAttribute("aria-label",it.name);
+  const wasKey=SWAP_WAS[it.name];
+  const wasPk=wasKey?`<span class="pk" style="--k:0;--px:-44%;--py:-30%;--pr:-7deg"><img src="img/${wasKey}.png" alt=""><i>${esc(it.was)}</i></span>`:"";
+  const nowKey=SWAP_PH[it.name], nowHave=nowKey&&HAVE_S.has(nowKey);
+  const nowImg=nowHave?`<img class="orig" src="img/${nowKey}.png" alt="${esc(it.name)}" loading="lazy">`:svg(it.art);
+  t.innerHTML=`<span class="art ph fan"><span class="peek" aria-hidden="true">${wasPk}</span>${nowImg}</span>`;
   const k=SWAP_PH[it.name], ph=k&&HAVE_S.has(k);
   t.onclick=()=>openDrawer(`
     ${ph?`<div class="pair"><figure><img src="img/${SWAP_WAS[it.name]||"p-bottle"}.png" alt="${esc(it.was)}"><figcaption><span class="pill">Before</span>${esc(it.was)}</figcaption></figure><svg class="arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12h56M46 3l12 9-12 9"/></svg><figure class="now"><img src="img/${k}.png" alt="${esc(it.now)}"><figcaption><span class="pill g">Now</span>${esc(it.now)}</figcaption></figure></div>`:""}
