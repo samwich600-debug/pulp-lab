@@ -722,6 +722,15 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .suggest{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 18px}
 .suggest button{font:inherit;font-size:13px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:border-color .2s ease}
 .suggest button:hover,.suggest button:focus-visible{border-color:var(--ink);outline:none}
+/* Ideate: example drawings to try */
+.demos{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 18px}
+.demo{all:unset;cursor:pointer;display:grid;gap:8px;width:150px}
+.demo img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:10px}
+.demo span{font-size:12px;line-height:1.4;color:var(--muted)}
+.demo:hover span,.demo:focus-visible span{color:var(--ink)}
+.demo:hover img,.demo:focus-visible img{border-color:var(--ink)}
+.demo:focus-visible{outline:none}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -785,6 +794,13 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
         <button type="button" data-s="A shampoo bar wrapped in paper">A shampoo bar wrapped in paper</button>
         <button type="button" data-s="A takeout box made from molded pulp">A takeout box made from molded pulp</button>
       </div>
+      <div class="demos" role="group" aria-label="Example drawings">
+        <button type="button" class="demo" data-demo="0"><img src="img/demo-candle.png" alt=""><span>A soy candle in a glass jar, shipped online</span></button>
+        <button type="button" class="demo" data-demo="1"><img src="img/demo-cup.png" alt=""><span>A takeout coffee cup with a lid</span></button>
+        <button type="button" class="demo" data-demo="2"><img src="img/demo-shampoo.png" alt=""><span>A shampoo bottle for a bathroom brand</span></button>
+        <button type="button" class="demo" data-demo="3"><img src="img/demo-snack.png" alt=""><span>A snack bag for crisps</span></button>
+        <button type="button" class="demo" data-demo="4"><img src="img/demo-box.png" alt=""><span>A takeout box for noodles</span></button>
+      </div>
       <div class="board" id="board">
         <div class="surface" id="surface">
           <canvas id="pad" width="1200" height="900" aria-label="Drawing board. Draw your idea or drop an image."></canvas>
@@ -805,7 +821,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
           </div>
         </div>
       </div>
-        <aside class="rail" id="rail" aria-live="polite">
+        <aside class="rail" id="rail" aria-live="polite" hidden>
           <div class="rail-head"><span class="label">Materials</span><span class="status" id="ideaStatus" role="status"></span></div>
           <div class="railtools"><button type="button" class="chipbtn" id="copyBrief">Copy brief</button><button type="button" class="chipbtn" id="dlBrief" hidden>Download</button><button type="button" class="chipbtn" id="saveBrief">Save</button><select id="savedBriefs" aria-label="Saved briefs"><option value="">Saved briefs</option></select></div>
           <p class="read" id="sketchRead" hidden></p>
@@ -1538,7 +1554,7 @@ function drawOp(o,c=ctx,W=pad.width,H=pad.height){
   c.save(); c.globalCompositeOperation=o.erase?"destination-out":"source-over"; c.strokeStyle=o.color; c.lineWidth=o.size*(W/1000); c.lineCap="round"; c.lineJoin="round";
   c.beginPath(); o.pts.forEach(([x,y],i)=>i?c.lineTo(x*W,y*H):c.moveTo(x*W,y*H)); if(o.pts.length===1) c.lineTo(o.pts[0][0]*W+0.1,o.pts[0][1]*H); c.stroke(); c.restore();
 }
-function redraw(){ ctx.clearRect(0,0,pad.width,pad.height); ops.forEach(o=>drawOp(o)); $("#boardHint").classList.toggle("gone",ops.length>0); }
+function redraw(){ ctx.clearRect(0,0,pad.width,pad.height); ops.forEach(o=>drawOp(o)); $("#boardHint").classList.toggle("gone",ops.length>0); document.getElementById("rail").hidden=!ops.some(o=>o.kind==="img"); }
 const ptOf=e=>{ const r=pad.getBoundingClientRect(); return [(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]; };
 pad.addEventListener("pointerdown",e=>{ pad.setPointerCapture(e.pointerId); cur={kind:"stroke",erase:tool==="erase",color,size:tool==="erase"?28:4,pts:[ptOf(e)]}; ops.push(cur); redraw(); });
 pad.addEventListener("pointermove",e=>{ if(!cur) return; cur.pts.push(ptOf(e)); redraw(); });
@@ -1550,7 +1566,7 @@ $("#clearBtn").onclick=()=>{ ops=[]; redraw(); };
 const fileIn=$("#file");
 $("#upBtn").onclick=()=>fileIn.click();
 function addImage(f){ if(!f||!/^image\//.test(f.type)){ $("#ideaStatus").textContent="Drop a JPG, PNG or WebP image."; return; }
-  const img=new Image(); img.onload=()=>{ ops.push({kind:"img",img,x:.5,y:.45,w:.7,h:.7}); redraw(); }; img.src=URL.createObjectURL(f); }
+  const img=new Image(); img.onload=()=>{ ops.push({kind:"img",img,x:.5,y:.45,w:.7,h:.7}); redraw(); runIdeas(); }; img.src=URL.createObjectURL(f); }
 fileIn.onchange=()=>{ addImage(fileIn.files[0]); fileIn.value=""; };
 ["dragenter","dragover"].forEach(t=>board.addEventListener(t,e=>{e.preventDefault();board.classList.add("over");}));
 ["dragleave","drop"].forEach(t=>board.addEventListener(t,e=>{e.preventDefault();board.classList.remove("over");}));
@@ -1624,11 +1640,8 @@ function fillSaved(){ const sel=$("#savedBriefs"), list=loadSaved(); sel.innerHT
 $("#saveBrief").onclick=()=>{ if(!RUN.concepts.length) return; const list=loadSaved(); list.unshift(JSON.parse(JSON.stringify(RUN))); try{ localStorage.setItem(SKEY,JSON.stringify(list.slice(0,12))); st.textContent="Saved in this browser"; }catch(_){ st.textContent="Couldn't save in this browser"; } fillSaved(); };
 $("#savedBriefs").onchange=e=>{ const r=loadSaved()[+e.target.value]; if(!r) return; RUN=r; const cs=r.concepts.slice(); ghosts(0); RUN={...r,concepts:[]}; cs.forEach(c=>pushCard(c,r.qty)); st.textContent=r.brief.slice(0,30); e.target.value=""; };
 fillSaved();
-playLocal(localIdeas("soy candle glass jar shipped online"),5000);
-st.textContent="Example: soy candle in a jar";
 
-$("#ideaForm").addEventListener("submit",async e=>{
-  e.preventDefault();
+async function runIdeas(){
   const brief=$("#brief").value.trim(), qty=Number($("#qty").value)||1000, region=$("#region").value;
   const img=await boardBlob();
   RUN={brief:brief||"(from drawing)",qty,region,date:new Date().toISOString().slice(0,10),concepts:[]};
@@ -1655,7 +1668,8 @@ $("#ideaForm").addEventListener("submit",async e=>{
     else if(c==="image_rejected") st.textContent="Couldn't read that image";
     else if(!got){ st.textContent="From the material library"; playLocal(localIdeas(brief),qty); }
   }finally{ btn.disabled=false; stop.hidden=true; }
-});
+}
+$("#ideaForm").addEventListener("submit",e=>{ e.preventDefault(); runIdeas(); });
 /* ---------- logo: dot-grid PULP LAB (temporary switcher to compare 4 options) ---------- */
 (function(){
 const G={
@@ -1683,6 +1697,27 @@ const i=2; /* chosen: LED grid */
 const brand=document.querySelector(".brand");
 function show(){ brand.textContent="The Plastic Index"; }
 show();
+  /* Ideate: the example drawings. Clicking one puts it on the board, fills the description and generates the materials. */
+  (()=>{
+    const DEMOS=[
+      {src:"img/demo-candle.png",text:"A soy candle in a glass jar, shipped online"},
+      {src:"img/demo-cup.png",text:"A takeout coffee cup with a lid"},
+      {src:"img/demo-shampoo.png",text:"A shampoo bottle for a bathroom brand"},
+      {src:"img/demo-snack.png",text:"A snack bag for crisps"},
+      {src:"img/demo-box.png",text:"A takeout box for noodles"}
+    ];
+    document.querySelectorAll(".demo[data-demo]").forEach(btn=>btn.addEventListener("click",()=>{
+      const d=DEMOS[+btn.dataset.demo];
+      const img=new Image();
+      img.onload=()=>{
+        $("#brief").value=d.text;
+        ops=[{kind:"img",img,x:.5,y:.45,w:.7,h:.7}];
+        redraw();
+        runIdeas();
+      };
+      img.src=d.src;
+    }));
+  })();
 })();
 })();
 </script>
@@ -1742,5 +1777,6 @@ document.querySelectorAll(".suggest button[data-s]").forEach(b=>b.addEventListen
   i.value=b.dataset.s; i.focus();
 }));
 </script>
+
 
 </body></html>
