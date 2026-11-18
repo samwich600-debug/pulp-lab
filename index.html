@@ -629,6 +629,10 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-still-plastic .focus .fimg .art.fan .pk:hover i{opacity:1}
 #v-still-plastic .focus .fimg .art.fan .pk{pointer-events:auto}
 
+/* The open item takes the full width of its grid row; the heading stays put so the page does not jump */
+#stillFocus.inline{grid-column:1/-1;margin:24px 0 56px}
+.focusing .vhrow{display:flex}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -977,7 +981,7 @@ function renderIndex(){
   if(tiles[0]) tiles[0].setAttribute("aria-current","true");
 }
 function renderStill(){
-  const g=$("#g-still"); g.replaceChildren();
+  const g=$("#g-still"); [...g.children].filter(c=>c.id!=="stillFocus").forEach(c=>c.remove());
   $("#stillTitle").textContent = eco ? "The same things, without the plastic." : "Easy to make plastic-free. Still plastic.";
   $("#stillSub").textContent = eco ? "Every one of these swaps is on the market today." : "Tap an item to see what it leaves behind.";
   g.classList.toggle("plain", layout==="index");
@@ -1057,8 +1061,13 @@ function openStill(it){
   $("#fBack").onclick=closeFocus;
   const go=$("#goIdeate");
   if(go) go.onclick=e=>{ e.preventDefault(); $("#brief").value=it.brief; closeFocus(); location.hash="ideate"; };
-  panel.scrollIntoView({behavior:"smooth",block:"start"});
-  panel.focus?.({preventScroll:true});
+  panel.dataset.id=it.id;
+  const tile=grid.querySelector(`.tile[data-id="${it.id}"]`);
+  if(tile){
+    const row=[...grid.querySelectorAll(".tile")].find(t=>t.offsetTop===tile.offsetTop);
+    grid.insertBefore(panel,row); panel.classList.add("inline");
+  } else { sec.prepend(panel); panel.classList.remove("inline"); }
+  window.scrollTo({top:panel.getBoundingClientRect().top+scrollY-120,behavior:"smooth"});
 }
 function closeFocus(){
   const panel=$("#stillFocus"), grid=$("#g-still"), sec=$("#v-still-plastic");
@@ -1066,7 +1075,7 @@ function closeFocus(){
   panel.classList.remove("open"); panel.classList.add("leaving");
   sec.classList.remove("focusing");
   grid.classList.remove("dim");
-  setTimeout(()=>{ if(!focusOpen){ panel.hidden=true; panel.innerHTML=""; panel.classList.remove("leaving"); } },520);
+  setTimeout(()=>{ if(!focusOpen){ panel.hidden=true; panel.innerHTML=""; panel.classList.remove("leaving","inline"); sec.prepend(panel); const id=panel.dataset.id; const t=id&&grid.querySelector(`.tile[data-id="${id}"]`); if(t) t.scrollIntoView({block:"center",behavior:"smooth"}); } },520);
   grid.querySelectorAll(".tile.cur").forEach(t=>t.classList.remove("cur"));
   grid.scrollIntoView({behavior:"smooth",block:"start"});
 }
