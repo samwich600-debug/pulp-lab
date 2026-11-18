@@ -1150,7 +1150,7 @@ function stillHTML(it){
           <div><span class="label">Mismanaged worldwide</span><b>${OECD_MISMANAGED}%</b><span class="src">of plastic waste is dumped, burned or leaked (OECD)</span></div>
           <div><span class="label">Plastic per million</span><b>${perM>=1000?fmt(perM/1000,1)+" t":fmt(perM)+" kg"}</b><span class="src">at ~${it.g} g each</span></div>
         </div>
-        <div class="big">${dots(it.nr)}<span class="src" style="margin-top:6px">${esc(it.nrSrc)}</span></div>
+        <div class="big"><span class="src" style="margin-top:6px">${esc(it.nrSrc)}</span></div>
         <div class="kv">
           <div class="wide">${it.beach?`<span class="pill">Top-10 beach litter item</span>`:`<span class="src">Not a top-10 beach item, but breaks into microplastics once loose</span>`}</div>
         </div>
