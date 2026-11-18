@@ -850,6 +850,12 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #g-cases .tile .cnum{font-size:clamp(26px,2.6vw,34px)}
 aside.drawer.modal figcaption{font-size:15px;line-height:1.4;color:var(--ink)}
 aside.drawer.modal figcaption span{font-size:13px}
+/* Real World: a brand opens in place, with the same motion as the Plastic items */
+#g-cases.dim .tile{opacity:.14;filter:blur(2.5px);transition:opacity .6s var(--ease),filter .6s var(--ease)}
+#g-cases.dim .tile:hover{opacity:.5}
+#g-cases.dim .tile.cur{opacity:1;filter:none}
+#v-case-studies .focus.inline{grid-column:1/-1;margin:8px 0 40px}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -982,10 +988,11 @@ aside.drawer.modal figcaption span{font-size:13px}
     <p class="foot">Costs are indicative 2025–26 ranges at 1,000–50,000 units, before freight. Get supplier quotes before committing.</p>
   </section>
 
-  <section id="v-case-studies" data-view hidden>
+  <section id="v-case-studies" data-view hidden class="focus-host">
     <div class="vh"><h1>50 brands that cut plastic</h1><p>Plastic saved, as each company reported it. Tap one for the story.</p></div>
     <div class="stat3" id="caseStats" hidden></div>
     <div class="seg" role="group" aria-label="Category" id="caseSeg"></div>
+    <div class="focus" id="caseFocus" hidden></div>
     <div class="gallery four" id="g-cases"></div>
     <p class="foot">Company-reported estimates, not independent audits. Most brands don't publish what a switch cost them.</p>
   </section>
@@ -1579,7 +1586,7 @@ function renderCases(){
     if(br) t.classList.add("has-brand");
     t.innerHTML=`<span class="art ph${br?" flip":""}">${ph?`<img class="now" src="img/${ph}" alt="${esc(c.to)}" loading="lazy">`:""}${br?`<img class="brand" src="img/brand/${br}" alt="${esc(c.brand)} ${esc(c.product)} as sold" loading="lazy">`:""}</span><span class="nm" style="color:var(--ink);font-weight:600;font-size:14px">${esc(c.brand)}</span><span class="cnum">${c.t!=null?fmt(c.t,c.t<10?1:0)+" tonnes":"Not reported"}</span><span class="nm">${c.t!=null?"of plastic saved":"&nbsp;"}</span>`;
     const bef=CASE_BEFORE[c.brand];
-    t.onclick=()=>openDrawer(`
+    const caseBody=`
       ${ph&&bef?`<div class="pair" style="margin-bottom:20px"><figure><img src="img/${bef}" alt="${esc(c.from)}" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption><span class="pill">Before</span>${esc(c.from)}</figcaption></figure><svg class="arrow" viewBox="0 0 64 24" aria-hidden="true"><path d="M2 12h56M46 3l12 9-12 9"/></svg><figure class="now"><img src="img/${ph}" alt="${esc(c.to)}" style="width:100%;max-width:220px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption><span class="pill g">After</span>${esc(c.to)}</figcaption></figure></div>`:""}
       <div class="mtop">
         ${ph?`<figure style="margin:0;display:grid;gap:8px;justify-items:center;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px"><img src="img/${ph}" alt="${esc(c.to)}" style="width:100%;max-width:260px;aspect-ratio:1;object-fit:contain;filter:var(--shadow)"><figcaption class="src" style="text-align:center">Their solution: ${esc(c.to)}<br><span style="font-size:11px">Unbranded example</span></figcaption></figure>`:""}
@@ -1596,6 +1603,36 @@ function renderCases(){
     g.append(t);
   });
 }
+let caseOpen=false;
+function openCase(c,row,body,ph){
+  const panel=$("#caseFocus"), grid=$("#g-cases"), sec=$("#v-case-studies");
+  const clean=body.replace(/<figure style="margin:0;display:grid[\s\S]*?<\/figure>/,"");
+  panel.classList.remove("open","leaving"); panel.hidden=false; caseOpen=true;
+  panel.innerHTML=`<figure class="fimg">${ph?`<img src="img/${ph}" alt="${esc(c.to)}">`:""}</figure><div class="fbody"><button type="button" class="fback" id="caseBack">← All brands</button>${clean}</div>`;
+  sec.classList.add("focusing"); grid.classList.add("dim");
+  grid.querySelectorAll(".tile").forEach(x=>x.classList.toggle("cur",x===row));
+  const top=[...grid.querySelectorAll(".tile")].find(x=>x.offsetTop===row.offsetTop);
+  grid.insertBefore(panel,top||null); panel.classList.add("inline");
+  $("#caseBack").onclick=caseClose;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>panel.classList.add("open")));
+  window.scrollTo({top:panel.getBoundingClientRect().top+scrollY-120,behavior:"smooth"});
+}
+function caseClose(){
+  const panel=$("#caseFocus"), grid=$("#g-cases"), sec=$("#v-case-studies");
+  caseOpen=false;
+  panel.classList.remove("open"); panel.classList.add("leaving");
+  sec.classList.remove("focusing"); grid.classList.remove("dim");
+  grid.querySelectorAll(".tile.cur").forEach(x=>x.classList.remove("cur"));
+  setTimeout(()=>{ if(!caseOpen){ panel.hidden=true; panel.innerHTML=""; panel.classList.remove("leaving","inline"); sec.prepend(panel); } },520);
+}
+addEventListener("keydown",e=>{ if(e.key==="Escape"&&caseOpen) caseClose(); });
+document.addEventListener("click",e=>{
+  if(!caseOpen) return;
+  const panel=$("#caseFocus");
+  if(panel&&panel.contains(e.target)) return;
+  if(e.target.closest&&e.target.closest("#g-cases .tile")) return;
+  caseClose();
+});
 renderCases();
 
 /* ---------- companies ---------- */
@@ -1811,7 +1848,8 @@ function card(c,qty){
       <div class="wide"><span class="label">Environment</span><span>${esc(c.co2_note||"")}</span><span class="src">After use: ${esc(c.end_of_life||"")}</span></div>
       ${m?`<div class="wide"><span class="label">Watch</span><span>${esc(m.watch)}</span></div>`:""}
     </div>
-    ${specHTML(c.material_id)}${CLAIM}<p class="src">${c._src==="claude"?"Estimated by Claude for your brief":"From the Plastic Index material library"}, ${DATA_ASOF}. Get supplier quotes before you commit.</p>`, true);
+    ${specHTML(c.material_id)}${CLAIM}<p class="src">${c._src==="claude"?"Estimated by Claude for your brief":"From the Plastic Index material library"}, ${DATA_ASOF}. Get supplier quotes before you commit.</p>`;
+    t.onclick=()=>openCase(c,t,caseBody,ph);
   return el;
 }
 const stack=$("#ideas"), st=$("#ideaStatus");
