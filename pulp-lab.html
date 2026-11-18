@@ -782,6 +782,17 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 
 /* Rankings: the company panel stacks, so the pledge runs the full width */
 #v-companies .co2col{grid-template-columns:minmax(0,1fr)}
+/* Rankings: trend, main plastic, litter and data type become cards with a headline value */
+#v-companies .kv{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#v-companies .kv .wide{background:#F4F3EE;border-radius:18px;padding:18px 20px;display:grid;gap:8px;align-content:start;border:1px solid var(--line)}
+#v-companies .kv .wide>.label{display:flex;align-items:center;gap:8px}
+#v-companies .kv .wide>.label::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink);flex:none}
+#v-companies .kv .wide>span:not(.label){font-family:var(--serif);font-size:clamp(18px,1.6vw,22px);line-height:1.2;letter-spacing:-.01em}
+#v-companies .kv .wide>span.src,#v-companies .kv .wide>span.src a{font-family:var(--body);font-size:12px;line-height:1.5;color:var(--muted)}
+#v-companies .kv .wide:nth-child(2)>.label::before{background:#B0561E}
+#v-companies .kv .wide:nth-child(3)>.label::before{background:#2E5F23}
+#v-companies .kv .wide:nth-child(4)>.label::before{background:#7A7A72}
+
 </style>
 
 <header class="top"><div class="wrap">
