@@ -1200,6 +1200,14 @@ function closeFocus(){
   grid.scrollIntoView({behavior:"smooth",block:"start"});
 }
 addEventListener("keydown",e=>{ if(e.key==="Escape"&&focusOpen) closeFocus(); });
+/* Clicking anywhere outside the open item minimises it; clicking another item still switches to that one */
+document.addEventListener("click",e=>{
+  if(!focusOpen) return;
+  const panel=$("#stillFocus");
+  if(panel&&panel.contains(e.target)) return;
+  if(e.target.closest&&e.target.closest("#g-still .tile")) return;
+  closeFocus();
+});
 renderStill();
 
 const SWAP_WAS={"Shampoo bar":"p-shampoo","Canned water":"p-bottle","Boxed water":"p-bottle","Laundry sheets":"p-jug","Toothpaste tablets":"c-toothpaste","Bamboo toothbrush":"p-toothbrush","Paper-wrapped toilet roll":"w-tp","Collagen canister":"p-yogurt","Paper deodorant":"w-deo","Cleaning tablets":"c-spray","Wax food wrap":"p-film","Glass milk bottle":"w-milk","Pulp egg carton":"w-eggs","Paper can carrier":"w-rings","Mushroom inserts":"w-foam","Compostable coffee pod":"p-pod"};
