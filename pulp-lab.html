@@ -1,7 +1,8 @@
+<meta charset="utf-8">
 <title>Pulp Lab</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Doto:wght@800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Instrument+Serif&family=Doto:wght@800;900&display=swap">
 <style>
 /* Layout: a quiet gallery. Near-empty pages, a grid of line drawings; everything else lives in a side drawer. */
 :root{
@@ -330,33 +331,6 @@ main{overflow-x:clip}
 .hoverswap:hover{z-index:3}
 @media (prefers-reduced-motion:reduce){.art.fan .pk,.art.fan .orig,.tile.hoverswap{transition:none}}
 
-/* Frosted-glass popups (Seed reference): heavy blur behind, translucent sage panel, white type */
-.scrim{background:rgba(70,92,60,.22);backdrop-filter:blur(28px) saturate(1.25);-webkit-backdrop-filter:blur(28px) saturate(1.25)}
-aside.drawer.modal{
-  --ink:#FFFFFF; --muted:rgba(255,255,255,.74); --line:rgba(255,255,255,.26);
-  --paper:rgba(255,255,255,.07); --sheet:rgba(255,255,255,.10); --moss-soft:rgba(255,255,255,.16);
-  --kraft-soft:rgba(255,236,200,.18); --plastic:rgba(255,255,255,.14); --plastic-ink:#FFFFFF;
-  color:#fff;background:rgba(98,118,88,.58);backdrop-filter:blur(44px) saturate(1.35);-webkit-backdrop-filter:blur(44px) saturate(1.35);
-  border:1px solid rgba(255,255,255,.22);border-radius:32px;box-shadow:0 30px 90px rgba(31,59,22,.22);padding:34px max(32px,3vw) 40px}
-aside.drawer.modal h2,aside.drawer.modal h3,aside.drawer.modal b{color:#fff}
-aside.drawer.modal .label{color:rgba(255,255,255,.82);letter-spacing:.08em}
-aside.drawer.modal .label::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:8px;vertical-align:1px}
-aside.drawer.modal .src,aside.drawer.modal .src a,aside.drawer.modal a{color:rgba(255,255,255,.78)}
-aside.drawer.modal .dclose{background:transparent;color:#fff;opacity:.85}
-aside.drawer.modal .cofmt figure,aside.drawer.modal .pair figure,aside.drawer.modal .alt,aside.drawer.modal .swapbox{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.3);border-radius:22px}
-aside.drawer.modal .pair figure.now{background:rgba(255,255,255,.16)}
-aside.drawer.modal .pair .arrow{stroke:#fff}
-aside.drawer.modal .pill{color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.85);background:transparent}
-aside.drawer.modal .pill.g{background:#fff;color:#1F3B16;box-shadow:none}
-aside.drawer.modal .pill.r{background:rgba(255,226,180,.9);color:#5A3A0E;box-shadow:none}
-aside.drawer.modal .btn{background:#F7F8F1;color:#1F3B16}
-aside.drawer.modal .btn:hover{background:#fff}
-aside.drawer.modal .up{color:#FFE2AE} aside.drawer.modal .down{color:#DDF7BE}
-aside.drawer.modal .dots i{background:rgba(255,255,255,.25)} aside.drawer.modal .dots i.on{background:#fff}
-aside.drawer.modal .buy a{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3);color:#fff}
-aside.drawer.modal .buy a span{color:rgba(255,255,255,.75)} aside.drawer.modal .buy a::after{color:#fff}
-aside.drawer.modal img{filter:drop-shadow(0 20px 22px rgba(20,40,15,.22))}
-aside.drawer.modal #dTitle{font-size:clamp(30px,3.6vw,46px)!important;line-height:1.05;letter-spacing:-.035em}
 
 /* temporary logo switcher + dot logo */
 .brand svg .on{fill:var(--moss)} .brand svg .off{fill:color-mix(in srgb,var(--moss) 14%,transparent)}
@@ -424,6 +398,112 @@ body.is-home header.top{z-index:5}
 .buy em{font-style:normal;font-weight:400;font-size:11.5px;color:var(--muted)}
 aside.drawer.modal .buy em{color:rgba(255,255,255,.72)}
 .buy a span{color:inherit}
+
+/* ---- Striking, minimal, with gravitas (Nov 2026) ----
+   Warm paper, near-black ink, one serif for display, Geist for everything else.
+   Hairlines instead of cards, black pills for actions, no glass or blur. */
+:root{
+  --paper:#F1F0EB; --sheet:#F7F6F1; --ink:#0C0C0B; --muted:#6E6D66; --line:#D5D3CA;
+  --moss:#0C0C0B; --moss-soft:#E3E1D8; --kraft-soft:#EAE4D3;
+  --plastic:#E3E1D8; --plastic-ink:#3B3B37; --warn:#7A5418; --good:#2E4A2A;
+  --serif:"Instrument Serif","Times New Roman",Georgia,serif;
+  --display:var(--serif);
+  --shadow:drop-shadow(0 18px 16px rgba(0,0,0,.09)) drop-shadow(0 2px 3px rgba(0,0,0,.05));
+}
+body{background:var(--paper);color:var(--ink);font-size:15px;letter-spacing:-.005em}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:400;letter-spacing:-.01em;line-height:1.02;color:var(--ink)}
+
+/* header: hairline, serif wordmark, quiet uppercase nav */
+header.top{background:var(--paper);border-bottom:1px solid var(--line)}
+header.top .wrap{padding-block:20px}
+.brand{font-family:var(--serif);font-weight:400;font-size:30px;letter-spacing:-.01em;text-transform:none;color:var(--ink)}
+nav{gap:0}
+nav a{margin-left:20px;padding:6px 0;border-radius:0;background:none!important;box-shadow:none!important;font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);opacity:1}
+nav a:hover{color:var(--ink)}
+nav a[aria-current="page"]{color:var(--ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:9px}
+
+/* page heads: large serif statement, then space */
+main{padding-block:72px 140px}
+.vh{margin:0 auto 80px;max-width:980px;gap:18px}
+.vh h1{font-size:clamp(46px,8.2vw,124px);font-weight:400;letter-spacing:-.04em;line-height:.9}
+.vh p{font-size:15px;color:var(--muted);letter-spacing:0}
+.vhrow{margin-bottom:80px}
+.label{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* gallery: more air, no tile backgrounds */
+.gallery{gap:clamp(48px,5.5vw,88px) clamp(16px,2.6vw,36px)}
+.gallery.four{gap:clamp(48px,5.5vw,88px) clamp(16px,2.6vw,36px)}
+.tile .art,.tile:hover .art,.tile:focus-visible .art{background:transparent;transform:none}
+.tile .nm{font-size:14px;font-weight:400;letter-spacing:0;color:var(--ink)}
+.tile .cnum{font-family:var(--serif);font-weight:400;font-size:clamp(30px,3vw,42px);letter-spacing:-.02em;line-height:1}
+.tile.case .nm:first-of-type{font-family:var(--serif);font-size:24px!important;font-weight:400!important;letter-spacing:-.01em}
+.tile .stat{font-size:11px;letter-spacing:.04em}
+
+/* actions: black pills, outline ghost */
+.btn{background:var(--ink);color:var(--paper);font-size:14px;font-weight:500;letter-spacing:0;padding:13px 28px}
+.btn:hover{background:#2A2A27}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.switch{box-shadow:inset 0 0 0 1px var(--ink);color:var(--ink);font-size:13px;font-weight:500}
+.switch[aria-checked="true"] .knob{background:var(--ink)}
+
+/* footnotes and sources: small and quiet */
+.foot{margin:120px auto 0;text-align:center;font-size:12px;line-height:1.7;color:var(--muted);max-width:64ch}
+.src{font-size:12px}
+
+/* drawer and popups: solid paper, hairline, no glass */
+.scrim{background:rgba(12,12,11,.30);backdrop-filter:none;-webkit-backdrop-filter:none}
+aside.drawer{background:var(--paper);border-left:1px solid var(--line)}
+aside.drawer.modal{
+  --ink:#0C0C0B; --muted:#6E6D66; --line:#D5D3CA; --paper:#F1F0EB; --sheet:#F7F6F1;
+  --moss-soft:#E3E1D8; --kraft-soft:#EAE4D3; --plastic:#E3E1D8; --plastic-ink:#3B3B37;
+  color:var(--ink); background:var(--paper); backdrop-filter:none; -webkit-backdrop-filter:none;
+  border:1px solid var(--line); border-radius:6px; box-shadow:0 40px 100px rgba(0,0,0,.14);
+  padding:40px max(36px,3vw) 44px;
+}
+aside.drawer.modal #dTitle{font-family:var(--serif);font-size:clamp(40px,4.6vw,64px)!important;line-height:1;letter-spacing:-.02em}
+aside.drawer.modal .label::before{display:none}
+aside.drawer.modal .cofmt figure,aside.drawer.modal .pair figure,aside.drawer.modal .alt,aside.drawer.modal .swapbox{background:var(--sheet);border:1px solid var(--line);border-radius:4px}
+aside.drawer.modal .pair figure.now{background:var(--moss-soft)}
+aside.drawer.modal .pair .arrow{stroke:var(--ink)}
+aside.drawer.modal .pill{color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:transparent}
+aside.drawer.modal .pill.g{background:var(--ink);color:var(--paper);box-shadow:none}
+aside.drawer.modal .pill.r{background:var(--kraft-soft);color:var(--warn);box-shadow:none}
+aside.drawer.modal .btn{background:var(--ink);color:var(--paper)}
+aside.drawer.modal .up{color:var(--warn)} aside.drawer.modal .down{color:var(--good)}
+aside.drawer.modal .dots i{background:var(--line)} aside.drawer.modal .dots i.on{background:var(--ink)}
+aside.drawer.modal .buy a{background:var(--sheet);border:1px solid var(--line);color:var(--ink);border-radius:4px}
+aside.drawer.modal .buy a span,aside.drawer.modal .buy em{color:var(--muted)} aside.drawer.modal .buy a::after{color:var(--ink)}
+aside.drawer.modal .src,aside.drawer.modal .src a,aside.drawer.modal a{color:var(--muted)}
+aside.drawer.modal .dclose{background:transparent;color:var(--ink);opacity:1}
+aside.drawer.modal img{filter:var(--shadow)}
+.modal .dclose{background:var(--paper)}
+
+/* big figures: serif numerals */
+.big b,.stat3 b,.case-n,.ctab b{font-family:var(--serif);font-weight:400;letter-spacing:-.03em}
+.stat3 b{font-size:clamp(40px,4.4vw,56px)}
+.stat3 span{font-size:12px;letter-spacing:.02em;color:var(--muted)}
+
+/* ideate board and rail: flat, hairline */
+.board{background-image:none;background-color:var(--sheet);border:1px solid var(--line);border-radius:4px;box-shadow:none}
+.rail{background:var(--paper)}
+.mcard{background:var(--sheet);border:1px solid var(--line);border-radius:4px;box-shadow:none}
+.mcard h4{font-family:var(--serif);font-size:20px}
+.promptbar{background:var(--paper);border:1px solid var(--ink);border-radius:999px;box-shadow:none}
+.tools{background:var(--paper);border:1px solid var(--line);border-radius:4px;box-shadow:none}
+.tool[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+/* companies and specs: hairline rows */
+.corow:hover,.corow:focus-visible{background:var(--sheet)}
+.corow .bar{background:var(--ink)}
+.corow .bar.v{background:linear-gradient(90deg,var(--ink) var(--v),var(--moss-soft) var(--v))}
+.spec>div{border-bottom:1px solid var(--line);padding-bottom:8px}
+.pair figure,.cofmt figure,.alt,.ideas .idea,.idea{background:var(--sheet);border:1px solid var(--line);border-radius:4px}
+.pair figure.now{background:var(--moss-soft)}
+.ctab>div{background:var(--sheet);border:1px solid var(--line);border-radius:4px}
+.buy a{border-radius:4px}
+.dots i.on{background:var(--ink)}
+.hoverswap .nm .ec{color:var(--ink)}
 
 </style>
 
