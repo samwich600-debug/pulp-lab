@@ -21,7 +21,7 @@ Plastic-free packaging research and ideation site; thesis prototype for helping 
 3. To update the Claude artifact, publish `pulp-lab.html` to the URL above with the data files and any new images.
 
 ## Conventions
-- Look: minimal and serious. Warm paper (#F1F0EB), near-black ink (#0C0C0B), Instrument Serif for headlines and big numbers, Geist for everything else, hairline borders, black pills for actions, solid (not frosted) popups. Logo is still the temporary dot-grid switcher.
+- Look: minimal and serious. White paper (#FFFFFF), near-black ink (#0C0C0B), Instrument Serif for headlines and big numbers, Geist for everything else, hairline borders, black pills for actions, solid (not frosted) popups. Logo is still the temporary dot-grid switcher.
 - Product photos: unbranded, studio style, background removed, soft green-tinted shadow.
 - Cost wording: say "X% more/less than plastic, per unit", never "+X% vs plastic".
 - Numbers must be sourced and dated; mark estimates as estimates. Never invent prices; use "Quote only" when a supplier doesn't publish one.
