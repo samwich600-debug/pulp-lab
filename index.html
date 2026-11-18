@@ -907,6 +907,13 @@ aside.drawer.modal figcaption span{font-size:13px}
 .ic img{width:100%;aspect-ratio:4/3;object-fit:contain;margin-bottom:4px}
 .ic b{font-size:14px}
 .ic>span:not(.src){font-size:12.5px;color:var(--muted)}
+
+/* case popup: money spent, saved, payback */
+.money{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.money .mrow{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:baseline;font-size:14px}
+.money .mrow.ok span:last-child{color:var(--good)}
+.money .mrow.bad span:last-child{color:var(--warn)}
+@media (max-width:600px){.money .mrow{grid-template-columns:1fr;gap:2px}}
 </style>
 
 <header class="top"><div class="wrap">
@@ -1084,6 +1091,7 @@ aside.drawer.modal figcaption span{font-size:13px}
 <script src="data-prices.js" charset="utf-8"></script>
 <script src="data-shares.js" charset="utf-8"></script>
 <script src="data-case-totals.js" charset="utf-8"></script>
+<script src="data-case-money.js" charset="utf-8"></script>
 <script>
 (function(){
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -1767,6 +1775,17 @@ const OLD_PHOTO=[[/shrink/i,"c-shrink.png"],[/blister/i,"p-blister.png"],[/bottl
 const oldPhoto=from=>{ const hit=OLD_PHOTO.find(([re])=>re.test(from||"")); return hit?hit[1]:null; };
 /* tonnes in everyday terms: 1 tonne = 1,000 kg ≈ 83,000 empty plastic water bottles (12 g each, the Plastic page figure) */
 /* plastic saved next to the company's total plastic packaging, as a bar */
+/* what the switch cost or saved, and whether it paid back */
+function moneyHTML(c){
+  const m=(typeof CASE_MONEY!=="undefined")&&CASE_MONEY[c.brand+"|"+c.product];
+  const row=(lab,txt,cls)=>`<div class="mrow${cls?" "+cls:""}"><span class="label">${lab}</span><span>${esc(txt)}</span></div>`;
+  if(!m) return `<div class="money"><span class="label">Money</span><span class="src">${esc(c.brand)} hasn't published what the switch cost or saved, or whether it paid back.</span></div>`;
+  return `<div class="money"><span class="label">Money</span>
+    ${row("Spent",m.spent||"Not published")}
+    ${row("Saved",m.saved||"Not published")}
+    ${row("Did it pay back?",m.payback||"No return on investment published",m.good===true?"ok":m.good===false?"bad":"")}
+    <span class="src">Source: <a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.src)}</a>. Company-reported figures.</span></div>`;
+}
 function totalBar(c){
   const T=(typeof CASE_TOTAL!=="undefined")&&CASE_TOTAL[c.brand];
   if(c.t==null) return "";
@@ -1835,8 +1854,8 @@ function renderCases(){
       <div class="kv">
         <div class="wide"><span class="label">Switch</span><span>${esc(c.from)} → <b style="font-family:var(--body);font-size:14px">${esc(c.to)}</b></span></div>
         <div class="wide"><span class="label">Impact</span><span>${esc(c.benefit)}</span></div>
-        <div class="wide"><span class="label">Cost</span><span>${esc(c.cost)}</span></div>
       </div>
+      ${moneyHTML(c)}
       <div class="swapbox"><span class="label">Lesson for makers</span><span>${esc(c.lesson)}</span>${lessonImgs?`<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:10px">${lessonImgs}</div>`:""}</div>
       </div></div>
       <p class="src">Sources: ${c.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(n)}</a>`).join(", ")}. Company-reported figures.${br?` Branded photo © ${esc(c.brand)}${(()=>{ const u=pick(CASE_BRAND_SRC,/^Nesquik/.test(c.product)?"Nesquik":nb); try{ return u?`, via <a href="${u}" target="_blank" rel="noopener">${new URL(u).hostname}</a>`:""; }catch(_){ return ""; } })()}; shown for study, not for commercial reuse.`:""}</p>`;
