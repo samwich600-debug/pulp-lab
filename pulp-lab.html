@@ -218,6 +218,7 @@ input[type=number]{width:96px}
 .tile .art.ph{background:transparent;overflow:visible;position:relative}
 .tile:hover .art.ph,.tile:focus-visible .art.ph{background:transparent}
 .tile .art.ph img{width:100%;height:100%;object-fit:contain;display:block;transition:opacity .35s, transform .35s;filter:var(--shadow)}
+.tile.case .art.ph>img:only-child{position:absolute;inset:0}
 .tile:hover .art.ph img{transform:scale(1.06)}
 .art.ph .multi{display:grid;grid-template-columns:repeat(var(--n,1),minmax(0,1fr));gap:2px;width:100%;height:100%}
 .art.ph .multi img{height:100%}
@@ -958,9 +959,9 @@ aside.drawer.modal figcaption span{font-size:13px}
   <nav aria-label="Pages">
     <a href="#still-plastic" data-v="still-plastic">Plastic</a>
     <a href="#case-studies" data-v="case-studies">Real World</a>
-    <a href="#already-swapped" data-v="already-swapped">Swaps</a>
     <a href="#ideate" data-v="ideate">Ideate</a>
     <a href="#companies" data-v="companies">Rankings</a>
+    <a href="#already-swapped" data-v="already-swapped">Swaps</a>
     <a href="#materials" data-v="materials">Material Lab</a>
     <a href="#every-day" data-v="every-day">Every day</a>
   </nav>
