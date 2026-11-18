@@ -663,6 +663,16 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
   .cats button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 }
 
+/* Categories as a vertical timeline: a dot per category, the name appears when you hover its dot */
+.cats{width:auto;gap:2px;position:fixed}
+.cats::before{content:"";position:absolute;left:5px;top:12px;bottom:12px;width:1px;background:var(--line)}
+.cats button{position:relative;display:flex;align-items:center;gap:16px;padding:6px 0;font-size:0;color:var(--ink);background:none}
+.cats button i{position:relative;z-index:1;flex:none;width:11px;height:11px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 1px #9A9A94;transition:background .25s ease,transform .25s ease,box-shadow .25s ease}
+.cats button span{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);white-space:nowrap;opacity:0;transform:translateX(-6px);transition:opacity .25s ease,transform .25s ease;pointer-events:none}
+.cats button:hover span,.cats button:focus-visible span{opacity:1;transform:none}
+.cats button:hover i,.cats button:focus-visible i{transform:scale(1.25);box-shadow:0 0 0 1px var(--ink)}
+.cats button[aria-current="true"] i{background:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+
 </style>
 
 <header class="top"><div class="wrap">
@@ -1026,10 +1036,10 @@ function renderIndex(){
   if(tiles[0]) tiles[0].setAttribute("aria-current","true");
 }
 const ROOM_CATS=[
-  ["Kitchen",["dishsoap","sponge","storage","binliner","teabag","milk","breadbag"]],
   ["Food and drink",["bottle","soda","multipack","coldcup","lid","chips","candy","yogurt","clamshell","pod","straw","cutlery","bag","film","mailer"]],
   ["Bathroom",["shampoo","handsoap","toothpaste","toothbrush","razor","swab","deodorant","floss","toiletwrap"]],
-  ["Home and office",["jug","spray","pods","tape","hangers","blister"]]
+  ["Home and office",["jug","spray","pods","tape","hangers","blister"]],
+  ["Kitchen",["dishsoap","sponge","storage","binliner","teabag","milk","breadbag"]]
 ];
 const catSlug=n=>"cat-"+n.toLowerCase().replace(/[^a-z]+/g,"-");
 const catOrder=()=>{
@@ -1042,7 +1052,7 @@ const catOrder=()=>{
 };
 function buildCatNav(){
   const nav=$("#catNav");
-  nav.innerHTML=catOrder().map(c=>`<button type="button" data-cat="${catSlug(c.name)}">${esc(c.name)}</button>`).join("");
+  nav.innerHTML=catOrder().map(c=>`<button type="button" data-cat="${catSlug(c.name)}"><i aria-hidden="true"></i><span>${esc(c.name)}</span></button>`).join("");
   nav.onclick=e=>{ const b=e.target.closest("button[data-cat]"); if(!b) return; const m=document.getElementById(b.dataset.cat); m&&m.scrollIntoView({behavior:"smooth",block:"start"}); };
 }
 let catIO=null;
