@@ -103,6 +103,22 @@ aside.drawer.modal{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-
 .btn:disabled{opacity:.5;cursor:default}
 .btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
 .src{font-size:12px;color:var(--muted)} .src a{color:var(--muted)}
+/* savings case studies */
+.sv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 40px;max-width:1040px}
+@media (max-width:560px){.sv-grid{grid-template-columns:minmax(0,1fr);gap:32px}}
+.sv-card{background:var(--sheet);border:1px solid var(--line);border-radius:4px;padding:26px;display:grid;gap:12px;align-content:start}
+.sv-logo{height:30px;width:auto;max-width:180px;object-fit:contain;justify-self:start}
+.sv-photo{margin:0;aspect-ratio:4/3;border-radius:6px;background:#fff;border:1px solid var(--line);overflow:hidden;display:grid}
+.sv-photo img{width:100%;height:100%;object-fit:contain;display:block}
+.sv-photo.empty{place-items:center;background:var(--paper);border-style:dashed}
+.sv-photo.empty span{font-size:14px;color:#4E5A48}
+.sv-amt{font-family:var(--serif);font-size:clamp(44px,4.6vw,56px);line-height:1;letter-spacing:-.02em}
+.sv-card h3{font-size:20px;line-height:1.3;margin:0;font-weight:600}
+.sv-card p{margin:0;font-size:17px;line-height:1.6;color:var(--ink)}
+.sv-card .src{font-size:14px;line-height:1.5;color:#4E5A48}
+.cite{color:inherit;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:5px;text-decoration-color:var(--kraft);cursor:pointer}
+.cite:hover,.cite:focus-visible{text-decoration-color:var(--ink)}
+.sv-note{margin-top:28px;max-width:640px}
 /* ideate */
 .composer{max-width:720px;display:grid;gap:12px}
 .box{background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:6px;display:grid}
@@ -223,6 +239,11 @@ input[type=number]{width:96px}
 .art.ph .multi{display:grid;grid-template-columns:repeat(var(--n,1),minmax(0,1fr));gap:2px;width:100%;height:100%}
 .art.ph .multi img{height:100%}
 .eco-badge{position:absolute;left:8px;bottom:8px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--moss-soft);color:var(--moss);padding:3px 7px;border-radius:999px}
+.intro{display:grid;gap:20px;max-width:434px;margin:64px 0 144px;color:var(--ink)}
+.intro p{margin:0}
+.intro p:not(.intro-hello){font-size:17px;line-height:1.6}
+.intro-hello{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(32px,3.6vw,44px);line-height:1.05;letter-spacing:-.01em;margin-bottom:4px}
+.intro a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 .vhrow{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:44px}
 .vhrow .vh{margin-bottom:0}
 .switch{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:500;padding:6px 6px 6px 14px;border-radius:999px;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--line)}
@@ -555,7 +576,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .board{grid-template-columns:minmax(0,1fr);min-height:min(64vh,600px)}
 .rail{border-left:0;border-top:0;background:transparent;backdrop-filter:none;max-height:none;overflow:visible;padding:28px 0 0}
 .rail .stack{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
-@media (max-width:860px){.promptbar{border-radius:22px;margin-bottom:14px}}
+@media (max-width:860px){.promptbar{border-radius:22px;margin-bottom:14px}.promptbar input[type=text]{flex:1 1 100%;width:100%;min-width:0}}
 
 /* Plastic page: wider screens get five to a row, tighter spacing, no swap-count tag; the heading and subline match Real World's */
 .eco-badge{display:none}
@@ -639,8 +660,6 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 /* ---- Every day: Earth in the middle of a screen that fills up with bottles ---- */
 .ton-view{position:relative;margin:-40px calc(50% - 50vw) -120px;width:100vw;background:#fff;color:var(--ink);overflow:hidden}
 .ton-stage{position:relative;height:calc(100vh - 64px);height:calc(100dvh - 64px);min-height:560px;overflow:hidden;background:#fff}
-.ton-pile{position:absolute;inset:0;z-index:1;pointer-events:none}
-.ton-pile canvas{position:absolute;inset:0;width:100%;height:100%}
 .ton-b{position:absolute;perspective:900px;transform-style:preserve-3d}
 .ton-i{display:block;width:100%;height:100%;object-fit:contain;transform-origin:50% 50%;transform-style:preserve-3d;transform:rotateZ(var(--a)) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--s));filter:drop-shadow(calc(var(--s)*6px) calc(var(--s)*16px) calc(var(--s)*12px) rgba(0,0,0,.24))}
 .ton-b.far .ton-i{filter:blur(1px) drop-shadow(calc(var(--s)*4px) calc(var(--s)*10px) calc(var(--s)*8px) rgba(0,0,0,.16));opacity:.9}
@@ -650,9 +669,7 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
   35%{transform:rotateZ(var(--a)) rotateX(var(--rx)) rotateY(var(--ry)) scale(calc(var(--s)*1.07),calc(var(--s)*.9))}
   100%{transform:rotateZ(var(--a)) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--s))}
 }
-.ton-earth{position:absolute;left:50%;top:50%;width:min(56vmin,640px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;overflow:hidden;z-index:2}
-.ton-earth img{position:absolute;width:116%;height:116%;left:-8%;top:-8%;object-fit:cover;display:block}
-.ton-copy{position:absolute;top:22px;left:50%;transform:translateX(-50%);z-index:3;text-align:center;display:grid;gap:8px;justify-items:center;width:min(760px,92%)}
+.ton-copy{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;text-align:center;display:grid;gap:8px;justify-items:center;width:min(760px,92%)}
 .ton-copy h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3vw,42px);line-height:1.05;letter-spacing:-.02em;margin:0;background:rgba(255,255,255,.7);padding:0 10px;border-radius:6px}
 .ton-count{position:absolute;left:24px;top:18px;z-index:3;display:grid;gap:2px}
 .ton-count b{font-family:var(--serif);font-weight:400;font-size:clamp(44px,5.4vw,88px);line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.7);padding:0 6px;border-radius:6px;align-self:start}
@@ -757,10 +774,8 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 .car{all:unset;cursor:pointer;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:22px;line-height:1;color:var(--ink);background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
 .car:hover,.car:focus-visible{box-shadow:inset 0 0 0 1px var(--ink)}
 /* Material Lab: scroll left and right through the materials */
-.mats-car{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
-.mats-car .stack{display:flex;gap:clamp(14px,2vw,24px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:8px 2px 18px}
-.mats-car .stack::-webkit-scrollbar{display:none}
-.mats-car .stack>*{flex:0 0 min(240px,60%);scroll-snap-align:start}
+.mats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:clamp(14px,2vw,24px);padding:8px 0 18px}
+.mats-grid>*{min-width:0}
 /* Rankings: a company opens in place, with the same motion as the Plastic items */
 #v-companies.focusing .corows .corow:not(.cur){opacity:.35;transition:opacity .4s ease}
 #v-companies .focus.inline{grid-column:1/-1;margin:8px 0 40px}
@@ -865,6 +880,14 @@ aside.drawer.modal{background:rgba(241,240,235,.74);backdrop-filter:blur(28px) s
 #v-companies details.evidence[open] summary u{display:none}
 #v-companies details.evidence p{margin:8px 0 0}
 #v-companies .fact.hero .src{font-size:15px;color:var(--ink)}
+#v-companies details.howcalc{margin-top:10px;font-size:14px;line-height:1.5;color:var(--ink)}
+#v-companies details.howcalc summary{cursor:pointer;list-style:none;font-family:inherit;font-size:14px;font-weight:600;line-height:1.4;color:#2e6b34;text-decoration:underline;text-underline-offset:3px}
+#v-companies details.howcalc summary::-webkit-details-marker{display:none}
+#v-companies details.howcalc summary b{font-family:inherit;font-size:inherit;font-weight:inherit;line-height:inherit;letter-spacing:normal;color:inherit}
+#v-companies details.howcalc p{margin:8px 0 0;font-size:14px}
+#v-companies details.howcalc ul{margin:8px 0 0;padding-left:18px;font-size:14px}
+#v-companies details.howcalc li{margin:2px 0}
+#v-companies details.howcalc a{color:inherit}
 /* Rankings: the eco swap sits behind the clicked item */
 #v-companies .fimg.costack{position:relative}
 #v-companies .facts{grid-column:1/-1}
@@ -1010,6 +1033,7 @@ aside.drawer.modal figcaption span{font-size:13px}
     <a href="#case-studies" data-v="case-studies">Real World</a>
     <a href="#ideate" data-v="ideate">Ideate</a>
     <a href="#companies" data-v="companies">Rankings</a>
+    <a href="#savings" data-v="savings">Savings</a>
     <a href="#already-swapped" data-v="already-swapped">Swaps</a>
     <a href="#materials" data-v="materials">Material Lab</a>
     <a href="#circular" data-v="circular">Circular</a>
@@ -1035,6 +1059,12 @@ aside.drawer.modal figcaption span{font-size:13px}
   <section id="v-still-plastic" data-view class="focus-host">
     <nav class="cats" id="catNav" aria-label="Categories"></nav>
     <div class="focus" id="stillFocus" hidden></div>
+    <div class="intro">
+      <p class="intro-hello">Hello reader,</p>
+      <p>I created this index as part of my graduate thesis in the MFA Graphic Design program at ArtCenter College of Design in Fall 2026. My goal is to help leaders at companies large and small make decisions that are better for the environment.</p>
+      <p>If you have comments, suggestions, or would like to learn more, I'd love to hear from you at <a href="mailto:mko6@inside.artcenter.edu">mko6@inside.artcenter.edu</a>.</p>
+      <p class="intro-sign">– Mira Ko</p>
+    </div>
     <div class="vhrow">
       <div class="vh"><h1 id="stillTitle">Easy to make plastic-free.</h1><p id="stillSub">Tap an item to see what it leaves behind.</p></div>
       <button type="button" class="switch" id="ecoSwitch" role="switch" aria-checked="false">Show eco versions <span class="knob" aria-hidden="true"></span></button>
@@ -1045,6 +1075,64 @@ aside.drawer.modal figcaption span{font-size:13px}
     </div>
   </section>
 
+  <section id="v-savings" data-view hidden>
+    <div class="vh"><h1>Switches that saved money.</h1><p>Companies that moved to reusable or lighter packaging and kept the savings. Figures are as each source reports them. Underlined figures open the source with the matching line highlighted.</p></div>
+    <div class="sv-grid">
+      <article class="sv-card">
+        <figure class="sv-photo"><img src="img/case-wispak-shells.webp" alt="A 15-pack of reusable beverage shells (Rehrig Pacific photo)" loading="lazy"></figure>
+        <a class="sv-amt cite" href="https://www.rehrigpacific.com/about/news/when-reusables-add-up-how-wis-pak-saved-3-point-4-million-dollars-with-rehrig-pacific#:~:text=saved%20Wis-Pak%20approximately%20%243.4%20million" target="_blank" rel="noopener" title="Open the source with this line highlighted">$3.4M</a>
+        <img class="sv-logo" src="img/brand/wis-pak.png" alt="Wis-Pak logo" loading="lazy">
+        <h3>Wis-Pak · reusable beverage shells</h3>
+        <p>Kept reusable shells, which the company says last more than 100 trips, instead of one-way packaging. The figure already counts the cost of moving and sorting shells across seven plants.</p>
+        <p>Total spend: not stated by the source. Year: study published October 2024; the period it covers is not stated.</p>
+        <p class="src">Source: <a href="https://www.rehrigpacific.com/about/news/when-reusables-add-up-how-wis-pak-saved-3-point-4-million-dollars-with-rehrig-pacific" target="_blank" rel="noopener">Rehrig Pacific, Oct 2024</a>. Vendor-published study. Photo: Rehrig Pacific.</p>
+      </article>
+      <article class="sv-card">
+        <figure class="sv-photo empty"><span>Product photo to come</span></figure>
+        <a class="sv-amt cite" href="https://www.mmh.com/article/packaging_farm_saves_costs_and_labor_with_reusable_totes#:~:text=saving%20%2414%2C161%20per%20year%20in%20waxed%20cardboard%20box%20purchases" target="_blank" rel="noopener" title="Open the source with this line highlighted">$14,161/yr</a>
+        <img class="sv-logo" src="img/brand/full-belly-farm.png" alt="Full Belly Farm logo" loading="lazy">
+        <h3>Full Belly Farm · produce boxes</h3>
+        <p>An organic farm in California swapped about 8,330 waxed cardboard boxes for 2,000 reusable plastic totes in mid-2013. The saving is box purchases only; the farm also cut labor from forming, stacking and lining boxes.</p>
+        <p>About 8% of total box costs (per the 2014 RPA award page). Year: switched mid-2013, saving reported 2014.</p>
+        <p class="src">Source: <a href="https://www.mmh.com/article/packaging_farm_saves_costs_and_labor_with_reusable_totes" target="_blank" rel="noopener">Modern Materials Handling, Oct 2015</a>.</p>
+      </article>
+      <article class="sv-card">
+        <figure class="sv-photo empty"><span>Product photo to come</span></figure>
+        <span class="sv-amt">$16M</span>
+        <img class="sv-logo" src="img/brand/subaru.png" alt="Subaru of Indiana logo" loading="lazy">
+        <h3>Subaru of Indiana · reusable direct-ship parts packaging</h3>
+        <p>Reused packaging and replaced corrugated boxes with reusable versions, and eliminated about 28,000 tons of cardboard. The saving is avoided purchases of new packaging.</p>
+        <p>Total spend: not stated by the source. Year: 2015 (per the RPA case-study page).</p>
+        <p class="src">Source: <a href="https://reusables.org/reusables-library/case-studies/" target="_blank" rel="noopener">Reusable Packaging Association case studies</a>, 2015 (as the page states).</p>
+      </article>
+      <article class="sv-card">
+        <figure class="sv-photo empty"><span>Product photo to come</span></figure>
+        <span class="sv-amt">$28k/yr</span>
+        <img class="sv-logo" src="img/brand/finelite.svg" alt="Finelite logo" loading="lazy">
+        <h3>Finelite · reusable containers and tarps</h3>
+        <p>Replaced single-use packaging with reusable containers and tarps. Also eliminated 25,000 pounds of waste a year.</p>
+        <p>Total spend: not stated by the source. Year: 2013 (per the RPA award page).</p>
+        <p class="src">Source: <a href="https://reusables.org/inner-loop-library/rpa-in-the-news/2014-rpa-excellence-in-reusable-packaging-award/" target="_blank" rel="noopener">Reusable Packaging Association award pages</a>, 2013 award.</p>
+      </article>
+      <article class="sv-card">
+        <figure class="sv-photo empty"><span>Product photo to come</span></figure>
+        <span class="sv-amt">$5.6M/yr</span>
+        <h3>Cardinal Health · reusable cold-chain shipping</h3>
+        <p>Reusable packaging for refrigerated pharmaceuticals, reported as annual savings of $5.6 million plus $9.5 million in cost avoidance.</p>
+        <p>Total spend: not stated by the source. Year: not stated by the source.</p>
+        <p class="src">Source: <a href="https://reusables.org/reusables-library/case-studies/" target="_blank" rel="noopener">Reusable Packaging Association case studies</a>. The page gives no year.</p>
+      </article>
+      <article class="sv-card">
+        <figure class="sv-photo empty"><span>Product photo to come</span></figure>
+        <span class="sv-amt">$400k+</span>
+        <h3>Herman Miller · reusable furniture packaging</h3>
+        <p>Reusable packaging for furniture shipments, reported as more than $400,000 saved in packaging material and freight costs. An RPA award page gives a different figure: $46,000 a year (2012).</p>
+        <p>Total spend: not stated by the source. Year: not stated for the $400,000 figure. An RPA award page gives $46,000 a year for 2012.</p>
+        <p class="src">Source: <a href="https://reusables.org/reusables-library/case-studies/" target="_blank" rel="noopener">Reusable Packaging Association case studies</a>. The page gives no year.</p>
+      </article>
+    </div>
+    <p class="src sv-note">More named cases with audited savings are still needed. Most plastic-to-paper switches so far report projected or upfront costs, not realized savings.</p>
+  </section>
   <section id="v-already-swapped" data-view hidden class="focus-host">
     <nav class="cats" id="swapCatNav" aria-label="Swap categories"></nav>
     <div class="vh"><h1>Already on shelves, plastic-free.</h1><p>Everyday products that made the switch. Tap one to see how.</p></div>
@@ -1113,11 +1201,7 @@ aside.drawer.modal figcaption span{font-size:13px}
       <button type="button" aria-pressed="true" data-kind="common">Available now</button>
       <button type="button" aria-pressed="false" data-kind="dev">In development</button>
     </div>
-    <div class="carousel mats-car">
-      <button type="button" class="car prev" aria-label="Previous material">‹</button>
-      <div class="stack mats-stack" id="g-mats"></div>
-      <button type="button" class="car next" aria-label="Next material">›</button>
-    </div>
+    <div class="mats-grid" id="g-mats"></div>
     <section class="calc" aria-labelledby="calcT">
       <div class="vh" style="margin-bottom:28px"><span class="label">Tax and fee check</span><h2 id="calcT" style="font-size:clamp(28px,3.4vw,42px)">What plastic packaging costs in fees</h2><p>Plastic tax and packaging fees (EPR) for your pack, compared with a swap.</p></div>
       <div class="calc-grid">
@@ -1147,13 +1231,11 @@ aside.drawer.modal figcaption span{font-size:13px}
 
   <section id="v-every-day" data-view hidden class="ton-view" aria-label="Every day">
     <div class="ton-stage" id="tonStage">
-      <div class="ton-pile" id="tonPile" aria-hidden="true"><canvas id="tonCanvas"></canvas></div>
-      <div class="ton-earth"><img src="img/earth.png" alt="Planet Earth"></div>
       <div class="ton-copy">
         <span class="label">Every day</span>
         <h1>About 4,700 tonnes of plastic reach the ocean, every day.</h1>
       </div>
-      <div class="ton-count" aria-live="off"><b id="tonCount">0</b><span>tonnes so far</span></div>
+      <div class="ton-count"><b>4,700</b><span>tonnes a day</span></div>
       <p class="ton-src">OECD: 1.7 million tonnes reached the ocean in 2019; divided by 365, about 4,700 tonnes a day (a rough average).</p>
     </div>
   </section>
@@ -1386,6 +1468,13 @@ aside.drawer.modal figcaption span{font-size:13px}
       .ab-src ol{margin:10px 0 2px;padding-left:20px;display:grid;gap:6px;font-size:14px;line-height:1.45}
       .ab-src ol a{color:var(--ink)}
       .ab-src ol small{color:var(--muted);margin-left:6px}
+      .ab-thanks{display:grid;gap:14px;padding-top:26px;border-top:1px solid var(--line)}
+      .ab-thanks h2{font-family:var(--serif);font-weight:400;font-size:clamp(26px,2.6vw,34px);margin:0}
+      .ab-thanks h3{font-family:var(--body);font-size:17px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink);margin:14px 0 0}
+      .ab-thanks ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+      .ab-thanks li{font-size:16px;line-height:1.5}
+      .ab-thanks li b{font-weight:600}
+      .ab-thanks li span{color:var(--muted)}
     </style>
     <div class="vh"><span class="label">About</span><h1>Why I made this.</h1></div>
     <div class="ab">
@@ -1395,6 +1484,20 @@ aside.drawer.modal figcaption span{font-size:13px}
       <p>Every number on the site is sourced and dated, and estimates are marked as estimates.</p>
       <p class="by">I'm Mira Ko, a master's student in Graphic Design at ArtCenter College of Design. The Plastic Index is part of my thesis.</p>
       <div class="ab-src" id="abSources"></div>
+      <div class="ab-thanks">
+        <h2>Special thanks</h2>
+        <ul>
+          <li><b>Monica Schlaug</b>, Thesis Advisor · <span>Associate Chair of the Graphic Design BFA program, ArtCenter College of Design</span></li>
+          <li><b>Samantha Fleming</b>, Thesis Co-Advisor · <span>Associate Chair of the MFA in Graphic Design, ArtCenter College of Design</span></li>
+          <li><b>Amanda Mei</b> · <span>Assistant Professor, ArtCenter College of Design</span></li>
+          <li><b>Gerardo Herrera</b> · <span>Faculty Director of Packaging Design, ArtCenter College of Design</span></li>
+        </ul>
+        <h3>Interviewees</h3>
+        <ul>
+          <li><b>Daniel Hoy</b> · <span>Professor of Graphic Design and Packaging, ArtCenter College of Design</span></li>
+          <li><b>Emil Mertzel</b> · <span>Professor of Spatial Experience, ArtCenter College of Design</span></li>
+        </ul>
+      </div>
       <div class="ab-go"><a href="#still-plastic">See what's still plastic</a><a class="ghost" href="#case-studies">Real World</a><a class="ghost" href="#circular">Circular</a></div>
     </div>
   </section>
@@ -1889,17 +1992,17 @@ document.addEventListener("mouseover",e=>{
 /* Plastic page: real companies that already made this item's switch (keys are "brand|product" from data-cases.js) */
 const ITEM_CASES={
  toiletwrap:["Sainsbury's|Toilet and kitchen roll"],
- multipack:["Coca-Cola|Can multipacks","Carlsberg|Snap Pack can multipacks","Heineken UK|Green Grip multipacks","Walkers|Crisp multipacks","Tesco|Tinned food multipacks","Heinz|Canned multipacks (Beanz, soups, pasta)","Budweiser Brewing Group UK|Can multipacks (UK range)","Guinness (Diageo)|Beer can multipacks"],
+ multipack:["Wis-Pak|Reusable beverage shells","Coca-Cola|Can multipacks","Carlsberg|Snap Pack can multipacks","Heineken UK|Green Grip multipacks","Walkers|Crisp multipacks","Tesco|Tinned food multipacks","Heinz|Canned multipacks (Beanz, soups, pasta)","Budweiser Brewing Group UK|Can multipacks (UK range)","Guinness (Diageo)|Beer can multipacks"],
  chips:["Walkers|Crisp multipacks","Pringles|Crisp tube","Cadbury (Mondelēz)|Biscuit multipacks"],
  candy:["Nestlé|Smarties","Mars Wrigley Australia|Mars, Snickers, Milky Way bars","Nestlé Japan|KitKat minis bags","Quality Street (Nestlé UK)|Sweet wrappers"],
  yogurt:["Arla|Skyr and quark buckets","Quaker (PepsiCo UK)|Porridge pots"],
  icecream:["Upfield|Flora plant butter and spread tubs","Vital Proteins|Collagen Peptides canister"],
  straw:["Tetra Pak|Carton straws","Starbucks|Cold drink lids"],
- lid:["Starbucks|Cold drink lids","McDonald's UK|McFlurry","Dunkin'|Hot drink cups"],
+ lid:["Starbucks|Cold drink lids","McDonald's UK|McFlurry"],
  clamshell:["Waitrose|Organic grapes","Woolworths Australia|Fresh produce"],
  meattray:["Lidl GB|Beef mince","Woolworths Australia|Fresh produce","Asda|Steak range"],
  mealtray:["Iceland|Frozen ready meals"],
- produce:["Morrisons|Loose fruit and veg","Woolworths Australia|Fresh produce","REWE Group|Organic avocados and sweet potatoes"],
+ produce:["Morrisons|Loose fruit and veg","Woolworths Australia|Fresh produce","REWE Group|Organic avocados and sweet potatoes","Full Belly Farm|Produce boxes"],
  mailer:["H&M Group|Online order bags","Amazon|Delivery void fill (N. America)","Walmart|E-commerce mailers (US)","Nike|Online order packaging","Decathlon|Polybags and logistics packaging"],
  blister:["Gillette|Razor packs","Logitech|Mouse packaging","Hasbro|Toy and game packaging","Orkla Salvequick|Plaster packs","Colgate-Palmolive|Premium manual toothbrushes","Wilkinson Sword (Edgewell)|Hydro razor range","Dr.BEST (GSK)|GreenClean toothbrush","Marks & Spencer|Men's socks, pyjamas and underwear"],
  film:["Mattel|UNO decks"],
@@ -1915,6 +2018,8 @@ const ITEM_CASES={
  spray:["Cif (Unilever)|Ecorefill spray cleaner"],
  pods:["Finish (Reckitt)|Dishwasher tablet pouch"],
  eggs:["Ocado|Own-range refresh (530+ products)"],
+ cream:["Kiehl's|Ultra Facial Cream jar"],
+ wipes:["WaterWipes|Baby wipes"],
  coldcup:["Dunkin'|Hot drink cups"]
 };
 const caseKey=c=>c.brand+"|"+c.product;
@@ -1923,7 +2028,7 @@ function itemCasesHTML(it){
   const cs=keys.map(k=>CASES.find(c=>caseKey(c)===k)).filter(Boolean); if(!cs.length) return "";
   return `<div class="itemcases"><span class="label">Companies that already made this change</span><div class="ic-row">${cs.map(c=>{
     const nb=caseNb(c), br=caseBrandImg(c);
-    return `<button type="button" class="ic" data-case="${esc(caseKey(c))}">${br?`<img src="img/brand/${br}" alt="" loading="lazy">`:""}<b>${esc(c.brand)}</b><span>${esc(c.product)}</span><span class="src">${c.t!=null?fmt(c.t,c.t<10?1:0)+" t of plastic saved":esc(c.to)}</span></button>`; }).join("")}</div><span class="src">Tap one to read the full story on Real World.</span></div>`;
+    return `<button type="button" class="ic" data-case="${esc(caseKey(c))}">${br?`<img src="img/brand/${br}" alt="" loading="lazy">`:""}<b>${esc(c.brand)}</b><span>${esc(c.product)}</span><span class="src">${c.saved?esc(c.saved):c.t!=null?fmt(c.t,c.t<10?1:0)+" t of plastic saved":esc(c.to)}</span></button>`; }).join("")}</div><span class="src">Tap one to read the full story on Real World.</span></div>`;
 }
 /* jump to Real World and open that company's story */
 document.addEventListener("click",e=>{
@@ -1996,13 +2101,22 @@ function closeFocus(){
 }
 addEventListener("keydown",e=>{ if(e.key==="Escape"&&focusOpen) closeFocus(); });
 /* inside an open item, a click on empty space or on the big photo counts as "outside" and minimises it */
+/* Info panels close only from the white space around the image (not the image or the text) or the back button,
+   and never when the user is selecting text or the press started somewhere else */
+let pressTarget=null; document.addEventListener("mousedown",e=>{ pressTarget=e.target; },true);
+const wantsClose=(e,panel)=>{
+  if(!panel||!panel.contains(e.target)) return false;
+  if(String(window.getSelection&&window.getSelection())) return false;
+  if(pressTarget!==e.target) return false;
+  const t=e.target;
+  return t===panel || t.classList.contains("fimg") || t.classList.contains("fbody") || t.classList.contains("mtop") || t.classList.contains("mstats");
+};
 const blankHit=(t,panel)=>t===panel||!!(t.closest&&t.closest(".fimg"))||(t.classList&&(t.classList.contains("fbody")||t.classList.contains("mtop")||t.classList.contains("mstats")));
 /* Clicking anywhere outside the open item minimises it; clicking another item still switches to that one */
 document.addEventListener("click",e=>{
   if(!focusOpen) return;
   const panel=$("#stillFocus");
-  if(panel&&panel.contains(e.target)&&!blankHit(e.target,panel)) return;
-  if(e.target.closest&&e.target.closest("#g-still .tile")) return;
+  if(!wantsClose(e,panel)) return;
   closeFocus();
 });
 renderStill();
@@ -2055,8 +2169,7 @@ addEventListener("keydown",e=>{ if(e.key==="Escape"&&swapOpen) closeSwap(); });
 document.addEventListener("click",e=>{
   if(!swapOpen) return;
   const panel=$("#swapFocus");
-  if(panel&&panel.contains(e.target)&&!blankHit(e.target,panel)) return;
-  if(e.target.closest&&e.target.closest("#g-swap .tile")) return;
+  if(!wantsClose(e,panel)) return;
   closeSwap();
 });
 /* Swaps grouped like the Plastic page: each swap sits under the category of the plastic item it replaces */
@@ -2381,8 +2494,7 @@ addEventListener("keydown",e=>{ if(e.key==="Escape"&&caseOpen) caseClose(); });
 document.addEventListener("click",e=>{
   if(!caseOpen) return;
   const panel=$("#caseFocus");
-  if(panel&&panel.contains(e.target)&&!blankHit(e.target,panel)) return;
-  if(e.target.closest&&e.target.closest("#g-cases .tile")) return;
+  if(!wantsClose(e,panel)) return;
   caseClose();
 });
 renderCases();
@@ -2422,7 +2534,15 @@ renderCases();
     const shareTxt=share<1?share.toFixed(1):Math.round(share);
     return `<div class="profit graphic">
       <div class="facts">
-        <div class="fact hero"><span class="label">Portion of profit that would go to switching</span><b>${shareTxt}%</b><span class="src">of ${pr.y} profit, about ${money(premium)} a year</span></div>
+        <div class="fact hero"><span class="label">Portion of profit that would go to switching</span><b>${shareTxt}%</b><span class="src">of ${pr.y} profit, about ${money(premium)} a year</span>
+          <details class="src howcalc"><summary>ⓘ How this is worked out</summary><div>
+            <p>${fmt(c.t)} t × US$1,200 × ${(extra/100).toFixed(2)} = ${money(premium)} a year<br>${money(premium)} ÷ ${money(pr.p)} net profit = ${shareTxt}%</p>
+            <ul>
+              <li>Tonnes: <a href="${EMF[1]}" target="_blank" rel="noopener">${EMF[0]}</a></li>
+              ${c.co.startsWith("Nestl")?`<li>Net profit: <a href="https://www.nasdaq.com/press-release/solid-2024-performance-executing-plan-accelerate-growth-2025-02-13" target="_blank" rel="noopener">Nestlé 2024 results</a></li>`:`<li>Net profit: ${esc(pr.y)}, company results</li>`}
+              <li>US$1,200 per tonne of resin: assumed, no source</li>
+            </ul>
+          </div></details></div>
         <div class="fact"><span class="label">Total profit</span><b>${money(pr.p)}</b><span class="src">${pr.y}</span></div>
         <div class="fact"><span class="label">Cost per unit</span><b>${Math.abs(Math.round(extra))}% ${extra>=0?"more":"less"}</b><span class="src">than plastic, for ${esc(m.name)}</span></div>
       </div>
@@ -2494,8 +2614,7 @@ renderCases();
   document.addEventListener("click",e=>{
     if(!coOpen) return;
     const panel=$("#coFocus");
-    if(panel&&panel.contains(e.target)&&!blankHit(e.target,panel)) return;
-    if(e.target.closest&&e.target.closest("#coRows .corow")) return;
+    if(!wantsClose(e,panel)) return;
     coClose();
   });
   const open=(c,row)=>coOpenFor(c,row);
@@ -2576,7 +2695,7 @@ const REEL=[ /* free Pexels footage, trimmed; credit in each caption */
 
 /* ---------- router ---------- */
 const SHOW_HOME=false; /* video home page put away for now */
-const VIEWS=[...(SHOW_HOME?["home"]:[]),"still-plastic","already-swapped","ideate","materials","case-studies","companies","every-day","circular","about"];
+const VIEWS=[...(SHOW_HOME?["home"]:[]),"still-plastic","already-swapped","ideate","materials","case-studies","companies","savings","every-day","circular","about"];
 function route(){ const h=(location.hash||"").slice(1); const v=VIEWS.includes(h)?h:(SHOW_HOME?"home":"still-plastic"); document.body.classList.toggle("is-home",v==="home"); window.__reel&&window.__reel(v==="home");
   $$("[data-view]").forEach(s=>s.hidden=!(s.id==="v-"+v||(v==="home"&&s.id==="v-still-plastic")));
   $$("nav a").forEach(a=>a.dataset.v===v?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));
@@ -2588,6 +2707,8 @@ addEventListener("hashchange",route); route();
 })();
 
 /* ---------- ideate studio ---------- */
+/* a shorter example on phones, so the placeholder isn't cut off */
+if(matchMedia("(max-width:860px)").matches) $("#brief").placeholder="e.g. a soy candle in a jar";
 const pad=$("#pad"), surface=$("#surface"), board=$("#board"), ctx=pad.getContext("2d");
 let ops=[], cur=null, tool="pen", color="#1C1F1D";
 function fitPad(){ const r=surface.getBoundingClientRect(), d=Math.min(2,window.devicePixelRatio||1); if(!r.width) return; pad.width=Math.round(r.width*d); pad.height=Math.round(r.height*d); redraw(); }
@@ -2799,83 +2920,6 @@ show();
 })();
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-<script>
-/* Every day: water bottles (the Plastic page photo) fall under real gravity. They bounce on the ground, knock into each other and hit the Earth, and roll off to the side. The tonnes counter climbs with each bottle that drops in. */
-(()=>{
-  const stage=document.getElementById("tonStage"), canvas=document.getElementById("tonCanvas"), out=document.getElementById("tonCount");
-  if(!stage||!canvas||!out||typeof Matter==="undefined") return;
-  const {Engine,World,Bodies,Body}=Matter;
-  const TOTAL=4700, N=260, EVERY=70;
-  const ctx=canvas.getContext("2d");
-  const img=new Image(); img.src="img/p-bottle.png";
-  const R_=(lo,hi)=>lo+Math.random()*(hi-lo);
-  let started=false, engine, bodies=[], spawned=0, W=0, H=0, L=0, T=0, dpr=1, ratio=3;
-
-  function start(){
-    W=stage.clientWidth; H=stage.clientHeight; dpr=window.devicePixelRatio||1;
-    canvas.width=W*dpr; canvas.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
-    ratio=img.naturalWidth?img.naturalHeight/img.naturalWidth:3;
-    L=Math.max(288,Math.min(420,W*0.28)); T=L/ratio;
-
-    // the Earth is a real circle in the physics, matching the picture on the page
-    const sr=stage.getBoundingClientRect(), er=stage.querySelector(".ton-earth").getBoundingClientRect();
-    const ex=er.left-sr.left+er.width/2, ey=er.top-sr.top+er.height/2, ER=er.width/2;
-
-    engine=Engine.create();
-    engine.gravity.y=1; engine.positionIterations=12; engine.velocityIterations=8;
-    const ground=Bodies.rectangle(W/2,H+100,W*4,200,{isStatic:true,friction:0.9,restitution:0.15});
-    const wallL=Bodies.rectangle(-30,H/2,60,H*4,{isStatic:true});
-    const wallR=Bodies.rectangle(W+30,H/2,60,H*4,{isStatic:true});
-    const earth=Bodies.circle(ex,ey,ER,{isStatic:true,restitution:0.5,friction:0.3});
-    World.add(engine.world,[ground,wallL,wallR,earth]);
-
-    let last=performance.now();
-    function frame(now){
-      const dt=Math.min(32,now-last); last=now;
-      if(spawned<N && (spawned===0 || (now-(frame.t||0))>EVERY)){
-        frame.t=now; spawn();
-      }
-      for(let acc=dt; acc>0; acc-=16.67) Engine.update(engine,Math.min(16.67,acc));
-      draw();
-      requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-  }
-
-  function spawn(){
-    const x=R_(0.12,0.88)*W;
-    const b=Bodies.rectangle(x,-L,L,T,{
-      chamfer:{radius:T*0.42},
-      restitution:0.3, friction:0.7, frictionAir:0.004, density:0.0015
-    });
-    Body.setAngle(b,R_(0,Math.PI*2));
-    Body.setAngularVelocity(b,R_(-0.04,0.04));
-    Body.setVelocity(b,{x:R_(-1.5,1.5),y:R_(0,2)});
-    bodies.push(b); World.add(engine.world,b);
-    spawned++;
-    out.textContent=Math.round(spawned*TOTAL/N).toLocaleString("en-US");
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    bodies=bodies.filter(b=>b.position.y<H+1200);
-    bodies.forEach(b=>{
-      ctx.save();
-      ctx.translate(b.position.x,b.position.y);
-      ctx.rotate(b.angle+Math.PI/2);
-      ctx.shadowColor="rgba(0,0,0,.12)"; ctx.shadowBlur=6; ctx.shadowOffsetY=3;
-      ctx.drawImage(img,-T/2,-L/2,T,L);
-      ctx.restore();
-    });
-  }
-
-  const io=new IntersectionObserver(es=>{
-    if(es[0].isIntersecting&&!started){ started=true; io.disconnect(); if(img.complete) start(); else img.onload=start; }
-  },{threshold:.35});
-  io.observe(stage);
-})();
-</script>
 <script>
 /* Ideate: a suggested idea fills the brief and puts the cursor in it */
 document.querySelectorAll(".suggest button[data-s]").forEach(b=>b.addEventListener("click",()=>{
@@ -2885,10 +2929,4 @@ document.querySelectorAll(".suggest button[data-s]").forEach(b=>b.addEventListen
 </script>
 
 <script>
-/* Material Lab: the arrows scroll the row of materials */
-document.querySelectorAll(".mats-car").forEach(c=>{
-  const st=c.querySelector(".mats-stack"), step=()=>(st.firstElementChild?.offsetWidth||240)+24;
-  c.querySelector(".prev").onclick=()=>st.scrollBy({left:-step(),behavior:"smooth"});
-  c.querySelector(".next").onclick=()=>st.scrollBy({left:step(),behavior:"smooth"});
-});
 </script>
